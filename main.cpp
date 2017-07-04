@@ -1,5 +1,6 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
+#include <unistd.h>
 
 #include "emulator.h"
 
@@ -13,11 +14,11 @@ int main() {
     if (!glfwInit())
     {
         std::cout << "Install glfw3"<< std::endl;
+        return EXIT_FAILURE;
     }
 
-    while(1)
-        GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
-
+    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    sleep(10);
     glfwTerminate();
     return 0;
 }
