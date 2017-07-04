@@ -1,6 +1,3 @@
-//
-// Created by trent on 6/30/17.
-//
 #include <iostream>
 #include "emulator.h"
 

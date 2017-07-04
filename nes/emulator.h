@@ -1,7 +1,3 @@
-//
-// Created by trent on 6/30/17.
-//
-
 #ifndef VMOS6502_EMULATOR_H
 #define VMOS6502_EMULATOR_H
 

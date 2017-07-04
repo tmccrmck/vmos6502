@@ -4,7 +4,7 @@
 
 #include "nes/emulator.h"
 
-int main() {
+int main(int argc, char* argv[]) {
 
     std::cout << "Hello, World!" << std::endl;
     emulator *emu;
@@ -20,5 +20,5 @@ int main() {
     GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
     sleep(10);
     glfwTerminate();
-    return 0;
+    return EXIT_SUCCESS;
 }
