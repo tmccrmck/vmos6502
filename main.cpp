@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <unistd.h>
 
-#include "emulator.h"
+#include "nes/emulator.h"
 
 int main() {
 
