@@ -8,8 +8,9 @@
 
 class cpu {
 public:
-    cpu(int A);
-        int A;
+    cpu(int A, int X);
+    int A;
+    int X;
 
 
 };

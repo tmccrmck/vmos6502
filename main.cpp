@@ -1,12 +1,17 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
-#include <unistd.h>
 
 #include "nes/emulator.h"
+#include "nes/INes.h"
 
 int main(int argc, char* argv[]) {
+    if (argc != 2) {
+        std::cout << "Give rom" << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    std::cout << "Hello, World!" << std::endl;
+    loadNesFile(argv[1]);
+
     emulator *emu;
     emu = new emulator(1024, 1, 1);
     emu->run();
@@ -17,8 +22,6 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    GLFWwindow* window = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
-    sleep(10);
     glfwTerminate();
     return EXIT_SUCCESS;
 }
