@@ -1,7 +1,3 @@
-#ifndef VMOS6502_EMULATOR_H
-#define VMOS6502_EMULATOR_H
-
-
 class emulator {
 public:
     emulator(int memory_size, int eip, int esp);

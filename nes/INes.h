@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <iostream>
+#include <cstring>
 
 const int NES_MAGIC = 0x1a53454e;
 
@@ -31,12 +32,20 @@ void loadNesFile(const char* path) {
     }
 
     int prgSize = header.numPrg << 14;
-    uint8_t *PRG = new uint8_t[prgSize];
+    uint8_t* PRG = new uint8_t[prgSize];
     amount_read = fread(PRG, prgSize, 1, file);
     // TODO handle failure
 
     int chrSize = header.numChr << 13;
-    uint8_t *CHR = new uint8_t[chrSize];
+
+    uint8_t *CHR;
+    if (chrSize == 0) {
+        chrSize = 8192;
+        CHR = new uint8_t[8192];
+        memset(CHR, 0, 8192);
+    } else {
+        CHR = new uint8_t[chrSize];
+    }
 
     fclose(file);
 
