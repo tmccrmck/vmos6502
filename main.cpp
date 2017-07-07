@@ -1,6 +1,4 @@
 #include <iostream>
-#include <GLFW/glfw3.h>
-
 #include "nes/emulator.h"
 #include "nes/INes.h"
 
@@ -16,12 +14,12 @@ int main(int argc, char* argv[]) {
     emu = new emulator(1024, 1, 1);
     emu->run();
 
-    if (!glfwInit())
+    /*if (!glfwInit())
     {
         std::cout << "Install glfw3"<< std::endl;
         return EXIT_FAILURE;
     }
 
-    glfwTerminate();
+    glfwTerminate();*/
     return EXIT_SUCCESS;
 }

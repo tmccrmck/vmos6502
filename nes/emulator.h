@@ -5,6 +5,3 @@ public:
 private:
     void execute();
 };
-
-
-#endif //VMOS6502_EMULATOR_H

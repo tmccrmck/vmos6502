@@ -2,7 +2,7 @@
 
 class Cartridge {
 public:
-    Cartridge(uint8_t* PRG, uint8_t* CHR, );
+    Cartridge(uint8_t* PRG, uint8_t* CHR);
 private:
     bool initialized;
     uint8_t* PRG; // PRG-ROM banks
