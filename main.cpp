@@ -1,6 +1,7 @@
 #include <iostream>
+#include <memory>
 #include "nes/emulator.h"
-#include "nes/INes.h"
+#include "nes/ines.h"
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -10,8 +11,7 @@ int main(int argc, char* argv[]) {
 
     loadNesFile(argv[1]);
 
-    emulator *emu;
-    emu = new emulator(1024, 1, 1);
+    std::unique_ptr<emulator> emu (new emulator(1024, 1, 1));
     emu->run();
 
     /*if (!glfwInit())

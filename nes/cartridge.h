@@ -1,8 +1,8 @@
 #include <cstdint>
 
-class Cartridge {
+class cartridge {
 public:
-    Cartridge(uint8_t* PRG, uint8_t* CHR);
+    cartridge(uint8_t* PRG, uint8_t* CHR);
 private:
     bool initialized;
     uint8_t* PRG; // PRG-ROM banks
@@ -15,5 +15,4 @@ private:
     uint8_t mapper; // mapper type
     uint8_t mirror; // mirroring mode
     uint8_t battery_present; // battery present
-
 };

@@ -4,7 +4,7 @@
 
 const int NES_MAGIC = 0x1a53454e;
 
-struct Header {
+struct header {
     uint32_t magic;     // iNES cartridge file magic number
     uint8_t numPrg;    // number of 16k PRG-ROM banks
     uint8_t numChr;    // number of 8k CHR-ROM banks
@@ -22,7 +22,7 @@ void loadNesFile(const char* path) {
         return;
     }
 
-    Header header;
+    header header;
     auto amount_read = fread(&header, sizeof(header), 1, file);
     // TODO handle failure
 

@@ -10,6 +10,6 @@ if (UNIX)
 	#find_package(glfw3 REQUIRED)
 endif (UNIX)
 
-set(SOURCE_FILES main.cpp nes/emulator.cpp nes/emulator.h nes/nes.cpp nes/nes.h nes/cpu.cpp nes/cpu.h nes/INes.h nes/Cartridge.cpp nes/Cartridge.h)
+set(SOURCE_FILES main.cpp nes/emulator.cpp nes/emulator.h nes/nes.cpp nes/nes.h nes/cpu.cpp nes/cpu.h nes/ines.h nes/cartridge.cpp nes/cartridge.h)
 add_executable(vmos6502 ${SOURCE_FILES})
 target_link_libraries(vmos6502 ${GLFW_LIBRARIES})
