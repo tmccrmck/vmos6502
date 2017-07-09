@@ -9,9 +9,9 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    ines::load(argv[1]);
+    rom nes_rom = load_nes(argv[1]);
 
-    std::unique_ptr<emulator> emu (new emulator(1024, 1, 1));
+    std::unique_ptr<emulator> emu (new emulator(nes_rom));
     emu->run();
 
     /*if (!glfwInit())

@@ -1,7 +1,11 @@
+#include "rom.h"
+
 class emulator {
 public:
-    emulator(int memory_size, int eip, int esp);
+    explicit emulator(const rom &r);
+
+    emulator(const emulator &rom);
+
     void run();
 private:
-    void execute();
 };
