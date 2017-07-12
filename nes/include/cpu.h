@@ -5,6 +5,7 @@ typedef uint64_t Cycles;
 class memmap {
 public:
 	uint8_t loadb(uint16_t addr);
+	void storeb(uint16_t self, uint8_t val);
 };
 
 class Cpu {

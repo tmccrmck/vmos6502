@@ -75,9 +75,11 @@ std::array<std::string,  256> instr_names = {
 };
 
 
-Cpu::Cpu() : cycles(0), PC(0xc000), SP(0), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
+Cpu::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
 
-void Cpu::storeb(uint16_t addr, uint8_t val){}
+void Cpu::storeb(uint16_t addr, uint8_t val) {
+	mem.storeb(addr, val);
+}
 
 uint8_t Cpu::loadb(uint16_t addr) {
 	return mem.loadb(addr);
@@ -90,15 +92,18 @@ uint8_t Cpu::loadb_bump_pc() {
 }
 
 uint8_t memmap::loadb(uint16_t addr) {
+	// TODO
 	return 0;
 }
+
+void memmap::storeb(uint16_t self, uint8_t val) { return; /* TODO */ }
 
 class acc_addressing_mode {
 public:
 	uint8_t load(Cpu cpu) {
 		return cpu.A;
 	}
-	uint8_t store(Cpu cpu, uint8_t val) {
+	void store(Cpu cpu, uint8_t val) {
 		cpu.A = val;
 	}
 };
@@ -111,8 +116,14 @@ public:
 };
 
 class mem_addressing_mode {
+public:
+	uint16_t mem;
+	mem_addressing_mode(uint16_t _mem) : mem(_mem) {}
 	uint8_t load(Cpu cpu) {
-
+		return cpu.loadb(mem);
+	}
+	void store(Cpu cpu, uint8_t val) {
+		return cpu.storeb(mem, val);
 	}
 };
 
