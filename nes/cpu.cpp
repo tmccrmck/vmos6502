@@ -74,23 +74,6 @@ std::array<std::string,  256> instr_names = {
 		"SED", "SBC", "NOP", "ISC", "NOP", "SBC", "INC", "ISC",
 };
 
-
-Cpu::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
-
-void Cpu::storeb(uint16_t addr, uint8_t val) {
-	mem.storeb(addr, val);
-}
-
-uint8_t Cpu::loadb(uint16_t addr) {
-	return mem.loadb(addr);
-}
-
-uint8_t Cpu::loadb_bump_pc() {
-	auto val = loadb(PC);
-	PC += 1;
-	return val;
-}
-
 class acc_addressing_mode {
 public:
 	uint8_t load(Cpu cpu) {
@@ -113,10 +96,29 @@ public:
 	uint16_t mem;
 	mem_addressing_mode(uint16_t _mem) : mem(_mem) {}
 	uint8_t load(Cpu cpu) {
-		return cpu.loadb(mem);
+		return cpu.loadb(this->mem);
 	}
 	void store(Cpu cpu, uint8_t val) {
-		return cpu.storeb(mem, val);
+		cpu.storeb(reinterpret_cast<uint16_t>(this) + sizeof(*this), val);
 	}
 };
 
+Cpu::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
+
+void Cpu::storeb(uint16_t addr, uint8_t val) {
+	mem.storeb(addr, val);
+}
+
+uint8_t Cpu::loadb(uint16_t addr) {
+	return mem.loadb(addr);
+}
+
+uint8_t Cpu::loadb_bump_pc() {
+	auto val = this->loadb(PC);
+	PC += 1;
+	return val;
+}
+
+void Cpu::pushb(uint8_t val) {
+	this->storeb(uint16_t(0x100 + SP), val);
+}

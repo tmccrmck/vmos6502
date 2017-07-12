@@ -5,9 +5,11 @@ typedef uint64_t Cycles;
 class Cpu {
 public:
     Cpu();
+	void step();
 	uint8_t loadb(uint16_t addr);
 	void storeb(uint16_t addr, uint8_t val);
 	uint8_t loadb_bump_pc();
+	void pushb(uint8_t val);
 
     Cycles cycles;
     uint16_t PC;       // program counter
