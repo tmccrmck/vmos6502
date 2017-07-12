@@ -91,13 +91,6 @@ uint8_t Cpu::loadb_bump_pc() {
 	return val;
 }
 
-uint8_t memmap::loadb(uint16_t addr) {
-	// TODO
-	return 0;
-}
-
-void memmap::storeb(uint16_t self, uint8_t val) { return; /* TODO */ }
-
 class acc_addressing_mode {
 public:
 	uint8_t load(Cpu cpu) {
