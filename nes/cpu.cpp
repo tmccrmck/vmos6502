@@ -74,33 +74,24 @@ std::array<std::string,  256> instr_names = {
 		"SED", "SBC", "NOP", "ISC", "NOP", "SBC", "INC", "ISC",
 };
 
-class acc_addressing_mode {
-public:
-	uint8_t load(Cpu cpu) {
-		return cpu.A;
-	}
-	void store(Cpu cpu, uint8_t val) {
-		cpu.A = val;
-	}
-};
+uint8_t acc_addressing_mode::load(Cpu cpu) {
+    return cpu.A;
+}
 
-class imm_addressing_mode {
-public:
-	uint8_t load(Cpu cpu) {
-		return cpu.loadb_bump_pc();
-	}
-};
+void acc_addressing_mode::store(Cpu cpu, uint8_t val) {
+    cpu.A = val;
+}
 
-class mem_addressing_mode {
-public:
-	uint16_t mem;
-	mem_addressing_mode(uint16_t _mem) : mem(_mem) {}
-	uint8_t load(Cpu cpu) {
-		return cpu.loadb(this->mem);
-	}
-	void store(Cpu cpu, uint8_t val) {
-		cpu.storeb(this->mem, val);
-	}
+uint8_t imm_addressing_mode::load(Cpu cpu) {
+    return cpu.loadb_bump_pc();
+}
+
+uint8_t mem_addressing_mode::load(Cpu cpu) {
+    return cpu.loadb(this->mem);
+}
+
+void mem_addressing_mode::store(Cpu cpu, uint8_t val) {
+    cpu.storeb(this->mem, val);
 };
 
 Cpu::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
@@ -154,4 +145,23 @@ uint16_t Cpu::popw() {
     auto val = loadw(0x100 + uint16_t(SP) + 1);
     SP += 2;
     return val;
+}
+
+bool Cpu::get_flag(uint8_t flag) {
+    return (flags & flag) != 0;
+}
+
+void Cpu::set_flag(uint8_t flag, bool on) {
+    if (on)
+        flags = flags | flag;
+    else
+        flags = flags & !flag;
+}
+
+imm_addressing_mode Cpu::immediate() { imm_addressing_mode();}
+
+acc_addressing_mode Cpu::accumulator() { acc_addressing_mode();}
+
+mem_addressing_mode Cpu::zero_page() {
+    mem_addressing_mode(loadb_bump_pc());
 }

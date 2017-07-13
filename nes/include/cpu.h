@@ -1,6 +1,27 @@
 #include "mem.h"
 
+class Cpu;
 typedef uint64_t Cycles;
+
+class acc_addressing_mode {
+public:
+    uint8_t load(Cpu cpu);
+    void store(Cpu cpu, uint8_t val);
+};
+
+class imm_addressing_mode {
+public:
+    uint8_t load(Cpu cpu);
+};
+
+class mem_addressing_mode {
+public:
+    uint16_t mem;
+
+    explicit mem_addressing_mode(uint16_t _mem) : mem(_mem) {}
+    uint8_t load(Cpu cpu);
+    void store(Cpu cpu, uint8_t val);
+};
 
 class Cpu {
 public:
@@ -18,7 +39,9 @@ public:
     uint16_t popw();
     bool get_flag(uint8_t flag);
     void set_flag(uint8_t flag, bool on);
-
+    imm_addressing_mode immediate();
+    acc_addressing_mode accumulator();
+    mem_addressing_mode zero_page();
 
     Cycles cycles;
     uint16_t PC;       // program counter
