@@ -99,7 +99,7 @@ public:
 		return cpu.loadb(this->mem);
 	}
 	void store(Cpu cpu, uint8_t val) {
-		cpu.storeb(reinterpret_cast<uint16_t>(this) + sizeof(*this), val);
+		cpu.storeb(this->mem, val);
 	}
 };
 
@@ -109,8 +109,17 @@ void Cpu::storeb(uint16_t addr, uint8_t val) {
 	mem.storeb(addr, val);
 }
 
+void Cpu::storew(uint16_t addr, uint16_t val){
+    mem.storeb(addr, uint8_t(val & 0xff));
+    mem.storeb(addr + 1, uint8_t((val >> 8) & 0xff));
+}
+
 uint8_t Cpu::loadb(uint16_t addr) {
 	return mem.loadb(addr);
+}
+
+uint16_t Cpu::loadw(uint16_t addr) {
+    return mem.loadb(addr) | uint16_t(mem.loadb(addr + 1)) << 8;
 }
 
 uint8_t Cpu::loadb_bump_pc() {
@@ -119,6 +128,30 @@ uint8_t Cpu::loadb_bump_pc() {
 	return val;
 }
 
+uint16_t Cpu::loadw_bump_pc() {
+    auto val = this->loadw(PC);
+    PC += 1;
+    return val;
+}
+
 void Cpu::pushb(uint8_t val) {
-	this->storeb(uint16_t(0x100 + SP), val);
+	this->storeb(0x100 + uint16_t(SP), val);
+    SP -= 1;
+}
+
+void Cpu::pushw(uint16_t val) {
+    pushb(val >> 8);
+    pushb(val & 0xff);
+}
+
+uint8_t Cpu::popb() {
+    auto val = loadb(0x100 + uint16_t(SP) + 1);
+    SP += 1;
+    return val;
+}
+
+uint16_t Cpu::popw() {
+    auto val = loadw(0x100 + uint16_t(SP) + 1);
+    SP += 2;
+    return val;
 }
