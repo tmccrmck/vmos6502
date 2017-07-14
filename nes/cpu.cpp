@@ -162,4 +162,17 @@ imm_addressing_mode Cpu::immediate() { return imm_addressing_mode(); }
 
 acc_addressing_mode Cpu::accumulator() { return acc_addressing_mode(); }
 
-mem_addressing_mode Cpu::zero_page() { return mem_addressing_mode(loadb_bump_pc()); }
+mem_addressing_mode Cpu::zero_page() { return mem_addressing_mode(loadb_bump_pc() + X); }
+
+mem_addressing_mode Cpu::absolute() { return mem_addressing_mode(loadb_bump_pc()); }
+
+/**
+ * 6502 intructions
+ *
+ *
+ *
+ */
+
+template <typename mode_t> void Cpu::sta(mode_t am) { am.store(A); }
+template <typename mode_t> void stx(mode_t am) { am.store(X); }
+template <typename mode_t> void sty(mode_t am) { am.store(Y); }
