@@ -1,26 +1,36 @@
 #include "mem.h"
 
-class Cpu;
+template <class Mem> class Cpu;
 typedef uint64_t Cycles;
 
-class acc_addressing_mode {
+template <class Mem>
+class addressing_mode {
 public:
-    uint8_t load(Cpu cpu);
-    void store(Cpu cpu, uint8_t val);
+    virtual uint8_t load(Cpu<Mem> cpu) = 0;
+    virtual void store(Cpu<Mem> cpu, uint8_t val) = 0;
 };
 
-class imm_addressing_mode {
+template <class Mem>
+class acc_addressing_mode: public addressing_mode<Mem> {
 public:
-    uint8_t load(Cpu cpu);
+    uint8_t load(Cpu<Mem> cpu);
+    void store(Cpu<Mem> cpu, uint8_t val);
 };
 
-class mem_addressing_mode {
+template <class Mem>
+class imm_addressing_mode: public addressing_mode<Mem> {
+public:
+    uint8_t load(Cpu<Mem> cpu);
+};
+
+template <class Mem>
+class mem_addressing_mode: public addressing_mode<Mem> {
 public:
     uint16_t mem;
 
     explicit mem_addressing_mode(uint16_t _mem) : mem(_mem) {}
-    uint8_t load(Cpu cpu);
-    void store(Cpu cpu, uint8_t val);
+    uint8_t load(Cpu<Mem> cpu);
+    void store(Cpu<Mem> cpu, uint8_t val);
 };
 
 template <class Mem>
@@ -40,14 +50,14 @@ public:
     uint16_t popw();
     bool get_flag(uint8_t flag);
     void set_flag(uint8_t flag, bool on);
-    imm_addressing_mode immediate();
-    acc_addressing_mode accumulator();
-    mem_addressing_mode zero_page();
-	mem_addressing_mode absolute();
+    imm_addressing_mode<Mem> immediate();
+    acc_addressing_mode<Mem> accumulator();
+    mem_addressing_mode<Mem> zero_page();
+	mem_addressing_mode<Mem> absolute();
 
-	template <typename mode_t> void sta(mode_t am);
-	template <typename mode_t> void stx(mode_t am);
-	template <typename mode_t> void sty(mode_t am);
+	void sta(addressing_mode<Mem> am);
+	void stx(addressing_mode<Mem> am);
+	void sty(addressing_mode<Mem> am);
 
 
     Cycles cycles;
