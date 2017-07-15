@@ -23,6 +23,7 @@ public:
     void store(Cpu cpu, uint8_t val);
 };
 
+template <class Mem>
 class Cpu {
 public:
     Cpu();
@@ -49,7 +50,7 @@ public:
     uint8_t A;         // accumulator
     uint8_t X;         // X register
     uint8_t Y;         // Y register
-	memmap mem;
+	Mem mem;
     uint8_t flags;     // flags register
     uint8_t interrupt; // interrupt type
     int stall;
