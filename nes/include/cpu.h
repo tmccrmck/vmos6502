@@ -6,31 +6,31 @@ typedef uint64_t Cycles;
 template <class Mem>
 class AddressingMode {
 public:
-    virtual uint8_t load(Cpu<Mem> cpu) = 0;
-    virtual void store(Cpu<Mem> cpu, uint8_t val) = 0;
+    virtual uint8_t load(Cpu<Mem>& cpu) = 0;
+    virtual void store(Cpu<Mem>& cpu, uint8_t val) = 0;
 };
 
 template <class Mem>
 class AccAddressingMode: public AddressingMode<Mem> {
 public:
-    uint8_t load(Cpu<Mem> cpu);
-    void store(Cpu<Mem> cpu, uint8_t val);
+    uint8_t load(Cpu<Mem>& cpu);
+    void store(Cpu<Mem>& cpu, uint8_t val);
 };
 
 template <class Mem>
 class ImmAddressingMode: public AddressingMode<Mem> {
 public:
-    uint8_t load(Cpu<Mem> cpu);
+    uint8_t load(Cpu<Mem>& cpu);
 };
 
 template <class Mem>
 class MemoryAddressingMode: public AddressingMode<Mem> {
 public:
-    uint16_t val;
+    uint16_t cur_val;
 
-    explicit MemoryAddressingMode(uint16_t val) : val(val) {}
-    uint8_t load(Cpu<Mem> cpu);
-    void store(Cpu<Mem> cpu, uint8_t val);
+    explicit MemoryAddressingMode(uint16_t val) : cur_val(cur_val) {}
+    uint8_t load(Cpu<Mem>& cpu);
+    void store(Cpu<Mem>& cpu, uint8_t val);
 };
 
 template <class Mem>
@@ -50,14 +50,23 @@ public:
     uint16_t popw();
     bool get_flag(uint8_t flag);
     void set_flag(uint8_t flag, bool on);
+    uint8_t set_zn(uint8_t val);
+
     ImmAddressingMode<Mem> immediate();
     AccAddressingMode<Mem> accumulator();
     MemoryAddressingMode<Mem> zero_page();
 	MemoryAddressingMode<Mem> absolute();
 
+    void lda(AddressingMode<Mem> am);
+    void ldx(AddressingMode<Mem> am);
+    void ldy(AddressingMode<Mem> am);
 	void sta(AddressingMode<Mem> am);
 	void stx(AddressingMode<Mem> am);
 	void sty(AddressingMode<Mem> am);
+
+    void anda(AddressingMode<Mem> am);
+    void ora(AddressingMode<Mem> am);
+    void xora(AddressingMode<Mem> am);
 
 
     Cycles cycles;

@@ -1,5 +1,15 @@
 #include <array>
+#include <iomanip>
+#include <iostream>
 #include "include/cpu.h"
+
+constexpr uint8_t CARRY_FLAG    = 1 << 0;
+constexpr uint8_t ZERO_FLAG     = 1 << 1;
+constexpr uint8_t IRQ_FLAG      = 1 << 2;
+constexpr uint8_t DECIMAL_FLAG  = 1 << 3;
+constexpr uint8_t BREAK_FLAG    = 1 << 4;
+constexpr uint8_t OVERFLOW_FLAG = 1 << 6;
+constexpr uint8_t NEGATIVE_FLAG = 1 << 7;
 
 std::array<uint8_t, 256> instr_cycles = {
 	/*0x00*/ 7, 6, 2, 8, 3, 3, 5, 5, 3, 2, 2, 2, 4, 4, 6, 6, 
@@ -20,30 +30,34 @@ std::array<uint8_t, 256> instr_cycles = {
 	/*0xF0*/ 2, 5, 2, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7, 
 };
 
+// Addressing modes
+
 template <class Mem>
-uint8_t AccAddressingMode<Mem>::load(Cpu<Mem> cpu) {
+uint8_t AccAddressingMode<Mem>::load(Cpu<Mem>& cpu) {
     return cpu.A;
 }
 
 template <class Mem>
-void AccAddressingMode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
+void AccAddressingMode<Mem>::store(Cpu<Mem>& cpu, uint8_t val) {
     cpu.A = val;
 }
 
 template <class Mem>
-uint8_t ImmAddressingMode<Mem>::load(Cpu<Mem> cpu) {
+uint8_t ImmAddressingMode<Mem>::load(Cpu<Mem>& cpu) {
     return cpu.loadb_bump_pc();
 }
 
 template <class Mem>
-uint8_t MemoryAddressingMode<Mem>::load(Cpu<Mem> cpu) {
-    return cpu.loadb(this->mem);
+uint8_t MemoryAddressingMode<Mem>::load(Cpu<Mem>& cpu) {
+    return cpu.loadb(this->cur_val);
 }
 
 template <class Mem>
-void MemoryAddressingMode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
-    cpu.storeb(this->mem, val);
+void MemoryAddressingMode<Mem>::store(Cpu<Mem>& cpu, uint8_t val) {
+    cpu.storeb(this->cur_val, val);
 };
+
+// Cpu implementation
 
 template <class Mem>
 Cpu<Mem>::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
@@ -119,6 +133,13 @@ void Cpu<Mem>::set_flag(uint8_t flag, bool on) {
 }
 
 template <class Mem>
+uint8_t Cpu<Mem>::set_zn(uint8_t val){
+    set_flag(ZERO_FLAG, val == 0);
+    set_flag(NEGATIVE_FLAG, (val & 0x80) != 0);
+    return val;
+}
+
+template <class Mem>
 ImmAddressingMode<Mem> Cpu<Mem>::immediate() { return ImmAddressingMode<Mem>(); }
 
 template <class Mem>
@@ -130,12 +151,41 @@ MemoryAddressingMode<Mem> Cpu<Mem>::zero_page() { return MemoryAddressingMode<Me
 template <class Mem>
 MemoryAddressingMode<Mem> Cpu<Mem>::absolute() { return MemoryAddressingMode<Mem>(loadb_bump_pc()); }
 
+template <class Mem>
+void Cpu<Mem>::step() {
+    auto op = loadb_bump_pc();
+
+    switch(op){
+        case 0xa5: { auto v = zero_page(); lda(v); break; }
+        default: std::cerr << "Unrecognized operation: " << std::hex << op;
+
+    }
+}
+
 /**
  * 6502 instructions
  *
  *
  *
  */
+
+template <class Mem>
+void Cpu<Mem>::lda(AddressingMode<Mem> am){
+    auto val = am.load(*this);
+    A = set_zn(val);
+}
+
+template <class Mem>
+void Cpu<Mem>::ldx(AddressingMode<Mem> am){
+    auto val = am.load(*this);
+    X = set_zn(val);
+}
+
+template <class Mem>
+void Cpu<Mem>::ldy(AddressingMode<Mem> am){
+    auto val = am.load(*this);
+    Y = set_zn(val);
+}
 
 template <class Mem>
 void Cpu<Mem>::sta(AddressingMode<Mem> am) { am.store(*this, A); }
@@ -145,3 +195,21 @@ void Cpu<Mem>::stx(AddressingMode<Mem> am) { am.store(*this, X); }
 
 template <class Mem>
 void Cpu<Mem>::sty(AddressingMode<Mem> am) { am.store(*this, Y); }
+
+template <class Mem>
+void Cpu<Mem>::anda(AddressingMode<Mem> am) {
+    auto val = am.load(*this) & A;
+    A = set_zn(val);
+}
+
+template <class Mem>
+void Cpu<Mem>::ora(AddressingMode<Mem> am) {
+    auto val = am.load(*this) | A;
+    A = set_zn(val);
+}
+
+template <class Mem>
+void Cpu<Mem>::xora(AddressingMode<Mem> am) {
+    auto val = am.load(*this) ^ A;
+    A = set_zn(val);
+}
