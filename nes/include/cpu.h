@@ -43,6 +43,12 @@ public:
     imm_addressing_mode immediate();
     acc_addressing_mode accumulator();
     mem_addressing_mode zero_page();
+	mem_addressing_mode absolute();
+
+	template <typename mode_t> void sta(mode_t am);
+	template <typename mode_t> void stx(mode_t am);
+	template <typename mode_t> void sty(mode_t am);
+
 
     Cycles cycles;
     uint16_t PC;       // program counter
