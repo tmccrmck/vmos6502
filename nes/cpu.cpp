@@ -21,27 +21,27 @@ std::array<uint8_t, 256> instr_cycles = {
 };
 
 template <class Mem>
-uint8_t acc_addressing_mode<Mem>::load(Cpu<Mem> cpu) {
+uint8_t AccAddressingMode<Mem>::load(Cpu<Mem> cpu) {
     return cpu.A;
 }
 
 template <class Mem>
-void acc_addressing_mode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
+void AccAddressingMode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
     cpu.A = val;
 }
 
 template <class Mem>
-uint8_t imm_addressing_mode<Mem>::load(Cpu<Mem> cpu) {
+uint8_t ImmAddressingMode<Mem>::load(Cpu<Mem> cpu) {
     return cpu.loadb_bump_pc();
 }
 
 template <class Mem>
-uint8_t mem_addressing_mode<Mem>::load(Cpu<Mem> cpu) {
+uint8_t MemoryAddressingMode<Mem>::load(Cpu<Mem> cpu) {
     return cpu.loadb(this->mem);
 }
 
 template <class Mem>
-void mem_addressing_mode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
+void MemoryAddressingMode<Mem>::store(Cpu<Mem> cpu, uint8_t val) {
     cpu.storeb(this->mem, val);
 };
 
@@ -119,29 +119,29 @@ void Cpu<Mem>::set_flag(uint8_t flag, bool on) {
 }
 
 template <class Mem>
-imm_addressing_mode<Mem> Cpu<Mem>::immediate() { return imm_addressing_mode<Mem>(); }
+ImmAddressingMode<Mem> Cpu<Mem>::immediate() { return ImmAddressingMode<Mem>(); }
 
 template <class Mem>
-acc_addressing_mode<Mem> Cpu<Mem>::accumulator() { return acc_addressing_mode<Mem>(); }
+AccAddressingMode<Mem> Cpu<Mem>::accumulator() { return AccAddressingMode<Mem>(); }
 
 template <class Mem>
-mem_addressing_mode<Mem> Cpu<Mem>::zero_page() { return mem_addressing_mode<Mem>(loadb_bump_pc() + X); }
+MemoryAddressingMode<Mem> Cpu<Mem>::zero_page() { return MemoryAddressingMode<Mem>(loadb_bump_pc() + X); }
 
 template <class Mem>
-mem_addressing_mode<Mem> Cpu<Mem>::absolute() { return mem_addressing_mode<Mem>(loadb_bump_pc()); }
+MemoryAddressingMode<Mem> Cpu<Mem>::absolute() { return MemoryAddressingMode<Mem>(loadb_bump_pc()); }
 
 /**
- * 6502 intructions
+ * 6502 instructions
  *
  *
  *
  */
 
 template <class Mem>
-void Cpu<Mem>::sta(addressing_mode<Mem> am) { am.store(*this, A); }
+void Cpu<Mem>::sta(AddressingMode<Mem> am) { am.store(*this, A); }
 
 template <class Mem>
-void Cpu<Mem>::stx(addressing_mode<Mem> am) { am.store(*this, X); }
+void Cpu<Mem>::stx(AddressingMode<Mem> am) { am.store(*this, X); }
 
 template <class Mem>
-void Cpu<Mem>::sty(addressing_mode<Mem> am) { am.store(*this, Y); }
+void Cpu<Mem>::sty(AddressingMode<Mem> am) { am.store(*this, Y); }
