@@ -2,6 +2,7 @@
 #include <memory>
 #include "nes/include/emulator.h"
 #include "nes/include/ines.h"
+#include "nes/include/cpu.h"
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -9,10 +10,8 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
     }
 
-    rom nes_rom = load_nes(argv[1]);
-
-    std::unique_ptr<emulator> emu (new emulator(nes_rom));
-    emu->run();
+    auto nes_rom = load_nes(argv[1]);
+    //auto cpu = std::make_unique<Cpu<>>();
 
     /*if (!glfwInit())
     {

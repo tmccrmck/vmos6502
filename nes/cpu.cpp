@@ -62,25 +62,17 @@ void MemoryAddressingMode<Mem>::store(Cpu<Mem>& cpu, uint8_t val) {
 template <class Mem>
 Cpu<Mem>::Cpu() : cycles(0), PC(0xc000), SP(0xfd), A(0), X(0), Y(0), flags(0x24), interrupt(0), stall(0) {}
 
+
 template <class Mem>
-void Cpu<Mem>::storeb(uint16_t addr, uint8_t val) {
-	mem.storeb(addr, val);
-}
+void Cpu<Mem>::storeb(uint16_t addr, uint8_t val) { mem.storeb(addr, val); }
+
 template <class Mem>
-void Cpu<Mem>::storew(uint16_t addr, uint16_t val){
-    mem.storeb(addr, uint8_t(val & 0xff));
-    mem.storeb(addr + 1, uint8_t((val >> 8) & 0xff));
-}
-template <class Mem> 
 uint8_t Cpu<Mem>::loadb(uint16_t addr) {
 	return mem.loadb(addr);
 }
 
-template <class Mem> 
-uint16_t Cpu<Mem>::loadw(uint16_t addr) {
-    return mem.loadb(addr) | uint16_t(mem.loadb(addr + 1)) << 8;
-}
-template <class Mem> 
+
+template <class Mem>
 uint8_t Cpu<Mem>::loadb_bump_pc() {
 	auto val = this->loadb(PC);
 	PC += 1;

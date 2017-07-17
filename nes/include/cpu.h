@@ -34,7 +34,7 @@ public:
 };
 
 template <class Mem>
-class Cpu {
+class Cpu: public Mem {
 public:
     Cpu();
 	void step();
