@@ -28,7 +28,7 @@ class MemoryAddressingMode: public AddressingMode<Mem> {
 public:
     uint16_t cur_val;
 
-    explicit MemoryAddressingMode(uint16_t val) : cur_val(cur_val) {}
+    explicit MemoryAddressingMode(uint16_t val) : cur_val(val) {}
     uint8_t load(Cpu<Mem>& cpu);
     void store(Cpu<Mem>& cpu, uint8_t val);
 };
