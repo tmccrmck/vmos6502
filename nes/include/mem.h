@@ -1,3 +1,6 @@
+#include <stdint.h>
+#include <array>
+
 class Mem {
 public:
     Mem();
@@ -16,12 +19,16 @@ public:
     }
 };
 
-class Ram : public Mem{
+class Ram : public Mem {
 public:
-    std::array<uint8_t, 0x800> val;
+    std::array<uint16_t, 2048> val;
+
+	uint8_t loadb(uint16_t addr) {
+		return 1;
+	}
 
     void storeb(uint16_t addr, uint8_t val) {
-        Mem::storeb(addr, val);
+		return;
     }
 };
 
@@ -36,7 +43,6 @@ public:
     }
 
     void storeb(uint16_t self, uint8_t val) { return; /* TODO */ }
-private:
     Ram ram;
 };
 
