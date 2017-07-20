@@ -161,6 +161,8 @@ void Cpu<Mem>::step() {
  *
  */
 
+// loads
+
 template <class Mem>
 void Cpu<Mem>::lda(AddressingMode<Mem> am){
     auto val = am.load(*this);
@@ -179,6 +181,8 @@ void Cpu<Mem>::ldy(AddressingMode<Mem> am){
     Y = set_zn(val);
 }
 
+// stores
+
 template <class Mem>
 void Cpu<Mem>::sta(AddressingMode<Mem> am) { am.store(*this, A); }
 
@@ -187,6 +191,43 @@ void Cpu<Mem>::stx(AddressingMode<Mem> am) { am.store(*this, X); }
 
 template <class Mem>
 void Cpu<Mem>::sty(AddressingMode<Mem> am) { am.store(*this, Y); }
+
+// arithmetic
+
+template <class Mem>
+void Cpu<Mem>::adc(AddressingMode<Mem> am) {
+	auto val = am.load(*this);
+	auto result = uint32_t(A) + uint32_t(val);
+	if (get_flags(CARRY_FLAG))
+		result += 1;
+	set_flag(CARRY_FLAG, (result & 0x100) != 0);
+	result = uint8_t(result);
+	set_flag(OVERFLOW_FLAG, (self.regs.a ^ val) & 0x80 == 0 && (self.regs.a ^ result) & 0x80 == 0x80);
+	A = set_zn(result);
+}
+
+template <class Mem>
+void Cpu<Mem>::sbc(AddressingMode<Mem> am) {
+	auto val = am.load(*this);
+	auto result = uint32_t(A) - uint32_t(val);
+	if (!get_flags(CARRY_FLAG))
+		result -= 1;
+	set_flag(CARRY_FLAG, (result & 0x100) != 0);
+	result = uint8_t(result);
+	set_flag(OVERFLOW_FLAG, (self.regs.a ^ result) & 0x80 != 0 && (self.regs.a ^ val) & 0x80 == 0x80);
+	A = set_zn(result);
+}
+
+// comparisons
+
+void Cpu<Mem>::cmp_base(uint8_t reg, AddressingMode<Mem> am) {
+	auto v = am.load(*this);
+	auto result = uint32_t(reg) - uint32_t(v);
+	set_flag(CARRY_FLAG, (result & 0x100) == 0);
+	set_zn(result);
+}
+
+// bitwise
 
 template <class Mem>
 void Cpu<Mem>::anda(AddressingMode<Mem> am) {

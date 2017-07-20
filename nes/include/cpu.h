@@ -64,6 +64,14 @@ public:
 	void stx(AddressingMode<Mem> am);
 	void sty(AddressingMode<Mem> am);
 
+	void adc(AddressingMode<Mem> am);
+	void sbc(AddressingMode<Mem> am);
+
+	void cmp_base(uint8_t reg, AddressingMode<Mem> am);
+	void cmp(AddressingMode<Mem> am);
+	void cmpx(AddressingMode<Mem> am);
+	void cmpy(AddressingMode<Mem> am);
+
     void anda(AddressingMode<Mem> am);
     void ora(AddressingMode<Mem> am);
     void xora(AddressingMode<Mem> am);
