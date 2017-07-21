@@ -220,6 +220,7 @@ void Cpu<Mem>::sbc(AddressingMode<Mem> am) {
 
 // comparisons
 
+template <class Mem>
 void Cpu<Mem>::cmp_base(uint8_t reg, AddressingMode<Mem> am) {
 	auto v = am.load(*this);
 	auto result = uint32_t(reg) - uint32_t(v);

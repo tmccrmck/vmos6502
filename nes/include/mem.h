@@ -1,9 +1,10 @@
 #include <stdint.h>
 #include <array>
 
-class Mem {
+class Memory {
 public:
-    Mem();
+    Memory();
+	virtual ~Memory();
 
     virtual uint8_t loadb(uint16_t addr) = 0;
 
@@ -19,7 +20,7 @@ public:
     }
 };
 
-class Ram : public Mem {
+class Ram : public Memory {
 public:
     std::array<uint16_t, 2048> val;
 
@@ -33,7 +34,7 @@ public:
 };
 
 
-class Memmap: public Mem {
+class Memmap: public Memory {
 public:
     Memmap(const Ram &ram) : ram(ram) {}
 
