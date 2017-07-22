@@ -77,6 +77,13 @@ public:
     void xora(AddressingMode<Mem> am);
 	void bit(AddressingMode<Mem> am);
 
+    void shl_base(bool lsb, AddressingMode<Mem> am);
+    void shr_base(bool msb, AddressingMode<Mem> am);
+	void rol(AddressingMode<Mem> am);
+	void ror(AddressingMode<Mem> am);
+	void asl(AddressingMode<Mem> am);
+	void lsr(AddressingMode<Mem> am);
+
 
     Cycles cycles;
     uint16_t PC;       // program counter

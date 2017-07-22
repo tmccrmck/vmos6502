@@ -259,8 +259,52 @@ void Cpu<Mem>::xora(AddressingMode<Mem> am) {
 
 template <class Mem>
 void Cpu<Mem>::bit(AddressingMode<Mem> am) {
-	auto val = am.load(this);
+	auto val = am.load(*this);
 	set_flag(ZERO_FLAG, (val & A) == 0);
     set_flag(NEGATIVE_FLAG, (val & 0x80) != 0);
     set_flag(OVERFLOW_FLAG, (val & 0x40) != 0);
 }
+
+// shifts
+template <class Mem>
+void Cpu<Mem>::shl_base(bool lsb, AddressingMode<Mem> am) {
+    auto val = am.load(*this);
+    auto new_carry = (val & 0x80) != 0;
+    auto result = val << 1;
+    if (lsb)
+        result |= 1;
+    set_flag(CARRY_FLAG, new_carry);
+    val = set_zn(uint8_t(result));
+    am.store(*this, val);
+}
+
+template <class Mem>
+void Cpu<Mem>::shr_base(bool msb, AddressingMode<Mem> am) {
+    auto val = am.load(*this);
+    auto new_carry = (val & 0x1) != 0;
+    auto result = val >> 1;
+    if (msb)
+        result |= 0x80;
+    set_flag(CARRY_FLAG, new_carry);
+    val = set_zn(uint8_t(result));
+    am.store(*this, val);
+}
+
+template <class Mem>
+void Cpu<Mem>::rol(AddressingMode<Mem> am) {
+    auto val = get_flag(CARRY_FLAG);
+    shl_base(val, am);
+}
+
+template <class Mem>
+void Cpu<Mem>::ror(AddressingMode<Mem> am) {
+    auto val = get_flag(CARRY_FLAG);
+    shr_base(val, am);
+
+}
+
+template <class Mem>
+void Cpu<Mem>::asl(AddressingMode<Mem> am) { shl_base(false, am); }
+
+template <class Mem>
+void Cpu<Mem>::lsr(AddressingMode<Mem> am) { shr_base(false, am); }
