@@ -75,6 +75,7 @@ public:
     void anda(AddressingMode<Mem> am);
     void ora(AddressingMode<Mem> am);
     void xora(AddressingMode<Mem> am);
+	void bit(AddressingMode<Mem> am);
 
 
     Cycles cycles;

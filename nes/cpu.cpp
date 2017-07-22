@@ -228,6 +228,15 @@ void Cpu<Mem>::cmp_base(uint8_t reg, AddressingMode<Mem> am) {
 	set_zn(result);
 }
 
+template <class Mem>
+void Cpu<Mem>::cmp(AddressingMode<Mem> am) { cmp_base(A); }
+
+template <class Mem>
+void Cpu<Mem>::cmpx(AddressingMode<Mem> am) { cmp_base(X); }
+
+template <class Mem>
+void Cpu<Mem>::cmpy(AddressingMode<Mem> am) { cmp_base(Y); }
+
 // bitwise
 
 template <class Mem>
@@ -246,4 +255,10 @@ template <class Mem>
 void Cpu<Mem>::xora(AddressingMode<Mem> am) {
     auto val = am.load(*this) ^ A;
     A = set_zn(val);
+}
+
+template <class Mem>
+void Cpu<Mem>::bit(AddressingMode<Mem> am) {
+	auto val = am.load(this);
+	set_flag(ZERO_FLAG, )
 }
