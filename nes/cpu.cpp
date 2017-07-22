@@ -198,11 +198,11 @@ template <class Mem>
 void Cpu<Mem>::adc(AddressingMode<Mem> am) {
 	auto val = am.load(*this);
 	auto result = uint32_t(A) + uint32_t(val);
-	if (get_flags(CARRY_FLAG))
+	if (get_flag(CARRY_FLAG))
 		result += 1;
 	set_flag(CARRY_FLAG, (result & 0x100) != 0);
 	result = uint8_t(result);
-	set_flag(OVERFLOW_FLAG, (self.regs.a ^ val) & 0x80 == 0 && (self.regs.a ^ result) & 0x80 == 0x80);
+	set_flag(OVERFLOW_FLAG, ((A ^ val) & 0x80) == 0 && ((A ^ result) & 0x80) == 0x80);
 	A = set_zn(result);
 }
 
@@ -210,11 +210,11 @@ template <class Mem>
 void Cpu<Mem>::sbc(AddressingMode<Mem> am) {
 	auto val = am.load(*this);
 	auto result = uint32_t(A) - uint32_t(val);
-	if (!get_flags(CARRY_FLAG))
+	if (!get_flag(CARRY_FLAG))
 		result -= 1;
 	set_flag(CARRY_FLAG, (result & 0x100) != 0);
 	result = uint8_t(result);
-	set_flag(OVERFLOW_FLAG, (self.regs.a ^ result) & 0x80 != 0 && (self.regs.a ^ val) & 0x80 == 0x80);
+	set_flag(OVERFLOW_FLAG, ((A ^ result) & 0x80) != 0 && ((A ^ val) & 0x80) == 0x80);
 	A = set_zn(result);
 }
 
@@ -229,13 +229,13 @@ void Cpu<Mem>::cmp_base(uint8_t reg, AddressingMode<Mem> am) {
 }
 
 template <class Mem>
-void Cpu<Mem>::cmp(AddressingMode<Mem> am) { cmp_base(A); }
+void Cpu<Mem>::cmp(AddressingMode<Mem> am) { cmp_base(A, am); }
 
 template <class Mem>
-void Cpu<Mem>::cmpx(AddressingMode<Mem> am) { cmp_base(X); }
+void Cpu<Mem>::cmpx(AddressingMode<Mem> am) { cmp_base(X, am); }
 
 template <class Mem>
-void Cpu<Mem>::cmpy(AddressingMode<Mem> am) { cmp_base(Y); }
+void Cpu<Mem>::cmpy(AddressingMode<Mem> am) { cmp_base(Y, am); }
 
 // bitwise
 
@@ -260,5 +260,7 @@ void Cpu<Mem>::xora(AddressingMode<Mem> am) {
 template <class Mem>
 void Cpu<Mem>::bit(AddressingMode<Mem> am) {
 	auto val = am.load(this);
-	set_flag(ZERO_FLAG, )
+	set_flag(ZERO_FLAG, (val & A) == 0);
+    set_flag(NEGATIVE_FLAG, (val & 0x80) != 0);
+    set_flag(OVERFLOW_FLAG, (val & 0x40) != 0);
 }
