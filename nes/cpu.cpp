@@ -308,3 +308,94 @@ void Cpu<Mem>::asl(AddressingMode<Mem> am) { shl_base(false, am); }
 
 template <class Mem>
 void Cpu<Mem>::lsr(AddressingMode<Mem> am) { shr_base(false, am); }
+
+template <class Mem>
+void Cpu<Mem>::inc(AddressingMode<Mem> am) {
+    auto val = am.load(*this);
+    val = set_zn(val + 1);
+    am.store(*this, val);
+}
+
+template <class Mem>
+void Cpu<Mem>::dec(AddressingMode<Mem> am) {
+    auto val = am.load(*this);
+    val = set_zn(val - 1);
+    am.store(*this, val);
+}
+
+template <class Mem>
+void Cpu<Mem>::clc() { set_flag(CARRY_FLAG, false); }
+
+template <class Mem>
+void Cpu<Mem>::sec() { set_flag(CARRY_FLAG, true); }
+
+template <class Mem>
+void Cpu<Mem>::sed() { set_flag(DECIMAL_FLAG, true); }
+
+template <class Mem>
+void Cpu<Mem>::clv() { set_flag(OVERFLOW_FLAG, false); }
+
+template <class Mem>
+void Cpu<Mem>::cli() { set_flag(IRQ_FLAG, false); }
+
+template <class Mem>
+void Cpu<Mem>::sei() { set_flag(IRQ_FLAG, true); }
+
+template <class Mem>
+void Cpu<Mem>::cld() { set_flag(DECIMAL_FLAG, false); }
+
+template <class Mem>
+void Cpu<Mem>::bra_base(bool cond) {
+    auto disp = loadb_bump_pc();
+    if (cond) {
+        PC = (PC + disp);
+    }
+}
+
+template <class Mem>
+void Cpu<Mem>::bpl() {
+    auto flag = !get_flag(NEGATIVE_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bmi() {
+    auto flag = get_flag(NEGATIVE_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bvc() {
+    auto flag = !get_flag(OVERFLOW_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bvs() {
+    auto flag = get_flag(OVERFLOW_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bcc() {
+    auto flag = !get_flag(CARRY_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bcs() {
+    auto flag = get_flag(CARRY_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::bne() {
+    auto flag = !get_flag(ZERO_FLAG);
+    bra_base(flag);
+}
+
+template <class Mem>
+void Cpu<Mem>::beq() {
+    auto flag = get_flag(ZERO_FLAG);
+    bra_base(flag);
+}

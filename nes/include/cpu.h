@@ -84,6 +84,40 @@ public:
 	void asl(AddressingMode<Mem> am);
 	void lsr(AddressingMode<Mem> am);
 
+    void inc(AddressingMode<Mem> am);
+    void dec(AddressingMode<Mem> am);
+
+    void inx() { X = set_zn(X + 1); }
+    void dex() { X = set_zn(X - 1); }
+    void iny() { Y = set_zn(Y + 1); }
+    void dey() { Y = set_zn(Y - 1); }
+
+    // Register moves
+    void tax() { X = set_zn(A); }
+    void tay() { Y = set_zn(A); }
+    void txa() { A = set_zn(X); }
+    void tya() { A = set_zn(Y); }
+    void txs() { SP = X; }
+    void tsx() { X = set_zn(PC); }
+
+    void clc();
+    void sec();
+    void cli();
+    void sei();
+    void clv();
+    void cld();
+    void sed();
+
+    // Branches
+    void bra_base(bool cond);
+    void bpl();
+    void bmi();
+    void bvc();
+    void bvs();
+    void bcc();
+    void bcs();
+    void bne();
+    void beq();
 
     Cycles cycles;
     uint16_t PC;       // program counter
