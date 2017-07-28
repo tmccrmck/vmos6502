@@ -71,6 +71,17 @@ uint8_t Cpu<Mem>::loadb(uint16_t addr) {
 	return mem.loadb(addr);
 }
 
+template <class Mem>
+void Cpu<Mem>::storew(uint16_t addr, uint16_t val) {
+    storeb(addr, static_cast<uint8_t>(val & 0xFF));
+    storeb(static_cast<uint16_t>(addr + 1), static_cast<uint8_t>((val >> 8) & 0xFF));
+}
+
+template <class Mem>
+uint16_t Cpu<Mem>::loadw(uint16_t addr) {
+    return loadb(addr) | loadb(addr) << 8;
+}
+
 
 template <class Mem>
 uint8_t Cpu<Mem>::loadb_bump_pc() {
