@@ -119,6 +119,19 @@ public:
     void bne();
     void beq();
 
+	void jmp();
+	void jmpi();
+
+    void jsr(); 
+    void rts(); 
+    void brk(); 
+    void rti(); 
+    void pha(); 
+    void pla(); 
+    void php(); 
+    void plp(); 
+    void nop(); 
+
     Cycles cycles;
     uint16_t PC;       // program counter
     uint8_t SP;        // stack pointer

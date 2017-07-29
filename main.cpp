@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include "nes/include/emulator.h"
 #include "nes/include/ines.h"
 #include "nes/include/cpu.h"
 

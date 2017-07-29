@@ -410,3 +410,55 @@ void Cpu<Mem>::beq() {
     auto flag = get_flag(ZERO_FLAG);
     bra_base(flag);
 }
+
+// Jumps
+template <class Mem> void Cpu<Mem>::jmp() { PC = loadw_bump_pc() }
+template <class Mem> void Cpu<Mem>::jmpi() {
+    auto addr = loadw_bump_pc();
+
+    // Replicate the famous CPU bug...
+    auto lo = loadb(addr);
+    auto hi = loadb((addr & 0xff00) | ((addr + 1) & 0x00ff));
+
+    PC = (hi << 8) | lo;
+}
+
+// Procedure calls
+template <class Mem> void Cpu<Mem>::jsr() {
+    auto addr = loadw_bump_pc();
+    pushw(PC - 1);
+    PC = addr;
+}
+
+template <class Mem> void Cpu<Mem>::rts() { PC = popw() + 1 }
+
+template <class Mem> void Cpu<Mem>::brk() {
+    pushw(PC + 1);
+    pushb(flags);    
+    set_flag(IRQ_FLAG, true);
+    PC = loadw(BRK_VECTOR);
+}
+
+template <class Mem> void Cpu<Mem>::rti() {
+    auto flags = popb();
+    set_flags(flags);
+    PC = popw(); // NB: no + 1
+}
+
+// Stack operations
+template <class Mem> void Cpu<Mem>::pha() { pushb(A) }
+
+template <class Mem> void Cpu<Mem>::pla() {
+    auto val = popb();
+    A = set_zn(val)
+}
+
+template <class Mem> void Cpu<Mem>::php() { pushb(flags | BREAK_FLAG) }
+
+template <class Mem> void Cpu<Mem>::plp() {
+    auto val = popb();
+    set_flags(val)
+}
+
+template <class Mem> void Cpu<Mem>::nop() {}
+
