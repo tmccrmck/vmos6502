@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <cstdint>
 #include <array>
 
 class Memory {
@@ -12,7 +12,7 @@ public:
 
     void storew(uint16_t addr) {
         storeb(addr, uint8_t(addr & 0xff));
-        storeb(addr + 1, uint8_t((addr >> 8) & 0xff));
+        storeb(static_cast<uint16_t>(addr + 1), uint8_t((addr >> 8) & 0xff));
     }
 
     uint16_t loadw(uint16_t addr) {

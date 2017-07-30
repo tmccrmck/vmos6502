@@ -11,6 +11,10 @@ constexpr uint8_t BREAK_FLAG    = 1 << 4;
 constexpr uint8_t OVERFLOW_FLAG = 1 << 6;
 constexpr uint8_t NEGATIVE_FLAG = 1 << 7;
 
+static uint16_t NMI_VECTOR = 0xfffa;
+static uint16_t RESET_VECTOR = 0xfffc;
+static uint16_t BRK_VECTOR = 0xfffe;
+
 std::array<uint8_t, 256> instr_cycles = {
 	/*0x00*/ 7, 6, 2, 8, 3, 3, 5, 5, 3, 2, 2, 2, 4, 4, 6, 6, 
 	/*0x10*/ 2, 5, 2, 8, 4, 4, 6, 6, 2, 4, 2, 7, 4, 4, 7, 7, 
@@ -98,7 +102,7 @@ uint16_t Cpu<Mem>::loadw_bump_pc() {
 }
 template <class Mem>
 void Cpu<Mem>::pushb(uint8_t val) {
-	this->storeb(0x100 + uint16_t(SP), val);
+	this->storeb(static_cast<uint16_t>(0x100 + uint16_t(SP)), val);
     SP -= 1;
 }
 
@@ -132,7 +136,7 @@ void Cpu<Mem>::set_flag(uint8_t flag, bool on) {
     if (on)
         flags = flags | flag;
     else
-        flags = flags & !flag;
+        flags = flags & (flag == 0u);
 }
 
 template <class Mem>
@@ -412,7 +416,7 @@ void Cpu<Mem>::beq() {
 }
 
 // Jumps
-template <class Mem> void Cpu<Mem>::jmp() { PC = loadw_bump_pc() }
+template <class Mem> void Cpu<Mem>::jmp() { PC = loadw_bump_pc(); }
 template <class Mem> void Cpu<Mem>::jmpi() {
     auto addr = loadw_bump_pc();
 
@@ -430,7 +434,7 @@ template <class Mem> void Cpu<Mem>::jsr() {
     PC = addr;
 }
 
-template <class Mem> void Cpu<Mem>::rts() { PC = popw() + 1 }
+template <class Mem> void Cpu<Mem>::rts() { PC = popw() + 1; }
 
 template <class Mem> void Cpu<Mem>::brk() {
     pushw(PC + 1);
@@ -446,18 +450,18 @@ template <class Mem> void Cpu<Mem>::rti() {
 }
 
 // Stack operations
-template <class Mem> void Cpu<Mem>::pha() { pushb(A) }
+template <class Mem> void Cpu<Mem>::pha() { pushb(A); }
 
 template <class Mem> void Cpu<Mem>::pla() {
     auto val = popb();
-    A = set_zn(val)
+    A = set_zn(val);
 }
 
-template <class Mem> void Cpu<Mem>::php() { pushb(flags | BREAK_FLAG) }
+template <class Mem> void Cpu<Mem>::php() { pushb(flags | BREAK_FLAG); }
 
 template <class Mem> void Cpu<Mem>::plp() {
     auto val = popb();
-    set_flags(val)
+    set_flags(val);
 }
 
 template <class Mem> void Cpu<Mem>::nop() {}
