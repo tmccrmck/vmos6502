@@ -37,13 +37,38 @@ public:
 class Memmap: public Memory {
 public:
     Memmap(const Ram &ram) : ram(ram) {}
+    Ram ram;
 
     uint8_t loadb(uint16_t addr) {
-        // TODO
-        return 0;
+        if(addr < 0x2000 ){
+            return ram.loadb(addr);
+        } else if( addr < 0x4000 ){
+            return ppu.loadb(addr);
+        } else if( addr == 0x4016) {
+            return input.loadb(addr);
+        } else if( addr <= 0x4018) {
+            return apu.loadb(addr);
+        } else if( addr < 0x6000 ){
+            return 0;   // FIXME: I think some mappers use regs in this area?
+        } else {
+            mapper.prg_loadb(addr);
+        }
     }
 
-    void storeb(uint16_t self, uint8_t val) { return; /* TODO */ }
-    Ram ram;
+    void storeb(uint16_t self, uint8_t val) { 
+         if (addr < 0x2000 ){
+            return ram.storeb(addr, val);
+        } else if (addr < 0x4000 ){
+            return ppu.storeb(addr, val);
+        } else if (addr == 0x4016) {
+            return input.storeb(addr, val);
+        } else if (addr <= 0x4018) {
+            return apu.storeb(addr, val);
+        } else if (addr < 0x6000 ){
+            return; // TODO?
+        } else {
+            mapper.prg_storeb(addr, val);
+        } 
+    }
 };
 
