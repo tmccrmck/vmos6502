@@ -20,6 +20,16 @@ public:
     }
 };
 
+class Ppu : public Memory {
+    uint8_t loadb(uint16_t addr) {
+        return 1;
+    }
+
+    void storeb(uint16_t addr, uint8_t val) {
+        return;
+    }
+};
+
 class Ram : public Memory {
 public:
     std::array<uint16_t, 2048> val;
@@ -38,6 +48,7 @@ class Memmap: public Memory {
 public:
     Memmap(const Ram &ram) : ram(ram) {}
     Ram ram;
+    Ppu ppu;
 
     uint8_t loadb(uint16_t addr) {
         if(addr < 0x2000 ){
