@@ -30,6 +30,17 @@ public:
     }
 };
 
+class Apu : public Memory {
+public:
+    uint8_t loadb(uint16_t addr) override {
+        return 1;
+    }
+
+    void storeb(uint16_t addr, uint8_t val) override {
+    }
+};
+
+
 class Ram : public Memory {
 public:
     std::array<uint16_t, 2048> val;
@@ -45,9 +56,10 @@ public:
 
 class Memmap: public Memory {
 public:
-    Memmap(const Ram &ram, const Ppu &ppu) : ram(ram), ppu(ppu) {}
+    Memmap(const Ram &ram, const Ppu &ppu, const Apu &apu) : ram(ram), ppu(ppu), apu(apu) {}
     Ram ram;
     Ppu ppu;
+    Apu apu;
 
     uint8_t loadb(uint16_t addr) {
         if(addr < 0x2000 ){
@@ -65,7 +77,7 @@ public:
         }
     }
 
-    void storeb(uint16_t self, uint8_t val) { 
+    void storeb(uint16_t addr, uint8_t val) {
          if (addr < 0x2000 ){
             return ram.storeb(addr, val);
         } else if (addr < 0x4000 ){
