@@ -16,17 +16,17 @@ public:
     }
 
     uint16_t loadw(uint16_t addr) {
-        return loadb(addr) | uint16_t(loadb(addr + 1)) << 8;
+        return loadb(addr) | uint16_t(loadb(static_cast<uint16_t>(addr + 1))) << 8;
     }
 };
 
 class Ppu : public Memory {
-    uint8_t loadb(uint16_t addr) {
+public:
+    uint8_t loadb(uint16_t addr) override {
         return 1;
     }
 
-    void storeb(uint16_t addr, uint8_t val) {
-        return;
+    void storeb(uint16_t addr, uint8_t val) override {
     }
 };
 
@@ -34,19 +34,18 @@ class Ram : public Memory {
 public:
     std::array<uint16_t, 2048> val;
 
-	uint8_t loadb(uint16_t addr) {
+	uint8_t loadb(uint16_t addr) override {
 		return 1;
 	}
 
-    void storeb(uint16_t addr, uint8_t val) {
-		return;
+    void storeb(uint16_t addr, uint8_t val) override {
     }
 };
 
 
 class Memmap: public Memory {
 public:
-    Memmap(const Ram &ram) : ram(ram) {}
+    Memmap(const Ram &ram, const Ppu &ppu) : ram(ram), ppu(ppu) {}
     Ram ram;
     Ppu ppu;
 

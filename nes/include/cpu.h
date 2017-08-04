@@ -39,7 +39,7 @@ public:
     Cpu();
 	void step();
 	uint8_t loadb(uint16_t addr);
-    uint16_t loadw(uint16_t addr);
+    //uint16_t loadw(uint16_t addr);
 	void storeb(uint16_t addr, uint8_t val);
     void storew(uint16_t addr, uint16_t val);
 	uint8_t loadb_bump_pc();
@@ -87,10 +87,10 @@ public:
     void inc(AddressingMode<Mem> am);
     void dec(AddressingMode<Mem> am);
 
-    void inx() { X = set_zn(X + 1); }
-    void dex() { X = set_zn(X - 1); }
-    void iny() { Y = set_zn(Y + 1); }
-    void dey() { Y = set_zn(Y - 1); }
+    void inx() { X = set_zn(static_cast<uint8_t>(X + 1)); }
+    void dex() { X = set_zn(static_cast<uint8_t>(X - 1)); }
+    void iny() { Y = set_zn(static_cast<uint8_t>(Y + 1)); }
+    void dey() { Y = set_zn(static_cast<uint8_t>(Y - 1)); }
 
     // Register moves
     void tax() { X = set_zn(A); }
@@ -98,7 +98,7 @@ public:
     void txa() { A = set_zn(X); }
     void tya() { A = set_zn(Y); }
     void txs() { SP = X; }
-    void tsx() { X = set_zn(PC); }
+    void tsx() { X = set_zn(static_cast<uint8_t>(PC)); }
 
     void clc();
     void sec();
