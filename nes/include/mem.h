@@ -22,21 +22,21 @@ public:
 
 class Ppu : public Memory {
 public:
-    uint8_t loadb(uint16_t addr) override {
+    uint8_t loadb(uint16_t addr) {
         return 1;
     }
 
-    void storeb(uint16_t addr, uint8_t val) override {
+    void storeb(uint16_t addr, uint8_t val) {
     }
 };
 
 class Apu : public Memory {
 public:
-    uint8_t loadb(uint16_t addr) override {
+    uint8_t loadb(uint16_t addr) {
         return 1;
     }
 
-    void storeb(uint16_t addr, uint8_t val) override {
+    void storeb(uint16_t addr, uint8_t val) {
     }
 };
 
@@ -45,11 +45,11 @@ class Ram : public Memory {
 public:
     std::array<uint16_t, 2048> val;
 
-	uint8_t loadb(uint16_t addr) override {
+	uint8_t loadb(uint16_t addr) {
 		return 1;
 	}
 
-    void storeb(uint16_t addr, uint8_t val) override {
+    void storeb(uint16_t addr, uint8_t val) {
     }
 };
 
