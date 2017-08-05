@@ -10,9 +10,9 @@ public:
 
     virtual void storeb(uint16_t addr, uint8_t val) = 0;
 
-    void storew(uint16_t addr) {
-        storeb(addr, uint8_t(addr & 0xff));
-        storeb(static_cast<uint16_t>(addr + 1), uint8_t((addr >> 8) & 0xff));
+    void storew(uint16_t addr, uint16_t val) {
+        storeb(addr, static_cast<uint8_t>(val & 0xff));
+        storeb(static_cast<uint16_t>(addr + 1), static_cast<uint8_t>((val >> 8) & 0xff));
     }
 
     uint16_t loadw(uint16_t addr) {
