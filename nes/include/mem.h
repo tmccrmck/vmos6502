@@ -10,12 +10,12 @@ public:
 
     virtual void storeb(uint16_t addr, uint8_t val) = 0;
 
-    void storew(uint16_t addr, uint16_t val) {
+    virtual void storew(uint16_t addr, uint16_t val) {
         storeb(addr, static_cast<uint8_t>(val & 0xff));
         storeb(static_cast<uint16_t>(addr + 1), static_cast<uint8_t>((val >> 8) & 0xff));
     }
 
-    uint16_t loadw(uint16_t addr) {
+    virtual uint16_t loadw(uint16_t addr) {
         return loadb(addr) | uint16_t(loadb(static_cast<uint16_t>(addr + 1))) << 8;
     }
 };
@@ -53,13 +53,33 @@ public:
     }
 };
 
+class Input : public Memory {
+public:
+	uint8_t loadb(uint16_t addr) {
+		return 1;
+	}
+
+    void storeb(uint16_t addr, uint8_t val) {
+    }
+};
+
+class Mapper {
+public:
+    void prg_storeb(uint16_t addr, uint8_t val) {
+    }
+
+    uint8_t prg_loadb(uint16_t addr) { return 1; }
+};
 
 class Memmap: public Memory {
 public:
-    Memmap(const Ram &ram, const Ppu &ppu, const Apu &apu) : ram(ram), ppu(ppu), apu(apu) {}
+    Memmap(const Ram &ram, const Ppu &ppu, const Apu &apu, const Input &input, const Mapper &mapper)
+            : ram(ram), ppu(ppu), apu(apu), input(input), mapper(mapper) {}
     Ram ram;
     Ppu ppu;
     Apu apu;
+    Input input;
+    Mapper mapper;
 
     uint8_t loadb(uint16_t addr) {
         if(addr < 0x2000 ){
@@ -73,7 +93,7 @@ public:
         } else if( addr < 0x6000 ){
             return 0;   // FIXME: I think some mappers use regs in this area?
         } else {
-            mapper.prg_loadb(addr);
+            return mapper.prg_loadb(addr);
         }
     }
 
@@ -89,7 +109,7 @@ public:
         } else if (addr < 0x6000 ){
             return; // TODO?
         } else {
-            mapper.prg_storeb(addr, val);
+            return mapper.prg_storeb(addr, val);
         } 
     }
 };

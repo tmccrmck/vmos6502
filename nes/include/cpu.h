@@ -26,7 +26,7 @@ public:
 template <class Mem>
 class MemoryAddressingMode: public AddressingMode<Mem> {
 public:
-    uint16_t cur_val;
+    uint16_t cur_val{};
 
     explicit MemoryAddressingMode(uint16_t val) : cur_val(val) {}
     uint8_t load(Cpu<Mem>& cpu);
@@ -39,7 +39,7 @@ public:
     Cpu();
 	void step();
 	uint8_t loadb(uint16_t addr);
-    //uint16_t loadw(uint16_t addr);
+    uint16_t loadw(uint16_t addr);
 	void storeb(uint16_t addr, uint8_t val);
     void storew(uint16_t addr, uint16_t val);
 	uint8_t loadb_bump_pc();
