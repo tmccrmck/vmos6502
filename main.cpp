@@ -56,20 +56,6 @@ void notifyPaError(const PaError err) {
 	}
 }
 
-void printState(NES* nes) {
-	printf("\rSTATUS CPU PC=%hu APU DM=%hhu P1=%hhu P2=%hhu TR=%hhu NO=%hhu PPU BG=%hhu BL=%hhu SP=%hhu SL=%hhu",
-	nes->cpu->PC,
-	nes->apu->dmc.enabled,
-	nes->apu->pulse1.enabled,
-	nes->apu->pulse2.enabled,
-	nes->apu->triangle.enabled,
-	nes->apu->noise.enabled,
-	nes->ppu->flag_show_background,
-	nes->ppu->flag_show_left_background,
-	nes->ppu->flag_show_sprites,
-	nes->ppu->flag_show_left_sprites);
-}
-
 int main(int argc, char* argv[]) {
     if (!glfwInit()) {
         throw std::runtime_error("GLFW initialization failed");
@@ -79,11 +65,10 @@ int main(int argc, char* argv[]) {
 		throw std::invalid_argument("Must provide ROM");
 	}
 
-	char* SRAM_path = new char[strlen(argv[1]) + 1];
-	strcpy(SRAM_path, argv[1]);
-	strcat(SRAM_path, ".srm");
+	std::string sram (argv[1]);
+    std::string sram_path = sram + ".srm";
 
-	NES* nes = new NES(argv[1], SRAM_path);
+	std::unique_ptr<NES> nes = std::make_unique<NES>(sram, sram_path);
 	if (!nes->initialized) return EXIT_FAILURE;
 
 	PaError err = Pa_Initialize();
@@ -172,10 +157,10 @@ int main(int argc, char* argv[]) {
 		nes->controller1->buttons = getKeys(window, turbo) | getJoy(GLFW_JOYSTICK_1, turbo);
 		nes->controller2->buttons = getJoy(GLFW_JOYSTICK_2, turbo);
 
-		if ((nes->ppu->frame & 3) == 0) printState(nes);
+		if ((nes->ppu->frame & 3) == 0) nes->printState();
 
 		// step the NES state forward by 'dt' seconds, or more if in fast-forward
-		emulate(nes, getKey(window, GLFW_KEY_GRAVE_ACCENT) ? 4.0 * dt : dt);
+		emulate(nes.get(), getKey(window, GLFW_KEY_GRAVE_ACCENT) ? 4.0 * dt : dt);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 240, 0, GL_RGBA, GL_UNSIGNED_BYTE, nes->ppu->front);
 		glfwGetFramebufferSize(window, &w, &h);
@@ -211,7 +196,7 @@ int main(int argc, char* argv[]) {
 	// save SRAM back to file
 	if (nes->cartridge->battery_present) {
 		std::cout << std::endl << "Writing SRAM..." << std::endl;
-		FILE* fp = fopen(SRAM_path, "wb");
+		FILE* fp = fopen(sram_path.c_str(), "wb");
 		if (fp == nullptr || (fwrite(nes->cartridge->SRAM, 8192, 1, fp) != 1)) {
 			std::cout << "WARN: failed to save SRAM file!" << std::endl;
 		}

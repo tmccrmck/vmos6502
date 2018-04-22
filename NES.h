@@ -168,8 +168,8 @@ struct Cartridge {
 	uint8_t mirror; // mirroring mode
 	uint8_t battery_present; // battery present
 
-	Cartridge(const char* path, const char* SRAM_path) : initialized(false) {
-		FILE* fp = fopen(path, "rb");
+	Cartridge(const std::string path, const std::string SRAM_path) : initialized(false) {
+		FILE* fp = fopen(path.c_str(), "rb");
 		if (fp == nullptr) {
 			std::cerr << "ERROR: failed to open ROM file!" << std::endl;
 			return;
@@ -239,7 +239,7 @@ struct Cartridge {
 		if (battery_present) {
 			// try to read saved SRAM
 			std::cout << "Attempting to read previously saved SRAM..." << std::endl;
-			fp = fopen(SRAM_path, "rb");
+			fp = fopen(SRAM_path.c_str(), "rb");
 			if (fp == nullptr || (fread(SRAM, 8192, 1, fp) != 1)) {
 				std::cout << "WARN: failed to open SRAM file!" << std::endl;
 			}
@@ -715,7 +715,21 @@ struct NES {
 	Mapper* mapper;
 	uint8_t* RAM;
 
-	NES(const char* path, const char* SRAM_path);
+	NES(const std::string path, const std::string SRAM_path);
+
+    void printState() {
+        printf("\rSTATUS CPU PC=%hu APU DM=%hhu P1=%hhu P2=%hhu TR=%hhu NO=%hhu PPU BG=%hhu BL=%hhu SP=%hhu SL=%hhu",
+               cpu->PC,
+               apu->dmc.enabled,
+               apu->pulse1.enabled,
+               apu->pulse2.enabled,
+               apu->triangle.enabled,
+               apu->noise.enabled,
+               ppu->flag_show_background,
+               ppu->flag_show_left_background,
+               ppu->flag_show_sprites,
+               ppu->flag_show_left_sprites);
+    }
 };
 
 struct Instruction {

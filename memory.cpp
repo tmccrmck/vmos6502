@@ -402,7 +402,7 @@ void Mapper4::updateOffsets(Cartridge* cartridge) {
 	}
 }
 
-NES::NES(const char* path, const char* SRAM_path) : initialized(false) {
+NES::NES(const std::string path, const std::string SRAM_path) : initialized(false) {
 	std::cout << "Initializing cartridge..." << std::endl;
 	cartridge = new Cartridge(path, SRAM_path);
 	if (!cartridge->initialized) return;
