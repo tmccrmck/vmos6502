@@ -154,7 +154,8 @@ struct Controller {
 	Controller() : buttons(0), index(0), strobe(0) {}
 };
 
-struct NES {
+class NES {
+public:
 	bool initialized;
 	CPU* cpu;
 	APU* apu;
@@ -165,21 +166,19 @@ struct NES {
 	Mapper* mapper;
 	byte* RAM;
 
-	NES(const std::string path, const std::string SRAM_path);
+	NES(std::string path, std::string SRAM_path);
+    void emulate(double seconds);
+    void tickAPU(APU* apu);
 
     void printState() {
-        printf("\rSTATUS CPU PC=%hu APU DM=%hhu P1=%hhu P2=%hhu TR=%hhu NO=%hhu PPU BG=%hhu BL=%hhu SP=%hhu SL=%hhu",
-               cpu->PC,
-               apu->dmc.enabled,
-               apu->pulse1.enabled,
-               apu->pulse2.enabled,
-               apu->triangle.enabled,
-               apu->noise.enabled,
-               ppu->flag_show_background,
-               ppu->flag_show_left_background,
-               ppu->flag_show_sprites,
-               ppu->flag_show_left_sprites);
-    }
+		std::cout << "CPU status: "
+			<< "PC=" << cpu->PC <<  std::endl;
+		std::cout << "APU status: "
+			<< "DM=" << apu->dmc.enabled << " P1=" << apu->pulse1.enabled << " P2=" << apu->pulse2.enabled << " TR=" << apu->triangle.enabled<< " NO=" << apu->noise.enabled << std::endl;
+		std::cout << "PPU status: "
+			<< "BG=" << unsigned(ppu->flag_show_background) << " BL=" << unsigned(ppu->flag_show_left_background) << " SP=" << unsigned(ppu->flag_show_sprites) << " SL="<< unsigned(ppu->flag_show_left_sprites) << std::endl;
+		
+	}
 };
 
 struct Instruction {

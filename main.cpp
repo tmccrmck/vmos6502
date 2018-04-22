@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 		if ((nes->ppu->frame & 3) == 0) nes->printState();
 
 		// step the NES state forward by 'dt' seconds, or more if in fast-forward
-		emulate(nes.get(), getKey(window, GLFW_KEY_GRAVE_ACCENT) ? 4.0 * dt : dt);
+		nes->emulate(getKey(window, GLFW_KEY_GRAVE_ACCENT) ? 4.0 * dt : dt);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 256, 240, 0, GL_RGBA, GL_UNSIGNED_BYTE, nes->ppu->front);
 		glfwGetFramebufferSize(window, &w, &h);

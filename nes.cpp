@@ -362,6 +362,7 @@ byte pulseOutput(Pulse* p) {
 	}
 }
 
+
 void triggerIRQ(CPU* cpu) {
 	if (getI(cpu) == 0) {
 		cpu->interrupt = interruptIRQ;
@@ -380,7 +381,7 @@ void Mapper4::updateCounter(CPU* cpu) {
 	}
 }
 
-void tickAPU(NES* nes, APU* apu) {
+void NES::tickAPU(APU* apu) {
 	uint64_t cycle1 = apu->cycle;
 	++apu->cycle;
 	uint64_t cycle2 = apu->cycle;
@@ -407,8 +408,8 @@ void tickAPU(NES* nes, APU* apu) {
 		if (d->enabled) {
 			// tick reader
 			if (d->cur_len > 0 && d->bit_count == 0) {
-				nes->cpu->stall += 4;
-				d->shift_reg = readByte(nes, d->cur_addr);
+				this->cpu->stall += 4;
+				d->shift_reg = readByte(this, d->cur_addr);
 				d->bit_count = 8;
 				++d->cur_addr;
 				if (d->cur_addr == 0) {
@@ -477,7 +478,7 @@ void tickAPU(NES* nes, APU* apu) {
 					tickSweep(apu);
 					tickLength(apu);
 					if (apu->frame_IRQ) {
-						triggerIRQ(nes->cpu);
+						triggerIRQ(this->cpu);
 					}
 					break;
 				}
@@ -530,11 +531,11 @@ void tickAPU(NES* nes, APU* apu) {
 	}
 }
 
-void emulate(NES* nes, double seconds) {
+void NES::emulate(double seconds) {
 	int cycles = static_cast<int>(CPU_FREQ * seconds + 0.5);
 	while (cycles > 0) {
 		int cpuCycles = 0;
-		CPU* cpu = nes->cpu;
+		CPU* cpu = this->cpu;
 		if (cpu->stall > 0) {
 			--cpu->stall;
 			cpuCycles = 1;
@@ -543,37 +544,37 @@ void emulate(NES* nes, double seconds) {
 			uint64_t startCycles = cpu->cycles;
 
 			if (cpu->interrupt == interruptNMI) {
-				push16(nes, cpu->PC);
-				php(cpu, nes, 0, 0);
-				cpu->PC = read16(nes, 0xFFFA);
+				push16(this, cpu->PC);
+				php(cpu, this, 0, 0);
+				cpu->PC = read16(this, 0xFFFA);
 				setI(cpu, true);
 				cpu->cycles += 7;
 			}
 			else if (cpu->interrupt == interruptIRQ) {
-				push16(nes, cpu->PC);
-				php(cpu, nes, 0, 0);
-				cpu->PC = read16(nes, 0xFFFE);
+				push16(this, cpu->PC);
+				php(cpu, this, 0, 0);
+				cpu->PC = read16(this, 0xFFFE);
 				setI(cpu, true);
 				cpu->cycles += 7;
 			}
 			cpu->interrupt = interruptNone;
-			byte opcode = readByte(nes, cpu->PC);
-			execute(nes, opcode);
+			byte opcode = readByte(this, cpu->PC);
+			execute(this, opcode);
 			cpuCycles = static_cast<int>(cpu->cycles - startCycles);
 		}
 
 		const int ppuCycles = cpuCycles * 3;
 		for (int i = 0; i < ppuCycles; ++i) {
-			PPU* ppu = nes->ppu;
-			tickPPU(nes, nes->cpu, ppu);
+			PPU* ppu = this->ppu;
+			tickPPU(this, this->cpu, ppu);
 
 			if ((ppu->cycle == 280) && (ppu->scanline <= 239 || ppu->scanline >= 261) && (ppu->flag_show_background != 0 || ppu->flag_show_sprites != 0)) {
-				nes->mapper->updateCounter(nes->cpu);
+				this->mapper->updateCounter(this->cpu);
 			}
 		}
 
 		for (int i = 0; i < cpuCycles; ++i) {
-			tickAPU(nes, nes->apu);
+			this->tickAPU(this->apu);
 		}
 		cycles -= cpuCycles;
 	}
