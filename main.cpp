@@ -1,123 +1,16 @@
-/*******************************************************************
-*   main.cpp
-*   KNES
-*
-*	Author: Kareem Omar
-*	kareem.omar@uah.edu
-*	https://github.com/komrad36
-*
-*	Last updated Dec 18, 2016
-*******************************************************************/
-//
-// Lightweight but complete NES emulator. Straightforward implementation in a
-// few thousand lines of C++.
-//
-// Written from scratch in a speedcoding challenge in just 72 hours.
-// Intended to showcase low-level and 6502 emulation, basic game loop mechanics,
-// audio, video, user interaction. Also provides a compact emulator
-// fully open and free to study and modify.
-//
-// No external dependencies except for
-// those needed for interfacing:
-// 
-// - PortAudio for sound (http://www.portaudio.com/)
-// - GLFW for video (http://www.glfw.org/)
-//
-// If you compile GLFW yourself, be sure to specify
-// shared build ('cmake -DBUILD_SHARED_LIBS=ON .')
-// or you will enter dependency hell at link-time.
-//
-// Fully cross-platform. Tested on Windows and Linux.
-//
-// Fully playable, with CPU, APU, PPU emulated and 6 of the most common
-// mappers supported (0, 1, 2, 3, 4, 7). Get a .nes v1 file and go!
-//
-// Written from scratch in a speedcoding challenge (72 hours!). This means
-// the code is NOT terribly clean. Always loved the 6502 and wanted to try
-// something crazy. Got it fully working, with 6 mappers, in 3 days.
-//
-// I tend not to like OO much, especially for speedcoding, so here it's pretty
-// much only used for mapper polymorphism.
-//
-// Usage: KNES <rom_file>
-//
-// Keymap (modify as desired in 'main.cpp'):
-// -------------------------------------
-//  Up/Down/Left/Right   |  Arrow Keys
-//  Start                |  Enter
-//  Select               |  Right Shift
-//  A                    |  Z
-//  B                    |  X
-//  Turbo A              |  S
-//  Turbo B              |  D
-// -------------------------------------
-// Emulator keys:
-//  Tilde                |  Fast-forward
-//  Escape               |  Quit
-//  ALT+F4               |  Quit
-// -------------------------------------
-//
-// The display window can be freely resized at runtime.
-// You can also set proper full-screen mode at the top
-// of 'main.cpp', and also enable V-SYNC if you are
-// experiencing tearing issues.
-//
-// I love the 6502 and am relatively confident in the CPU emulation
-// but have much less knowledge about the PPU and APU
-// and am sure at least a few things are wrong here and there.
-//
-// Feel free to correct and/or teach me about the PPU and APU!
-//
-// Major thanks to http://www.6502.org/ for CPU ref, and especially
-// to http://nesdev.com/, which I basically spent the three days
-// scouring every inch of, especially to figure out the mappers and PPU.
-//
-
+#include <memory>
 #include <iostream>
 #include <portaudio.h>
 #include <GLFW/glfw3.h>
-
-#ifdef __linux__
 #include "pa_linux_alsa.h"
-#endif
-
 #include "NES.h"
 
 constexpr int AUDIO_FRAME_BUFFER_SIZE = 1024;
-
-// NES generates 256 x 240 pixels.
-// You are free to resize at runtime
-// but you can also set a scale factor to init with.
-// 3-5 is good.
-constexpr int display_scale_factor = 4;
-
-// Fullscreen is awesome!
-// Off by default so console can be seen
-// if something goes wrong.
-constexpr bool fullscreen = false;
-
-// Recommend off unless severe tearing.
-constexpr bool v_sync = false;
 
 bool getKey(GLFWwindow* window, int key) {
 	return glfwGetKey(window, key) == GLFW_PRESS;
 }
 
-//  Keymap (modify as desired)
-// -------------------------------------
-//  Up/Down/Left/Right   |  Arrow Keys
-//  Start                |  Enter
-//  Select               |  Right Shift
-//  A                    |  Z
-//  B                    |  X
-//  Turbo A              |  S
-//  Turbo B              |  D
-// -------------------------------------
-//  Emulator keys:
-//  Tilde                |  Fast-forward
-//  Escape               |  Quit
-//  ALT+F4               |  Quit
-// -------------------------------------
 uint8_t getKeys(GLFWwindow* window, bool turbo) {
 	uint8_t ret = getKey(window, GLFW_KEY_Z) || (turbo && getKey(window, GLFW_KEY_S));
 	ret |= (getKey(window, GLFW_KEY_X) || (turbo && getKey(window, GLFW_KEY_D))) << 1;
@@ -178,20 +71,21 @@ void printState(NES* nes) {
 }
 
 int main(int argc, char* argv[]) {
+    if (!glfwInit()) {
+        throw std::runtime_error("GLFW initialization failed");
+    }
+
 	if (argc != 2) {
-		std::cout << "Usage: KNES <rom file>" << std::endl;
-		return EXIT_FAILURE;
+		throw std::invalid_argument("Must provide ROM");
 	}
 
 	char* SRAM_path = new char[strlen(argv[1]) + 1];
 	strcpy(SRAM_path, argv[1]);
 	strcat(SRAM_path, ".srm");
 
-	std::cout << "Initializing NES..." << std::endl;
 	NES* nes = new NES(argv[1], SRAM_path);
 	if (!nes->initialized) return EXIT_FAILURE;
 
-	std::cout << "Initializing PortAudio..." << std::endl;
 	PaError err = Pa_Initialize();
 	if (err != paNoError) {
 		notifyPaError(err);
@@ -199,13 +93,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	PaStreamParameters outputParameters;
-#ifdef _WIN32
 	outputParameters.device = Pa_GetDefaultOutputDevice();
-	// you can select a specific device this way
-	//outputParameters.device = Pa_GetHostApiInfo(Pa_HostApiTypeIdToHostApiIndex(PaHostApiTypeId::paWASAPI))->defaultOutputDevice;
-#else
-	outputParameters.device = Pa_GetDefaultOutputDevice();
-#endif
 
 	if (outputParameters.device == paNoDevice) {
 		std::cerr << "ERROR: no PortAudio device found." << std::endl;
@@ -218,7 +106,6 @@ int main(int argc, char* argv[]) {
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
 	outputParameters.hostApiSpecificStreamInfo = nullptr;
 
-	std::cout << "Opening audio stream..." << std::endl;
 	err = Pa_OpenStream(
 		&nes->apu->stream,
 		nullptr,
@@ -235,31 +122,15 @@ int main(int argc, char* argv[]) {
 	}
 
 	std::cout << "Initializing GLFW..." << std::endl;
-	if (!glfwInit()) {
-		std::cerr << "ERROR: Failed to initialize GLFW. Aborting." << std::endl;
-		return EXIT_FAILURE;
-	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
 	std::cout << "Initializing GLFW window..." << std::endl;
 	GLFWwindow* window;
-	if (fullscreen) {
-		GLFWmonitor* const primary = glfwGetPrimaryMonitor();
-		const GLFWvidmode* const mode = glfwGetVideoMode(primary);
-		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-		window = glfwCreateWindow(mode->width, mode->height, "KNES", primary, nullptr);
-		std::cout << "Fullscreen framebuffer created." << std::endl;
-	}
-	else {
-		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-		window = glfwCreateWindow(256 * display_scale_factor, 240 * display_scale_factor, "KNES", nullptr, nullptr);
-		std::cout << "Window created." << std::endl;
-	}
+	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	window = glfwCreateWindow(512, 480, "vmos", nullptr, nullptr);
+	std::cout << "Window created." << std::endl;
 
 	if (!window) {
 		std::cerr << "ERROR: Failed to create window. Aborting." << std::endl;
@@ -269,17 +140,7 @@ int main(int argc, char* argv[]) {
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-	if (v_sync) {
-		// wait 1 sync to flip buffer (V_SYNC)
-		glfwSwapInterval(1);
-		std::cout << "V_SYNC enabled." << std::endl;
-	}
-	else {
-		// sync immediately for lower latency
-		// may introduce tearing
-		glfwSwapInterval(0);
-		std::cout << "V_SYNC disabled." << std::endl;
-	}
+	glfwSwapInterval(0);
 
 	int old_w, old_h, w, h;
 	glfwGetFramebufferSize(window, &old_w, &old_h);
@@ -295,17 +156,10 @@ int main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-	// decrease pops on linux
-#ifdef __linux__
 	PaAlsa_EnableRealtimeScheduling(nes->apu->stream, 1);
-#endif
 
 	std::cout << "Starting audio stream..." << std::endl;
 	Pa_StartStream(nes->apu->stream);
-	if (err != paNoError) {
-		notifyPaError(err);
-		return EXIT_FAILURE;
-	}
 
 	double prevtime = 0.0;
 	while (!glfwWindowShouldClose(window)) {
