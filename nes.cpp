@@ -1,29 +1,29 @@
-#include "NES.h"
+#include "nes.h"
 
 constexpr float pulse_tbl[] = { 0.0f, 0.01160913892f, 0.02293948084f, 0.03400094807f, 0.04480300099f, 0.05535465851f, 0.0656645298f, 0.07574082166f, 0.08559139818f, 0.09522374719f, 0.1046450436f, 0.1138621494f, 0.1228816435f, 0.1317097992f, 0.1403526366f, 0.1488159597f, 0.1571052521f, 0.1652258784f, 0.1731829196f, 0.1809812635f, 0.188625589f, 0.1961204559f, 0.2034701705f, 0.2106789351f, 0.2177507579f, 0.2246894985f, 0.2314988673f, 0.2381824702f, 0.2447437793f, 0.2511860728f, 0.2575125694f, 0.2637263834f };
 constexpr float tnd_tbl[] = { 0.0f, 0.006699823774f, 0.01334501989f, 0.01993625611f, 0.0264741797f, 0.03295944259f, 0.0393926762f, 0.04577450082f, 0.05210553482f, 0.05838638172f, 0.06461763382f, 0.07079987228f, 0.07693368942f, 0.08301962167f, 0.08905825764f, 0.09505013376f, 0.1009957939f, 0.1068957672f, 0.1127505824f, 0.1185607538f, 0.1243267879f, 0.130049184f, 0.1357284486f, 0.1413650513f, 0.1469594985f, 0.1525122225f, 0.1580237001f, 0.1634943932f, 0.1689247638f, 0.174315244f, 0.1796662807f, 0.1849783063f, 0.1902517378f, 0.1954869777f, 0.2006844729f, 0.2058446258f, 0.210967809f, 0.2160544395f, 0.2211049199f, 0.2261195928f, 0.2310988754f, 0.2360431105f, 0.2409527153f, 0.2458280027f, 0.2506693602f, 0.2554771006f, 0.2602516413f, 0.2649932802f, 0.2697023749f, 0.2743792236f, 0.2790241838f, 0.2836375833f, 0.2882197201f, 0.292770952f, 0.2972915173f, 0.3017818034f, 0.3062421083f, 0.3106726706f, 0.3150738478f, 0.3194458783f, 0.3237891197f, 0.3281037807f, 0.3323901892f, 0.3366486132f, 0.3408792913f, 0.3450825512f, 0.3492586315f, 0.3534077704f, 0.357530266f, 0.3616263568f, 0.3656963408f, 0.3697403669f, 0.3737587631f, 0.3777517378f, 0.3817195594f, 0.3856624365f, 0.3895806372f, 0.3934743702f, 0.3973438442f, 0.4011892974f, 0.4050109982f, 0.4088090658f, 0.412583828f, 0.4163354635f, 0.4200641513f, 0.4237701297f, 0.4274536073f, 0.431114763f, 0.4347538352f, 0.4383709729f, 0.4419664443f, 0.4455403984f, 0.449093014f, 0.4526245296f, 0.4561350644f, 0.4596248865f, 0.4630941153f, 0.4665429294f, 0.4699715674f, 0.4733801484f, 0.4767689407f, 0.4801379442f, 0.4834875166f, 0.4868176877f, 0.4901287258f, 0.4934206903f, 0.4966938794f, 0.4999483228f, 0.5031842589f, 0.5064018369f, 0.5096011758f, 0.5127824545f, 0.5159458518f, 0.5190914273f, 0.5222194791f, 0.5253300667f, 0.5284232497f, 0.5314993262f, 0.5345583558f, 0.5376005173f, 0.5406259298f, 0.5436347723f, 0.5466270447f, 0.549603045f, 0.5525628328f, 0.5555064678f, 0.5584343076f, 0.5613462329f, 0.5642424822f, 0.5671232343f, 0.5699884892f, 0.5728384256f, 0.5756732225f, 0.5784929395f, 0.5812976956f, 0.5840876102f, 0.5868628025f, 0.5896234512f, 0.5923695564f, 0.5951013565f, 0.5978189111f, 0.6005222797f, 0.6032115817f, 0.6058869958f, 0.6085486412f, 0.6111965775f, 0.6138308048f, 0.6164515615f, 0.6190590262f, 0.6216531396f, 0.6242340207f, 0.6268018484f, 0.6293566823f, 0.6318986416f, 0.6344277263f, 0.6369441748f, 0.6394480467f, 0.641939342f, 0.6444182396f, 0.6468848586f, 0.6493391991f, 0.6517813802f, 0.6542115211f, 0.6566297412f, 0.6590360403f, 0.6614305973f, 0.6638134122f, 0.6661846638f, 0.6685443521f, 0.6708925962f, 0.6732294559f, 0.6755550504f, 0.6778694391f, 0.6801727414f, 0.6824649572f, 0.6847462058f, 0.6870166063f, 0.6892762184f, 0.6915250421f, 0.6937633157f, 0.6959909201f, 0.698208034f, 0.7004147768f, 0.7026110888f, 0.7047972083f, 0.7069730759f, 0.7091388106f, 0.7112944722f, 0.7134401202f, 0.7155758739f, 0.7177017927f, 0.7198178768f, 0.7219242454f, 0.7240209579f, 0.7261080146f, 0.7281856537f, 0.7302538157f, 0.7323125601f, 0.7343619466f, 0.7364020944f, 0.7384331226f, 0.7404549122f, 0.7424675822f };
 constexpr uint32_t palette[] = { 0xff666666, 0xff882a00, 0xffa71214, 0xffa4003b, 0xff7e005c, 0xff40006e, 0xff00066c, 0xff001d56, 0xff003533, 0xff00480b, 0xff005200, 0xff084f00, 0xff4d4000, 0xff000000, 0xff000000, 0xff000000, 0xffadadad, 0xffd95f15, 0xffff4042, 0xfffe2775, 0xffcc1aa0, 0xff7b1eb7, 0xff2031b5, 0xff004e99, 0xff006d6b, 0xff008738, 0xff00930c, 0xff328f00, 0xff8d7c00, 0xff000000, 0xff000000, 0xff000000, 0xfffffeff, 0xffffb064, 0xffff9092, 0xffff76c6, 0xffff6af3, 0xffcc6efe, 0xff7081fe, 0xff229eea, 0xff00bebc, 0xff00d888, 0xff30e45c, 0xff82e045, 0xffdecd48, 0xff4f4f4f, 0xff000000, 0xff000000, 0xfffffeff, 0xffffdfc0, 0xffffd2d3, 0xffffc8e8, 0xffffc2fb, 0xffeac4fe, 0xffc5ccfe, 0xffa5d8f7, 0xff94e5e4, 0xff96efcf, 0xffabf4bd, 0xffccf3b3, 0xfff2ebb5, 0xffb8b8b8, 0xff000000, 0xff000000 };
 
-constexpr uint8_t duty_tbl[4][8] = {
+constexpr byte duty_tbl[4][8] = {
 	{ 0, 1, 0, 0, 0, 0, 0, 0 },
 	{ 0, 1, 1, 0, 0, 0, 0, 0 },
 	{ 0, 1, 1, 1, 1, 0, 0, 0 },
 	{ 1, 0, 0, 1, 1, 1, 1, 1 },
 };
 
-constexpr uint8_t tri_tbl[] = {
+constexpr byte tri_tbl[] = {
 	15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
 	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 };
 
-void spritePixel(PPU* ppu, uint8_t& i, uint8_t& sprite) {
+void spritePixel(PPU* ppu, byte& i, byte& sprite) {
 	i = sprite = 0;
 	if (ppu->flag_show_sprites == 0) return;
 	for (i = 0; i < ppu->sprite_cnt; ++i) {
 		int offset = (ppu->cycle - 1) - static_cast<int>(ppu->sprite_pos[i]);
 		if (offset < 0 || offset > 7) continue;
 		offset = 7 - offset;
-		sprite = static_cast<uint8_t>((ppu->sprite_patterns[i] >> static_cast<uint8_t>(offset << 2)) & 0x0F);
+		sprite = static_cast<byte>((ppu->sprite_patterns[i] >> static_cast<byte>(offset << 2)) & 0x0F);
 		if ((sprite & 3)) return;
 	}
 	i = sprite = 0;
@@ -70,13 +70,13 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 			int x = ppu->cycle - 1;
 			int y = ppu->scanline;
 
-			uint8_t background = 0;
+			byte background = 0;
 			if (ppu->flag_show_background != 0) {
 				uint32_t data = static_cast<uint32_t>(ppu->tile_data >> 32) >> ((7 - ppu->x) * 4);
-				background = static_cast<uint8_t>(data & 0x0F);
+				background = static_cast<byte>(data & 0x0F);
 			}
 
-			uint8_t i, sprite;
+			byte i, sprite;
 			spritePixel(ppu, i, sprite);
 
 			if (x < 8 && ppu->flag_show_left_background == 0) {
@@ -89,7 +89,7 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 			const bool b = (background & 3) != 0;
 			const bool s = (sprite & 3) != 0;
 
-			uint8_t color = 0;
+			byte color = 0;
 			if (!b && !s) {
 				color = 0;
 			}
@@ -129,24 +129,24 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 			}
 			else if (pcm8 == 5) {
 				const uint16_t fineY = (ppu->v >> 12) & 7;
-				const uint8_t table = ppu->flag_background_tbl;
-				const uint8_t tile = ppu->name_tbl_u8;
+				const byte table = ppu->flag_background_tbl;
+				const byte tile = ppu->name_tbl_u8;
 				const uint16_t address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
 				ppu->low_tile_u8 = readPPU(nes, address);
 			}
 			else if (pcm8 == 7) {
 				const uint16_t fineY = (ppu->v >> 12) & 7;
-				const uint8_t table = ppu->flag_background_tbl;
-				const uint8_t tile = ppu->name_tbl_u8;
+				const byte table = ppu->flag_background_tbl;
+				const byte tile = ppu->name_tbl_u8;
 				const uint16_t address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
 				ppu->high_tile_u8 = readPPU(nes, address + 8);
 			}
 			else if (pcm8 == 0) {
 				uint32_t data = 0;
 				for (int i = 0; i < 8; ++i) {
-					const uint8_t a = ppu->attrib_tbl_u8;
-					const uint8_t p1 = (ppu->low_tile_u8 & 0x80) >> 7;
-					const uint8_t p2 = (ppu->high_tile_u8 & 0x80) >> 6;
+					const byte a = ppu->attrib_tbl_u8;
+					const byte p1 = (ppu->low_tile_u8 & 0x80) >> 7;
+					const byte p2 = (ppu->high_tile_u8 & 0x80) >> 6;
 					ppu->low_tile_u8 <<= 1;
 					ppu->high_tile_u8 <<= 1;
 					data <<= 4;
@@ -203,28 +203,28 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 			int h = ppu->flag_sprite_size != 0 ? 16 : 8;
 			int count = 0;
 			for (int i = 0; i < 64; ++i) {
-				const uint8_t y = ppu->oam_tbl[4 * i + 0];
-				const uint8_t a = ppu->oam_tbl[4 * i + 2];
-				const uint8_t x = ppu->oam_tbl[4 * i + 3];
+				const byte y = ppu->oam_tbl[4 * i + 0];
+				const byte a = ppu->oam_tbl[4 * i + 2];
+				const byte x = ppu->oam_tbl[4 * i + 3];
 				int row = ppu->scanline - static_cast<int>(y);
 				if (row < 0 || row >= h) continue;
 				if (count < 8) {
 					uint32_t sprite_pattern = 0;
-					uint8_t tile = ppu->oam_tbl[4 * i + 1];
-					const uint8_t attributes = ppu->oam_tbl[4 * i + 2];
+					byte tile = ppu->oam_tbl[4 * i + 1];
+					const byte attributes = ppu->oam_tbl[4 * i + 2];
 					uint16_t address = 0;
 					if (ppu->flag_sprite_size == 0) {
 						if ((attributes & 0x80) == 0x80) {
 							row = 7 - row;
 						}
-						uint8_t table = ppu->flag_sprite_tbl;
+						byte table = ppu->flag_sprite_tbl;
 						address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + static_cast<uint16_t>(row);
 					}
 					else {
 						if ((attributes & 0x80) == 0x80) {
 							row = 15 - row;
 						}
-						uint8_t table = tile & 1;
+						byte table = tile & 1;
 						tile &= 0xFE;
 						if (row > 7) {
 							++tile;
@@ -232,12 +232,12 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 						}
 						address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + static_cast<uint16_t>(row);
 					}
-					uint8_t atts = (attributes & 3) << 2;
-					uint8_t low_tile_u8 = readPPU(nes, address);
-					uint8_t high_tile_u8 = readPPU(nes, address + 8);
+					byte atts = (attributes & 3) << 2;
+					byte low_tile_u8 = readPPU(nes, address);
+					byte high_tile_u8 = readPPU(nes, address + 8);
 
 					for (int j = 0; j < 8; ++j) {
-						uint8_t p1, p2;
+						byte p1, p2;
 						if ((attributes & 0x40) == 0x40) {
 							p1 = low_tile_u8 & 1;
 							p2 = (high_tile_u8 & 1) << 1;
@@ -256,7 +256,7 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 					ppu->sprite_patterns[count] = sprite_pattern;
 					ppu->sprite_pos[count] = x;
 					ppu->sprite_priorities[count] = (a >> 5) & 1;
-					ppu->sprite_idx[count] = static_cast<uint8_t>(i);
+					ppu->sprite_idx[count] = static_cast<byte>(i);
 				}
 				++count;
 			}
@@ -285,61 +285,6 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 
 		ppu->flag_sprite_zero_hit = 0;
 		ppu->flag_sprite_overflow = 0;
-	}
-}
-
-void pulseTickEnvelope(Pulse* p) {
-	if (p->envelope_start) {
-		p->envelope_vol = 15;
-		p->envelope_val = p->envelope_period;
-		p->envelope_start = false;
-	}
-	else if (p->envelope_val > 0) {
-		--p->envelope_val;
-	}
-	else {
-		if (p->envelope_vol > 0) {
-			--p->envelope_vol;
-		}
-		else if (p->envelope_loop) {
-			p->envelope_vol = 15;
-		}
-		p->envelope_val = p->envelope_period;
-	}
-}
-
-void tickEnvelope(APU* apu) {
-	pulseTickEnvelope(&apu->pulse1);
-	pulseTickEnvelope(&apu->pulse2);
-
-	Triangle* t = &apu->triangle;
-	if (t->counter_reload) {
-		t->counter_val = t->counter_period;
-	}
-	else if (t->counter_val > 0) {
-		--t->counter_val;
-	}
-	if (t->length_enabled) {
-		t->counter_reload = false;
-	}
-
-	Noise* n = &apu->noise;
-	if (n->envelope_start) {
-		n->envelope_vol = 15;
-		n->envelope_val = n->envelope_period;
-		n->envelope_start = false;
-	}
-	else if (n->envelope_val > 0) {
-		--n->envelope_val;
-	}
-	else {
-		if (n->envelope_vol > 0) {
-			--n->envelope_vol;
-		}
-		else if (n->envelope_loop) {
-			n->envelope_vol = 15;
-		}
-		n->envelope_val = n->envelope_period;
 	}
 }
 
@@ -405,7 +350,7 @@ void tickSweep(APU* apu) {
 	pulseTickSweep(&apu->pulse2);
 }
 
-uint8_t pulseOutput(Pulse* p) {
+byte pulseOutput(Pulse* p) {
 	if (!p->enabled || p->length_val == 0 || duty_tbl[p->duty_mode][p->duty_val] == 0 || p->timer_period < 8 || p->timer_period > 0x7FF) {
 		return 0;
 	}
@@ -448,7 +393,7 @@ void tickAPU(NES* nes, APU* apu) {
 		Noise* n = &apu->noise;
 		if (n->timer_val == 0) {
 			n->timer_val = n->timer_period;
-			uint8_t shift = n->mode ? 6 : 1;
+			byte shift = n->mode ? 6 : 1;
 			uint16_t b1 = n->shift_reg & 1;
 			uint16_t b2 = (n->shift_reg >> shift) & 1;
 			n->shift_reg >>= 1;
@@ -514,7 +459,7 @@ void tickAPU(NES* nes, APU* apu) {
 	const int f1 = static_cast<int>(static_cast<double>(cycle1) / FRAME_CTR_FREQ);
 	const int f2 = static_cast<int>(static_cast<double>(cycle2) / FRAME_CTR_FREQ);
 	if (f1 != f2) {
-		const uint8_t fp = apu->frame_period;
+		const byte fp = apu->frame_period;
 		if (fp == 4) {
 			apu->frame_val = (apu->frame_val + 1) & 3;
 				switch (apu->frame_val) {
@@ -558,13 +503,13 @@ void tickAPU(NES* nes, APU* apu) {
 	const int s2 = static_cast<int>(static_cast<double>(cycle2) / SAMPLE_RATE);
 
 	if (s1 != s2) {
-		const uint8_t p1_output = pulseOutput(&apu->pulse1);
-		const uint8_t p2_output = pulseOutput(&apu->pulse2);
+		const byte p1_output = pulseOutput(&apu->pulse1);
+		const byte p2_output = pulseOutput(&apu->pulse2);
 
-		const uint8_t tri_output = (!t->enabled || t->length_val == 0 || t->counter_val == 0) ? 0 : tri_tbl[t->duty_val];
+		const byte tri_output = (!t->enabled || t->length_val == 0 || t->counter_val == 0) ? 0 : tri_tbl[t->duty_val];
 
 		Noise* n = &apu->noise;
-		uint8_t noise_out;
+		byte noise_out;
 		if (!n->enabled || n->length_val == 0 || (n->shift_reg & 1) == 1) {
 			noise_out = 0;
 		}
@@ -575,7 +520,7 @@ void tickAPU(NES* nes, APU* apu) {
 			noise_out = n->const_vol;
 		}
 
-		const uint8_t dOut = apu->dmc.value;
+		const byte dOut = apu->dmc.value;
 
 		// combined outputs
 		float output[2];
@@ -612,7 +557,7 @@ void emulate(NES* nes, double seconds) {
 				cpu->cycles += 7;
 			}
 			cpu->interrupt = interruptNone;
-			uint8_t opcode = readByte(nes, cpu->PC);
+			byte opcode = readByte(nes, cpu->PC);
 			execute(nes, opcode);
 			cpuCycles = static_cast<int>(cpu->cycles - startCycles);
 		}

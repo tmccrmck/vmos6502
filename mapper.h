@@ -3,6 +3,7 @@
 
 #include "cpu.h"
 #include "cartridge.h"
+#include <iostream>
 
 enum MirrorModes {
 	MirrorHorizontal = 0,

@@ -3,7 +3,7 @@
 #include <portaudio.h>
 #include <GLFW/glfw3.h>
 #include "pa_linux_alsa.h"
-#include "NES.h"
+#include "nes.h"
 
 constexpr int AUDIO_FRAME_BUFFER_SIZE = 1024;
 
@@ -11,8 +11,8 @@ bool getKey(GLFWwindow* window, int key) {
 	return glfwGetKey(window, key) == GLFW_PRESS;
 }
 
-uint8_t getKeys(GLFWwindow* window, bool turbo) {
-	uint8_t ret = getKey(window, GLFW_KEY_Z) || (turbo && getKey(window, GLFW_KEY_S));
+byte getKeys(GLFWwindow* window, bool turbo) {
+	byte ret = getKey(window, GLFW_KEY_Z) || (turbo && getKey(window, GLFW_KEY_S));
 	ret |= (getKey(window, GLFW_KEY_X) || (turbo && getKey(window, GLFW_KEY_D))) << 1;
 	ret |= (getKey(window, GLFW_KEY_RIGHT_SHIFT)) << 2;
 	ret |= (getKey(window, GLFW_KEY_ENTER)) << 3;
@@ -23,7 +23,7 @@ uint8_t getKeys(GLFWwindow* window, bool turbo) {
 	return ret;
 }
 
-uint8_t getJoy(int joy, bool turbo) {
+byte getJoy(int joy, bool turbo) {
 	if (!glfwJoystickPresent(joy)) {
 		return 0;
 	}
@@ -31,7 +31,7 @@ uint8_t getJoy(int joy, bool turbo) {
 	const float* axes = glfwGetJoystickAxes(joy, &count);
 	const unsigned char* buttons = glfwGetJoystickButtons(joy, &count);
 
-	uint8_t ret = buttons[0] == 1 || (turbo && buttons[2] == 1);
+	byte ret = buttons[0] == 1 || (turbo && buttons[2] == 1);
 	ret |= (buttons[1] == 1 || (turbo && buttons[3] == 1)) << 1;
 	ret |= (buttons[6] == 1) << 2;
 	ret |= (buttons[7] == 1) << 3;

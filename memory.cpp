@@ -1,11 +1,11 @@
-#include "NES.h"
+#include "nes.h"
 
-constexpr uint8_t length_tbl[] = {
+constexpr byte length_tbl[] = {
 	10, 254, 20, 2, 40, 4, 80, 6, 160, 8, 60, 10, 14, 12, 26, 14,
 	12, 16, 24, 18, 48, 20, 96, 22, 192, 24, 72, 26, 16, 28, 32, 30
 };
 
-constexpr uint8_t dmc_tbl[] = {
+constexpr byte dmc_tbl[] = {
 	214, 190, 170, 160, 143, 127, 113, 107, 95, 80, 71, 64, 53, 42, 36, 27
 };
 
@@ -21,11 +21,11 @@ constexpr uint16_t mirror_tbl[5][4] = {
 	{ 0, 1, 2, 3 }
 };
 
-uint8_t readPPURegister(NES* nes, uint16_t address) {
+byte readPPURegister(NES* nes, uint16_t address) {
 	PPU* ppu = nes->ppu;
 	// PPUSTATUS
 	if (address == 0x2002) {
-		uint8_t status = ppu->reg & 0x1F;
+		byte status = ppu->reg & 0x1F;
 		status |= ppu->flag_sprite_overflow << 5;
 		status |= ppu->flag_sprite_zero_hit << 6;
 		if (ppu->nmi_occurred) {
@@ -40,10 +40,10 @@ uint8_t readPPURegister(NES* nes, uint16_t address) {
 		return ppu->oam_tbl[ppu->oam_addr];
 	}
 	else if (address == 0x2007) {
-		uint8_t value = readPPU(nes, ppu->v);
+		byte value = readPPU(nes, ppu->v);
 		// buffered read
 		if ((ppu->v & 16383) < 0x3F00) {
-			uint8_t buffered = ppu->buffered_data;
+			byte buffered = ppu->buffered_data;
 			ppu->buffered_data = value;
 			value = buffered;
 		}
@@ -57,8 +57,8 @@ uint8_t readPPURegister(NES* nes, uint16_t address) {
 	return 0;
 }
 
-uint8_t readController(Controller* c) {
-	const uint8_t value = (c->index < 8 && ((c->buttons >> c->index) & 1));
+byte readController(Controller* c) {
+	const byte value = (c->index < 8 && ((c->buttons >> c->index) & 1));
 	++c->index;
 	if ((c->strobe & 1) == 1 ){
 		c->index = 0;
@@ -66,7 +66,7 @@ uint8_t readController(Controller* c) {
 	return value;
 }
 
-uint8_t readByte(NES* nes, uint16_t address) {
+byte readByte(NES* nes, uint16_t address) {
 	if (address < 0x2000) {
 		return nes->RAM[address & 2047];
 	}
@@ -79,7 +79,7 @@ uint8_t readByte(NES* nes, uint16_t address) {
 	else if (address == 0x4015) {
 		// apu reg read
 		APU* apu = nes->apu;
-		uint8_t read_status = 0;
+		byte read_status = 0;
 		if (apu->pulse1.length_val > 0) {
 			read_status |= 1;
 		}
@@ -115,14 +115,14 @@ uint8_t readByte(NES* nes, uint16_t address) {
 	return 0;
 }
 
-void writeController(Controller* c, uint8_t value) {
+void writeController(Controller* c, byte value) {
 	c->strobe = value;
 	if ((c->strobe & 1) == 1) {
 		c->index = 0;
 	}
 }
 
-void pulseWriteControl(Pulse* p, uint8_t value) {
+void pulseWriteControl(Pulse* p, byte value) {
 	p->duty_mode = (value >> 6) & 3;
 	p->length_enabled = ((value >> 5) & 1) == 0;
 	p->envelope_loop = ((value >> 5) & 1) == 1;
@@ -132,7 +132,7 @@ void pulseWriteControl(Pulse* p, uint8_t value) {
 	p->envelope_start = true;
 }
 
-void pulseWriteSweep(Pulse* p, uint8_t value) {
+void pulseWriteSweep(Pulse* p, byte value) {
 	p->sweep_enabled = ((value >> 7) & 1) == 1;
 	p->sweep_period = ((value >> 4) & 7) + 1;
 	p->sweep_negate = ((value >> 3) & 1) == 1;
@@ -140,14 +140,14 @@ void pulseWriteSweep(Pulse* p, uint8_t value) {
 	p->sweep_reload = true;
 }
 
-void pulseWriteTimerHigh(Pulse* p, uint8_t value) {
+void pulseWriteTimerHigh(Pulse* p, byte value) {
 	p->length_val = length_tbl[value >> 3];
 	p->timer_period = (p->timer_period & 0x00FF) | (static_cast<uint16_t>(value & 7) << 8);
 	p->envelope_start = true;
 	p->duty_val = 0;
 }
 
-void writeRegisterAPU(APU* apu, uint16_t address, uint8_t value) {
+void writeRegisterAPU(APU* apu, uint16_t address, byte value) {
 	switch (address) {
 	case 0x4000:
 		pulseWriteControl(&apu->pulse1, value);
@@ -317,11 +317,11 @@ void Mapper1::updateOffsets(Cartridge* cartridge) {
 }
 
 // Control ($8000-$9FFF)
-void Mapper1::writeCtrl(Cartridge* cartridge, uint8_t value) {
+void Mapper1::writeCtrl(Cartridge* cartridge, byte value) {
 	control = value;
 	chr_mode = (value >> 4) & 1;
 	prg_mode = (value >> 2) & 3;
-	uint8_t mirror = value & 3;
+	byte mirror = value & 3;
 	switch (mirror) {
 	case 0:
 		cartridge->mirror = MirrorSingle0;
@@ -411,7 +411,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 	controller1 = new Controller;
 	controller2 = new Controller;
 
-	RAM = new uint8_t[2048];
+	RAM = new byte[2048];
 	memset(RAM, 0, 2048);
 
 	std::cout << "Initializing mapper..." << std::endl;
@@ -478,20 +478,20 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 	initialized = true;
 }
 
-uint16_t mirrorAddress(uint8_t mode, uint16_t address) {
+uint16_t mirrorAddress(byte mode, uint16_t address) {
 	address = (address - 0x2000) & 4095;
 	const uint16_t table = address >> 10;
 	const uint16_t offset = address & 1023;
 	return 0x2000 + (mirror_tbl[mode][table] << 10) + offset;
 }
 
-void writePPU(NES* nes, uint16_t address, uint8_t value) {
+void writePPU(NES* nes, uint16_t address, byte value) {
 	address &= 16383;
 	if (address < 0x2000) {
 		nes->mapper->write(nes->cartridge, address, value);
 	}
 	else if (address < 0x3F00) {
-		const uint8_t mode = nes->cartridge->mirror;
+		const byte mode = nes->cartridge->mirror;
 		nes->ppu->name_tbl[mirrorAddress(mode, address) & 2047] = value;
 	}
 	else if (address < 0x4000) {
@@ -507,7 +507,7 @@ void writePPU(NES* nes, uint16_t address, uint8_t value) {
 	}
 }
 
-void writeRegisterPPU(NES* nes, uint16_t address, uint8_t value) {
+void writeRegisterPPU(NES* nes, uint16_t address, byte value) {
 	PPU* ppu = nes->ppu;
 	ppu->reg = value;
 	switch (address) {
@@ -568,7 +568,7 @@ void writeRegisterPPU(NES* nes, uint16_t address, uint8_t value) {
 	}
 }
 
-void writeByte(NES* nes, uint16_t address, uint8_t value) {
+void writeByte(NES* nes, uint16_t address, byte value) {
 	if (address < 0x2000) {
 		nes->RAM[address & 2047] = value;
 	}
@@ -602,13 +602,13 @@ void writeByte(NES* nes, uint16_t address, uint8_t value) {
 	}
 }
 
-uint8_t readPPU(NES* nes, uint16_t address) {
+byte readPPU(NES* nes, uint16_t address) {
 	address &= 16383;
 	if (address < 0x2000) {
 		return nes->mapper->read(nes->cartridge, address);
 	}
 	else if (address < 0x3F00) {
-		uint8_t mode = nes->cartridge->mirror;
+		byte mode = nes->cartridge->mirror;
 		return nes->ppu->name_tbl[mirrorAddress(mode, address) & 2047];
 	}
 	else if (address < 0x4000) {
@@ -620,7 +620,7 @@ uint8_t readPPU(NES* nes, uint16_t address) {
 	return 0;
 }
 
-uint8_t readPalette(PPU* ppu, uint16_t address) {
+byte readPalette(PPU* ppu, uint16_t address) {
 	if (address >= 16 && (address & 3) == 0) {
 		address -= 16;
 	}
@@ -628,7 +628,7 @@ uint8_t readPalette(PPU* ppu, uint16_t address) {
 }
 
 // $2000: PPUCTRL
-void writePPUCtrl(PPU* ppu, uint8_t value) {
+void writePPUCtrl(PPU* ppu, byte value) {
 	ppu->flag_name_tbl = value & 3;
 	ppu->flag_increment = (value >> 2) & 1;
 	ppu->flag_sprite_tbl = (value >> 3) & 1;
@@ -641,7 +641,7 @@ void writePPUCtrl(PPU* ppu, uint8_t value) {
 }
 
 // $2001: PPUMASK
-void writePPUMask(PPU* ppu, uint8_t value) {
+void writePPUMask(PPU* ppu, byte value) {
 	ppu->flag_gray = value & 1;
 	ppu->flag_show_left_background = (value >> 1) & 1;
 	ppu->flag_show_left_sprites = (value >> 2) & 1;
