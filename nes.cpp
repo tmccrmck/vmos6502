@@ -661,10 +661,10 @@ byte NES::readByte(uint16_t address) {
 		return 0;
 	}
 	else if (address == 0x4016) {
-		return readController(this->controller1);
+		return controller1->readController();
 	}
 	else if (address == 0x4017) {
-		return readController(this->controller2);
+		return controller2->readController();
 	}
 	else if (address < 0x6000) {
 		// I/O registers
@@ -742,8 +742,8 @@ void NES::writeByte(uint16_t address, byte value) {
 		writeRegisterAPU(this->apu, address, value);
 	}
 	else if (address == 0x4016) {
-		writeController(this->controller1, value);
-		writeController(this->controller2, value);
+		controller1->writeController(value);
+		controller2->writeController(value);
 	}
 	else if (address == 0x4017) {
 		writeRegisterAPU(this->apu, address, value);

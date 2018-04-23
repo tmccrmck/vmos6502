@@ -21,22 +21,6 @@ constexpr uint16_t mirror_tbl[5][4] = {
 	{ 0, 1, 2, 3 }
 };
 
-byte readController(Controller* c) {
-	const byte value = (c->index < 8 && ((c->buttons >> c->index) & 1));
-	++c->index;
-	if ((c->strobe & 1) == 1 ){
-		c->index = 0;
-	}
-	return value;
-}
-
-void writeController(Controller* c, byte value) {
-	c->strobe = value;
-	if ((c->strobe & 1) == 1) {
-		c->index = 0;
-	}
-}
-
 void pulseWriteControl(Pulse* p, byte value) {
 	p->duty_mode = (value >> 6) & 3;
 	p->length_enabled = ((value >> 5) & 1) == 0;

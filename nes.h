@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "cartridge.h"
+#include "controller.h"
 #include "mapper.h"
 #include "cpu.h"
 #include "apu.h"
@@ -60,17 +61,6 @@ struct iNESHeader {
 	byte num_ram;    // number of 8k PRG-RAM banks
 	byte padding[7];
 };
-
-struct Controller {
-	byte buttons;
-	byte index;
-	byte strobe;
-
-	Controller() : buttons(0), index(0), strobe(0) {}
-};
-
-byte readController(Controller* c);
-void writeController(Controller* c, byte value);
 
 bool pagesDiffer(uint16_t a, uint16_t b);
 void writeRegisterAPU(APU* apu, uint16_t address, byte value);
