@@ -32,7 +32,7 @@ byte readPPURegister(NES* nes, uint16_t address) {
 			status |= 1 << 7;
 		}
 		ppu->nmi_occurred = false;
-		PPUnmiShift(ppu);
+		ppu->PPUnmiShift();
 		ppu->w = 0;
 		return status;
 	}
@@ -472,8 +472,8 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 	ppu->scanline = 250;
 	ppu->frame = 0;
 
-	writePPUCtrl(ppu, 0);
-	writePPUMask(ppu, 0);
+	ppu->writePPUCtrl(0);
+	ppu->writePPUMask(0);
 	ppu->oam_addr = 0;
 	initialized = true;
 }
@@ -512,10 +512,10 @@ void writeRegisterPPU(NES* nes, uint16_t address, byte value) {
 	ppu->reg = value;
 	switch (address) {
 	case 0x2000:
-		writePPUCtrl(ppu, value);
+		ppu->writePPUCtrl(value);
 		break;
 	case 0x2001:
-		writePPUMask(ppu, value);
+		ppu->writePPUMask(value);
 		break;
 	case 0x2003:
 		ppu->oam_addr = value;
@@ -627,27 +627,4 @@ byte readPalette(PPU* ppu, uint16_t address) {
 	return ppu->palette_tbl[address];
 }
 
-// $2000: PPUCTRL
-void writePPUCtrl(PPU* ppu, byte value) {
-	ppu->flag_name_tbl = value & 3;
-	ppu->flag_increment = (value >> 2) & 1;
-	ppu->flag_sprite_tbl = (value >> 3) & 1;
-	ppu->flag_background_tbl = (value >> 4) & 1;
-	ppu->flag_sprite_size = (value >> 5) & 1;
-	ppu->flag_rw = (value >> 6) & 1;
-	ppu->nmi_out = ((value >> 7) & 1) == 1;
-	PPUnmiShift(ppu);
-	ppu->t = (ppu->t & 0xF3FF) | ((static_cast<uint16_t>(value) & 3) << 10);
-}
 
-// $2001: PPUMASK
-void writePPUMask(PPU* ppu, byte value) {
-	ppu->flag_gray = value & 1;
-	ppu->flag_show_left_background = (value >> 1) & 1;
-	ppu->flag_show_left_sprites = (value >> 2) & 1;
-	ppu->flag_show_background = (value >> 3) & 1;
-	ppu->flag_show_sprites = (value >> 4) & 1;
-	ppu->flag_red_tint = (value >> 5) & 1;
-	ppu->flag_green_tint = (value >> 6) & 1;
-	ppu->flag_blue_tint = (value >> 7) & 1;
-}

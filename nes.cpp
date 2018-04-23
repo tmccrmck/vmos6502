@@ -276,12 +276,12 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 		// set v_blank
 		std::swap(ppu->front, ppu->back);
 		ppu->nmi_occurred = true;
-		PPUnmiShift(ppu);
+		ppu->PPUnmiShift();
 	}
 	if (preline && ppu->cycle == 1) {
 		// clear v_blank
 		ppu->nmi_occurred = false;
-		PPUnmiShift(ppu);
+		ppu->PPUnmiShift();
 
 		ppu->flag_sprite_zero_hit = 0;
 		ppu->flag_sprite_overflow = 0;
@@ -578,15 +578,6 @@ void NES::emulate(double seconds) {
 		}
 		cycles -= cpuCycles;
 	}
-}
-
-void PPUnmiShift(PPU* ppu) {
-	const bool nmi = ppu->nmi_out && ppu->nmi_occurred;
-	if (nmi && !ppu->nmi_last) {
-		// TODO: I think this is supposed to be 8...
-		ppu->nmi_delay = 15;
-	}
-	ppu->nmi_last = nmi;
 }
 
 void dmcRestart(DMC* d) {

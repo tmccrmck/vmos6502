@@ -5,7 +5,8 @@
 #include <cstdio>
 #include <cstdlib>
 
-struct CPU {
+class CPU {
+public:
 	uint64_t cycles;
 	uint16_t PC;       // program counter
 	uint8_t SP;        // stack pointer
