@@ -164,9 +164,9 @@ void writeRegisterAPU(APU* apu, uint16_t address, byte value) {
 		apu->frame_period = 4 + ((value >> 7) & 1);
 		apu->frame_IRQ = ((value >> 6) & 1) == 0;
 		if (apu->frame_period == 5) {
-			tickEnvelope(apu);
-			tickSweep(apu);
-			tickLength(apu);
+			apu->tickEnvelope();
+			apu->tickSweep();
+			apu->tickLength();
 		}
 		break;
 	}

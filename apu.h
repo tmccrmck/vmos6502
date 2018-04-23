@@ -28,6 +28,14 @@ struct Pulse {
 	uint8_t const_vol;
 
 	Pulse() : enabled(false), channel(0), length_enabled(false), length_val(0), timer_period(0), timer_val(0), duty_mode(0), duty_val(0), sweep_reload(false), sweep_enabled(false), sweep_negate(false), sweep_shift(0), sweep_period(0), sweep_val(0), envelope_enabled(false), envelope_loop(false), envelope_start(false), envelope_period(0), envelope_val(0), envelope_vol(0), const_vol(0) {}
+
+	void tickPulseTimer();
+
+	void sweep();
+
+	void pulseTickSweep();
+
+	byte pulseOutput();
 };
 
 struct Triangle {
@@ -80,7 +88,8 @@ struct DMC {
 	DMC() : enabled(false), value(0), samp_addr(0), samp_len(0), cur_addr(0), cur_len(0), shift_reg(0), bit_count(0), tick_period(0), tick_val(0), loop(false), irq(false) {}
 };
 
-struct APU {
+class APU {
+public:
 	PaStream* stream;
 	Pulse pulse1;
 	Pulse pulse2;
@@ -93,6 +102,13 @@ struct APU {
 	bool frame_IRQ;
 
 	APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+
+	void tickLength();
+
+void tickEnvelope();
+
+void tickSweep();
+
 };
 
 void dmcRestart(DMC* d);

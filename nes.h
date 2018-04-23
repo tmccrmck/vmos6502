@@ -131,6 +131,13 @@ struct Instruction {
 	constexpr Instruction(const byte _opcode, const char _name[4], void(*_dispatch)(CPU*, NES*, uint16_t, byte), const byte _mode, const byte _size, const byte _cycles, const byte _page_crossed_cycles) : opcode(_opcode), name(_name), dispatch(_dispatch), mode(_mode), size(_size), cycles(_cycles), page_cross_cycles(_page_crossed_cycles) {}
 };
 
+constexpr byte duty_tbl[4][8] = {
+	{ 0, 1, 0, 0, 0, 0, 0, 0 },
+	{ 0, 1, 1, 0, 0, 0, 0, 0 },
+	{ 0, 1, 1, 1, 1, 0, 0, 0 },
+	{ 1, 0, 0, 1, 1, 1, 1, 1 },
+};
+
 void php(CPU* cpu, NES* nes, uint16_t address, byte mode);
 
 void setI(CPU* cpu, bool value);
