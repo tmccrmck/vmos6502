@@ -35,26 +35,7 @@ struct Mapper1 : public Mapper {
 	void updateOffsets(Cartridge* cartridge);
 	void writeCtrl(Cartridge* cartridge, uint8_t value);
 
-	uint8_t read(Cartridge* cartridge, uint16_t address) {
-		if (address < 0x2000) {
-			const uint16_t bank = address >> 12;
-			const uint16_t offset = address & 4095;
-			return cartridge->CHR[chr_offsets[bank] + static_cast<int>(offset)];
-		}
-		else if (address >= 0x8000) {
-			address -= 0x8000;
-			const uint16_t bank = address >> 14;
-			const uint16_t offset = address & 16383;
-			return cartridge->PRG[prg_offsets[bank] + static_cast<int>(offset)];
-		}
-		else if (address >= 0x6000) {
-			return cartridge->SRAM[static_cast<int>(address) - 0x6000];
-		}
-		else {
-			std::cerr << "ERROR: Mapper1 encountered unrecognized read (address 0x" << std::hex << address << std::dec << ')' << std::endl;
-			return 0;
-		}
-	}
+	uint8_t read(Cartridge* cartridge, uint16_t address);
 
 	void write(Cartridge* cartridge, uint16_t address, uint8_t value) {
 		if (address < 0x2000) {
@@ -360,3 +341,4 @@ struct Mapper7 : public Mapper {
 };
 
 #endif //VMOS6502_MAPPER_H
+

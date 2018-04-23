@@ -730,23 +730,23 @@ void NES::writeByte(uint16_t address, byte value) {
 		this->RAM[address & 2047] = value;
 	}
 	else if (address < 0x4000) {
-		writeRegisterPPU(0x2000 + (address & 7), value);
+		this->writeRegisterPPU(0x2000 + (address & 7), value);
 	}
 	else if (address < 0x4014) {
-		writeRegisterAPU(this->apu, address, value);
+		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address == 0x4014) {
 		writeRegisterPPU(address, value);
 	}
 	else if (address == 0x4015) {
-		writeRegisterAPU(this->apu, address, value);
+		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address == 0x4016) {
 		controller1->writeController(value);
 		controller2->writeController(value);
 	}
 	else if (address == 0x4017) {
-		writeRegisterAPU(this->apu, address, value);
+		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address < 0x6000) {
 		// I/O registers

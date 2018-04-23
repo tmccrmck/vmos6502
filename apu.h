@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <portaudio.h>
 
-struct Pulse {
+class Pulse {
+public:
 	bool enabled;
 	uint8_t channel;
 	bool length_enabled;
@@ -28,14 +29,14 @@ struct Pulse {
 	uint8_t const_vol;
 
 	Pulse() : enabled(false), channel(0), length_enabled(false), length_val(0), timer_period(0), timer_val(0), duty_mode(0), duty_val(0), sweep_reload(false), sweep_enabled(false), sweep_negate(false), sweep_shift(0), sweep_period(0), sweep_val(0), envelope_enabled(false), envelope_loop(false), envelope_start(false), envelope_period(0), envelope_val(0), envelope_vol(0), const_vol(0) {}
-
 	void tickPulseTimer();
-
 	void sweep();
-
 	void pulseTickSweep();
-
 	byte pulseOutput();
+    void pulseWriteControl(byte value);
+    void pulseWriteSweep(byte value);
+    void pulseWriteTimerHigh(byte value);
+
 };
 
 struct Triangle {
@@ -104,11 +105,9 @@ public:
 	APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
 
 	void tickLength();
-
-void tickEnvelope();
-
-void tickSweep();
-
+    void tickEnvelope();
+    void tickSweep();
+    void writeRegisterAPU(uint16_t address, byte value);
 };
 
 void dmcRestart(DMC* d);

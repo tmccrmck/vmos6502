@@ -63,7 +63,6 @@ struct iNESHeader {
 };
 
 bool pagesDiffer(uint16_t a, uint16_t b);
-void writeRegisterAPU(APU* apu, uint16_t address, byte value);
 uint16_t mirrorAddress(byte mode, uint16_t address);
 
 class NES {
