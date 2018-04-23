@@ -69,6 +69,13 @@ struct Controller {
 	Controller() : buttons(0), index(0), strobe(0) {}
 };
 
+byte readController(Controller* c);
+void writeController(Controller* c, byte value);
+
+bool pagesDiffer(uint16_t a, uint16_t b);
+void writeRegisterAPU(APU* apu, uint16_t address, byte value);
+uint16_t mirrorAddress(byte mode, uint16_t address);
+
 class NES {
 public:
 	bool initialized;
@@ -83,7 +90,23 @@ public:
 
 	NES(std::string path, std::string SRAM_path);
     void emulate(double seconds);
+    void execute(byte opcode);
+
     void tickAPU(APU* apu);
+	void tickPPU(CPU* cpu, PPU* ppu);
+    void writePPU(uint16_t address, byte value);
+    void writeRegisterPPU(uint16_t address, byte value);
+    byte readPPU(uint16_t address);
+	byte readPPURegister(uint16_t address);
+
+    byte readByte(uint16_t address);
+    void push16(uint16_t value);
+    void push(byte value);
+    byte pop();
+    uint16_t  pop16();
+    uint16_t read16(uint16_t address);
+    uint16_t read16_ff_bug(uint16_t address);
+    void writeByte(uint16_t address, byte value);
 
     void printState() {
 		std::cout << "CPU status: "
@@ -108,16 +131,7 @@ struct Instruction {
 	constexpr Instruction(const byte _opcode, const char _name[4], void(*_dispatch)(CPU*, NES*, uint16_t, byte), const byte _mode, const byte _size, const byte _cycles, const byte _page_crossed_cycles) : opcode(_opcode), name(_name), dispatch(_dispatch), mode(_mode), size(_size), cycles(_cycles), page_cross_cycles(_page_crossed_cycles) {}
 };
 
-byte readPalette(PPU* ppu, uint16_t address);
-byte readPPU(NES* nes, uint16_t address);
-byte readByte(NES* nes, uint16_t address);
-void push16(NES* nes, uint16_t value);
 void php(CPU* cpu, NES* nes, uint16_t address, byte mode);
-
-uint16_t read16(NES* nes, uint16_t address);
-void execute(NES* nes, byte opcode);
-void writeByte(NES* nes, uint16_t address, byte value);
-void emulate(NES* nes, double seconds);
 
 void setI(CPU* cpu, bool value);
 byte getI(CPU* cpu);

@@ -90,6 +90,7 @@ public:
     void writePPUCtrl(byte x);
     void writePPUMask(byte x);
     void PPUnmiShift();
+    byte readPalette(uint16_t address);
 };
 
 

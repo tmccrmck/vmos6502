@@ -33,3 +33,10 @@ void PPU::PPUnmiShift() {
 	this->nmi_last = nmi;
 }
 
+byte PPU::readPalette(uint16_t address) {
+	if (address >= 16 && (address & 3) == 0) {
+		address -= 16;
+	}
+	return this->palette_tbl[address];
+}
+

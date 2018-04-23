@@ -30,7 +30,101 @@ void spritePixel(PPU* ppu, byte& i, byte& sprite) {
 	return;
 }
 
-void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
+byte NES::readPPU(uint16_t address) {
+	address &= 16383;
+	if (address < 0x2000) {
+		return this->mapper->read(this->cartridge, address);
+	}
+	else if (address < 0x3F00) {
+		byte mode = this->cartridge->mirror;
+		return this->ppu->name_tbl[mirrorAddress(mode, address) & 2047];
+	}
+	else if (address < 0x4000) {
+		return this->ppu->readPalette(address & 31);
+	}
+	else {
+		std::cerr << "ERROR: PPU encountered unrecognized read (address 0x" << std::hex << address << std::dec << ')' << std::endl;
+	}
+	return 0;
+}
+
+NES::NES(const std::string path, const std::string SRAM_path) : initialized(false) {
+	std::cout << "Initializing cartridge..." << std::endl;
+	cartridge = new Cartridge(path, SRAM_path);
+	if (!cartridge->initialized) return;
+
+	std::cout << "Initializing controllers..." << std::endl;
+	controller1 = new Controller;
+	controller2 = new Controller;
+
+	RAM = new byte[2048];
+	memset(RAM, 0, 2048);
+
+	std::cout << "Initializing mapper..." << std::endl;
+	if (cartridge->mapper == 0) {
+		const int prg_banks = cartridge->prg_size >> 14;
+		mapper = new Mapper2(prg_banks, 0, prg_banks - 1);
+	}
+	else if (cartridge->mapper == 1) {
+		Mapper1* m = new Mapper1();
+		m->shift_reg = 0x10;
+		m->prg_offsets[1] = m->prgBankOffset(cartridge, -1);
+		mapper = m;
+	}
+	else if (cartridge->mapper == 2) {
+		const int prg_banks = cartridge->prg_size >> 14;
+		mapper = new Mapper2(prg_banks, 0, prg_banks - 1);
+	}
+	else if (cartridge->mapper == 3) {
+		const int prg_banks = cartridge->prg_size >> 14;
+		mapper = new Mapper3(0, 0, prg_banks - 1);
+	}
+	else if (cartridge->mapper == 4) {
+		Mapper4* m = new Mapper4();
+		m->prg_offsets[0] = m->prgBankOffset(cartridge, 0);
+		m->prg_offsets[1] = m->prgBankOffset(cartridge, 1);
+		m->prg_offsets[2] = m->prgBankOffset(cartridge, -2);
+		m->prg_offsets[3] = m->prgBankOffset(cartridge, -1);
+		mapper = m;
+	}
+	else if (cartridge->mapper == 7) {
+		mapper = new Mapper7();
+	}
+	else {
+		std::cerr << "ERROR: cartridge uses Mapper " << static_cast<int>(cartridge->mapper) << ", which isn't currently supported by vmos!" << std::endl;
+		return;
+	}
+
+	std::cout << "Mapper " << static_cast<int>(cartridge->mapper) << " activated." << std::endl;
+
+	std::cout << "Initializing NES CPU..." << std::endl;
+	cpu = new CPU();
+
+	cpu->PC = read16(0xFFFC);
+	cpu->SP = 0xFD;
+	cpu->flags = 0x24;
+
+	std::cout << "Initializing NES APU..." << std::endl;
+	apu = new APU();
+	apu->noise.shift_reg = 1;
+	apu->pulse1.channel = 1;
+	apu->pulse2.channel = 2;
+
+	std::cout << "Initializing NES PPU..." << std::endl;
+	ppu = new PPU();
+	ppu->front = new uint32_t[256 * 240];
+	ppu->back = new uint32_t[256 * 240];
+	ppu->cycle = 340;
+	ppu->scanline = 250;
+	ppu->frame = 0;
+
+	ppu->writePPUCtrl(0);
+	ppu->writePPUMask(0);
+	ppu->oam_addr = 0;
+	initialized = true;
+}
+
+void NES::tickPPU(CPU* cpu, PPU* ppu) {
 	if (ppu->nmi_delay > 0) {
 		ppu->nmi_delay--;
 		if (ppu->nmi_delay == 0 && ppu->nmi_out && ppu->nmi_occurred) {
@@ -111,7 +205,7 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 				}
 			}
 
-			ppu->back[(y << 8) + x] = palette[readPalette(ppu, static_cast<uint16_t>(color)) & 63];
+			ppu->back[(y << 8) + x] = palette[ppu->readPalette(static_cast<uint16_t>(color)) & 63];
 		}
 		if (do_line_render && fetch_cycle) {
 			ppu->tile_data <<= 4;
@@ -119,27 +213,27 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 			if (pcm8 == 1) {
 				const uint16_t v = ppu->v;
 				const uint16_t address = 0x2000 | (v & 0x0FFF);
-				ppu->name_tbl_u8 = readPPU(nes, address);
+				ppu->name_tbl_u8 = readPPU(address);
 			}
 			else if (pcm8 == 3) {
 				const uint16_t v = ppu->v;
 				const uint16_t address = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
 				const int shift = ((v >> 4) & 4) | (v & 2);
-				ppu->attrib_tbl_u8 = ((readPPU(nes, address) >> shift) & 3) << 2;
+				ppu->attrib_tbl_u8 = ((readPPU(address) >> shift) & 3) << 2;
 			}
 			else if (pcm8 == 5) {
 				const uint16_t fineY = (ppu->v >> 12) & 7;
 				const byte table = ppu->flag_background_tbl;
 				const byte tile = ppu->name_tbl_u8;
 				const uint16_t address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
-				ppu->low_tile_u8 = readPPU(nes, address);
+				ppu->low_tile_u8 = readPPU(address);
 			}
 			else if (pcm8 == 7) {
 				const uint16_t fineY = (ppu->v >> 12) & 7;
 				const byte table = ppu->flag_background_tbl;
 				const byte tile = ppu->name_tbl_u8;
 				const uint16_t address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
-				ppu->high_tile_u8 = readPPU(nes, address + 8);
+				ppu->high_tile_u8 = readPPU(address + 8);
 			}
 			else if (pcm8 == 0) {
 				uint32_t data = 0;
@@ -233,8 +327,8 @@ void tickPPU(NES* nes, CPU* cpu, PPU* ppu) {
 						address = (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + static_cast<uint16_t>(row);
 					}
 					byte atts = (attributes & 3) << 2;
-					byte low_tile_u8 = readPPU(nes, address);
-					byte high_tile_u8 = readPPU(nes, address + 8);
+					byte low_tile_u8 = readPPU(address);
+					byte high_tile_u8 = readPPU(address + 8);
 
 					for (int j = 0; j < 8; ++j) {
 						byte p1, p2;
@@ -409,7 +503,7 @@ void NES::tickAPU(APU* apu) {
 			// tick reader
 			if (d->cur_len > 0 && d->bit_count == 0) {
 				this->cpu->stall += 4;
-				d->shift_reg = readByte(this, d->cur_addr);
+				d->shift_reg = readByte(d->cur_addr);
 				d->bit_count = 8;
 				++d->cur_addr;
 				if (d->cur_addr == 0) {
@@ -544,29 +638,29 @@ void NES::emulate(double seconds) {
 			uint64_t startCycles = cpu->cycles;
 
 			if (cpu->interrupt == interruptNMI) {
-				push16(this, cpu->PC);
+				push16(cpu->PC);
 				php(cpu, this, 0, 0);
-				cpu->PC = read16(this, 0xFFFA);
+				cpu->PC = read16(0xFFFA);
 				setI(cpu, true);
 				cpu->cycles += 7;
 			}
 			else if (cpu->interrupt == interruptIRQ) {
-				push16(this, cpu->PC);
+				push16(cpu->PC);
 				php(cpu, this, 0, 0);
-				cpu->PC = read16(this, 0xFFFE);
+				cpu->PC = read16(0xFFFE);
 				setI(cpu, true);
 				cpu->cycles += 7;
 			}
 			cpu->interrupt = interruptNone;
-			byte opcode = readByte(this, cpu->PC);
-			execute(this, opcode);
+			byte opcode = readByte(cpu->PC);
+			execute(opcode);
 			cpuCycles = static_cast<int>(cpu->cycles - startCycles);
 		}
 
 		const int ppuCycles = cpuCycles * 3;
 		for (int i = 0; i < ppuCycles; ++i) {
 			PPU* ppu = this->ppu;
-			tickPPU(this, this->cpu, ppu);
+			tickPPU(this->cpu, ppu);
 
 			if ((ppu->cycle == 280) && (ppu->scanline <= 239 || ppu->scanline >= 261) && (ppu->flag_show_background != 0 || ppu->flag_show_sprites != 0)) {
 				this->mapper->updateCounter(this->cpu);
@@ -580,7 +674,252 @@ void NES::emulate(double seconds) {
 	}
 }
 
+byte NES::readPPURegister(uint16_t address) {
+	PPU* ppu = this->ppu;
+	// PPUSTATUS
+	if (address == 0x2002) {
+		byte status = ppu->reg & 0x1F;
+		status |= ppu->flag_sprite_overflow << 5;
+		status |= ppu->flag_sprite_zero_hit << 6;
+		if (ppu->nmi_occurred) {
+			status |= 1 << 7;
+		}
+		ppu->nmi_occurred = false;
+		ppu->PPUnmiShift();
+		ppu->w = 0;
+		return status;
+	}
+	else if (address == 0x2004) {
+		return ppu->oam_tbl[ppu->oam_addr];
+	}
+	else if (address == 0x2007) {
+		byte value = readPPU(ppu->v);
+		// buffered read
+		if ((ppu->v & 16383) < 0x3F00) {
+			byte buffered = ppu->buffered_data;
+			ppu->buffered_data = value;
+			value = buffered;
+		}
+		else {
+			ppu->buffered_data = readPPU(ppu->v - 0x1000);
+		}
+
+		ppu->v += ppu->flag_increment == 0 ? 1 : 32;
+		return value;
+	}
+	return 0;
+}
+
+byte NES::readByte(uint16_t address) {
+	if (address < 0x2000) {
+		return this->RAM[address & 2047];
+	}
+	else if (address < 0x4000) {
+		return readPPURegister(0x2000 + (address & 7));
+	}
+	else if (address == 0x4014) {
+		return readPPURegister(address);
+	}
+	else if (address == 0x4015) {
+		// apu reg read
+		APU* apu = this->apu;
+		byte read_status = 0;
+		if (apu->pulse1.length_val > 0) {
+			read_status |= 1;
+		}
+		if (apu->pulse2.length_val > 0) {
+			read_status |= 2;
+		}
+		if (apu->triangle.length_val > 0) {
+			read_status |= 4;
+		}
+		if (apu->noise.length_val > 0) {
+			read_status |= 8;
+		}
+		if (apu->dmc.cur_len > 0) {
+			read_status |= 16;
+		}
+		return 0;
+	}
+	else if (address == 0x4016) {
+		return readController(this->controller1);
+	}
+	else if (address == 0x4017) {
+		return readController(this->controller2);
+	}
+	else if (address < 0x6000) {
+		// I/O registers
+	}
+	else if (address >= 0x6000) {
+		return this->mapper->read(this->cartridge, address);
+	}
+	else {
+		std::cerr << "ERROR: CPU encountered unrecognized read (address 0x" << std::hex << address << std::dec << ')' << std::endl;
+	}
+	return 0;
+}
+
+// push uint16_t onto stack
+void NES::push16(uint16_t value) {
+	push(static_cast<byte>(value >> 8));
+	push(static_cast<byte>(value));
+}
+
+// push byte onto stack
+void NES::push(byte value) {
+	CPU* cpu = this->cpu;
+	writeByte(0x100 | static_cast<uint16_t>(cpu->SP), value);
+	--cpu->SP;
+}
+
+// pop byte from stack
+byte NES::pop() {
+	CPU* cpu = this->cpu;
+	++cpu->SP;
+	return readByte(0x100 | static_cast<uint16_t>(cpu->SP));
+}
+
+// pop uint16_t onto stack
+uint16_t NES::pop16() {
+	const byte lo = static_cast<uint16_t>(pop());
+	const byte hi = static_cast<uint16_t>(pop());
+	return (hi << 8) | lo;
+}
+
 void dmcRestart(DMC* d) {
 	d->cur_addr = d->samp_addr;
 	d->cur_len = d->samp_len;
 }
+
+// famous 6502 memory indirect jump bug: only the low byte wraps on an xxFF read instead of the whole word incrementing
+uint16_t NES::read16_ff_bug(uint16_t address) {
+	const uint16_t a = address;
+	const uint16_t b = (a & 0xFF00) | static_cast<uint16_t>(static_cast<byte>(static_cast<byte>(a) + 1));
+	const byte lo = readByte(a);
+	const byte hi = readByte(b);
+	return (static_cast<uint16_t>(hi) << 8) | static_cast<uint16_t>(lo);
+}
+
+uint16_t NES::read16(uint16_t address) {
+	const byte lo = static_cast<uint16_t>(readByte(address));
+	const byte hi = static_cast<uint16_t>(readByte(address + 1));
+	return (hi << 8) | lo;
+}
+
+void NES::writeByte(uint16_t address, byte value) {
+	if (address < 0x2000) {
+		this->RAM[address & 2047] = value;
+	}
+	else if (address < 0x4000) {
+		writeRegisterPPU(0x2000 + (address & 7), value);
+	}
+	else if (address < 0x4014) {
+		writeRegisterAPU(this->apu, address, value);
+	}
+	else if (address == 0x4014) {
+		writeRegisterPPU(address, value);
+	}
+	else if (address == 0x4015) {
+		writeRegisterAPU(this->apu, address, value);
+	}
+	else if (address == 0x4016) {
+		writeController(this->controller1, value);
+		writeController(this->controller2, value);
+	}
+	else if (address == 0x4017) {
+		writeRegisterAPU(this->apu, address, value);
+	}
+	else if (address < 0x6000) {
+		// I/O registers
+	}
+	else if (address >= 0x6000) {
+		this->mapper->write(this->cartridge, address, value);
+	}
+	else {
+		std::cerr << "ERROR: CPU encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
+	}
+}
+
+void NES::writePPU(uint16_t address, byte value) {
+	address &= 16383;
+	if (address < 0x2000) {
+		this->mapper->write(this->cartridge, address, value);
+	}
+	else if (address < 0x3F00) {
+		const byte mode = this->cartridge->mirror;
+		this->ppu->name_tbl[mirrorAddress(mode, address) & 2047] = value;
+	}
+	else if (address < 0x4000) {
+		// palette
+		address &= 31;
+		if (address >= 16 && (address & 3) == 0) {
+			address -= 16;
+		}
+		this->ppu->palette_tbl[address] = value;
+	}
+	else {
+		std::cerr << "ERROR: PPU encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
+	}
+}
+
+void NES::writeRegisterPPU(uint16_t address, byte value) {
+	PPU* ppu = this->ppu;
+	ppu->reg = value;
+	switch (address) {
+	case 0x2000:
+		ppu->writePPUCtrl(value);
+		break;
+	case 0x2001:
+		ppu->writePPUMask(value);
+		break;
+	case 0x2003:
+		ppu->oam_addr = value;
+		break;
+	case 0x2004:
+		ppu->oam_tbl[ppu->oam_addr] = value;
+		++ppu->oam_addr;
+		break;
+	case 0x2005:
+		// scroll
+		if (ppu->w == 0) {
+			ppu->t = (ppu->t & 0xFFE0) | (static_cast<uint16_t>(value) >> 3);
+			ppu->x = value & 7;
+			ppu->w = 1;
+		}
+		else {
+			ppu->t = (ppu->t & 0x8FFF) | ((static_cast<uint16_t>(value) & 0x07) << 12);
+			ppu->t = (ppu->t & 0xFC1F) | ((static_cast<uint16_t>(value) & 0xF8) << 2);
+			ppu->w = 0;
+		}
+		break;
+	case 0x2006:
+		if (ppu->w == 0) {
+			ppu->t = (ppu->t & 0x80FF) | ((static_cast<uint16_t>(value) & 0x3F) << 8);
+			ppu->w = 1;
+		}
+		else {
+			ppu->t = (ppu->t & 0xFF00) | static_cast<uint16_t>(value);
+			ppu->v = ppu->t;
+			ppu->w = 0;
+		}
+		break;
+	case 0x2007:
+		writePPU(ppu->v, value);
+		ppu->v += ppu->flag_increment == 0 ? 1 : 32;
+		break;
+	case 0x4014:
+		// DMA
+		CPU* cpu = this->cpu;
+		address = static_cast<uint16_t>(value) << 8;
+		for (int i = 0; i < 256; ++i) {
+			ppu->oam_tbl[ppu->oam_addr] = readByte(address);
+			++ppu->oam_addr;
+			++address;
+		}
+		cpu->stall += 513;
+		if (cpu->cycles & 1) {
+			++cpu->stall;
+		}
+	}
+}
+

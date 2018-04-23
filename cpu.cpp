@@ -83,52 +83,11 @@ void compare(CPU* cpu, byte a, byte b) {
 	setC(cpu, a >= b);
 }
 
-// push byte onto stack
-void push(NES* nes, byte value) {
-	CPU* cpu = nes->cpu;
-	writeByte(nes, 0x100 | static_cast<uint16_t>(cpu->SP), value);
-	--cpu->SP;
-}
-
-// pop byte from stack
-byte pop(NES* nes) {
-	CPU* cpu = nes->cpu;
-	++cpu->SP;
-	return readByte(nes, 0x100 | static_cast<uint16_t>(cpu->SP));
-}
-
-// push uint16_t onto stack
-void push16(NES* nes, uint16_t value) {
-	push(nes, static_cast<byte>(value >> 8));
-	push(nes, static_cast<byte>(value));
-}
-
-// pop uint16_t onto stack
-uint16_t pop16(NES* nes) {
-	const byte lo = static_cast<uint16_t>(pop(nes));
-	const byte hi = static_cast<uint16_t>(pop(nes));
-	return (hi << 8) | lo;
-}
-
 // do addresses represent different pages?
 bool pagesDiffer(uint16_t a, uint16_t b) {
 	return (a & 0xFF00) != (b & 0xFF00);
 }
 
-// famous 6502 memory indirect jump bug: only the low byte wraps on an xxFF read instead of the whole word incrementing
-uint16_t read16_ff_bug(NES* nes, uint16_t address) {
-	const uint16_t a = address;
-	const uint16_t b = (a & 0xFF00) | static_cast<uint16_t>(static_cast<byte>(static_cast<byte>(a) + 1));
-	const byte lo = readByte(nes, a);
-	const byte hi = readByte(nes, b);
-	return (static_cast<uint16_t>(hi) << 8) | static_cast<uint16_t>(lo);
-}
-
-uint16_t read16(NES* nes, uint16_t address) {
-	const byte lo = static_cast<uint16_t>(readByte(nes, address));
-	const byte hi = static_cast<uint16_t>(readByte(nes, address + 1));
-	return (hi << 8) | lo;
-}
 
 // 1 cycle for taking a branch
 // 1 cycle if the branch is to a new page
@@ -143,7 +102,7 @@ void branchDelay(CPU* cpu, uint16_t address, uint16_t pc) {
 void adc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = cpu->A;
-	const byte b = readByte(nes, address);
+	const byte b = nes->readByte(address);
 	const byte c = getC(cpu);
 	cpu->A = a + b + c;
 	setZN(cpu, cpu->A);
@@ -155,7 +114,7 @@ void adc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // Nonstandard name to disambiguate from 'and' label
 void and_instruction(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->A &= readByte(nes, address);
+	cpu->A &= nes->readByte(address);
 	setZN(cpu, cpu->A);
 }
 
@@ -167,10 +126,10 @@ void asl(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 		setZN(cpu, cpu->A);
 	}
 	else {
-		byte value = readByte(nes, address);
+		byte value = nes->readByte(address);
 		setC(cpu, (value >> 7) & 1);
 		value <<= 1;
-		writeByte(nes, address, value);
+		nes->writeByte(address, value);
 		setZN(cpu, value);
 	}
 }
@@ -178,7 +137,7 @@ void asl(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // BIT - BIt Test
 void bit(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address);
+	const byte value = nes->readByte(address);
 	setV(cpu, (value >> 6) & 1);
 	setZ(cpu, value & cpu->A);
 	setN(cpu, value);
@@ -187,29 +146,29 @@ void bit(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // CMP - CoMPare
 void cmp(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address);
+	const byte value = nes->readByte(address);
 	compare(cpu, cpu->A, value);
 }
 
 // CPX - ComPare X register
 void cpx(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address);
+	const byte value = nes->readByte(address);
 	compare(cpu, cpu->X, value);
 }
 
 // CPY - ComPare Y register
 void cpy(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address);
+	const byte value = nes->readByte(address);
 	compare(cpu, cpu->Y, value);
 }
 
 // DEC - DECrement memory
 void dec(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address) - 1;
-	writeByte(nes, address, value);
+	const byte value = nes->readByte(address) - 1;
+	nes->writeByte(address, value);
 	setZN(cpu, value);
 }
 
@@ -217,15 +176,15 @@ void dec(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // EOR - Exclusive OR
 void eor(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->A ^= readByte(nes, address);
+	cpu->A ^= nes->readByte(address);
 	setZN(cpu, cpu->A);
 }
 
 // INC - INCrement memory
 void inc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = readByte(nes, address) + 1;
-	writeByte(nes, address, value);
+	const byte value = nes->readByte(address) + 1;
+	nes->writeByte(address, value);
 	setZN(cpu, value);
 }
 
@@ -239,21 +198,21 @@ void jmp(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // LDA - LoaD Accumulator
 void lda(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->A = readByte(nes, address);
+	cpu->A = nes->readByte(address);
 	setZN(cpu, cpu->A);
 }
 
 // LDX - LoaD X register
 void ldx(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->X = readByte(nes, address);
+	cpu->X = nes->readByte(address);
 	setZN(cpu, cpu->X);
 }
 
 // LDY - LoaD Y register
 void ldy(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->Y = readByte(nes, address);
+	cpu->Y = nes->readByte(address);
 	setZN(cpu, cpu->Y);
 }
 
@@ -265,10 +224,10 @@ void lsr(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 		setZN(cpu, cpu->A);
 	}
 	else {
-		byte value = readByte(nes, address);
+		byte value = nes->readByte(address);
 		setC(cpu, value & 1);
 		value >>= 1;
-		writeByte(nes, address, value);
+		nes->writeByte(address, value);
 		setZN(cpu, value);
 	}
 }
@@ -276,7 +235,7 @@ void lsr(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // ORA - logical OR with Accumulator
 void ora(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	cpu->A |= readByte(nes, address);
+	cpu->A |= nes->readByte(address);
 	setZN(cpu, cpu->A);
 }
 
@@ -284,7 +243,7 @@ void ora(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void php(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	push(nes, cpu->flags | 0x10);
+	nes->push(cpu->flags | 0x10);
 }
 
 // ROL - ROtate Left
@@ -297,10 +256,10 @@ void rol(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	}
 	else {
 		const byte c = getC(cpu);
-		byte value = readByte(nes, address);
+		byte value = nes->readByte(address);
 		setC(cpu, (value >> 7) & 1);
 		value = (value << 1) | c;
-		writeByte(nes, address, value);
+		nes->writeByte(address, value);
 		setZN(cpu, value);
 	}
 }
@@ -315,10 +274,10 @@ void ror(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	}
 	else {
 		const byte c = getC(cpu);
-		byte value = readByte(nes, address);
+		byte value = nes->readByte(address);
 		setC(cpu, value & 1);
 		value = (value >> 1) | (c << 7);
-		writeByte(nes, address, value);
+		nes->writeByte(address, value);
 		setZN(cpu, value);
 	}
 }
@@ -327,7 +286,7 @@ void ror(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void sbc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = cpu->A;
-	const byte b = readByte(nes, address);
+	const byte b = nes->readByte(address);
 	const byte c = getC(cpu);
 	cpu->A = a - b - (1 - c);
 	setZN(cpu, cpu->A);
@@ -346,27 +305,27 @@ void sei(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // STA - STore Accumulator
 void sta(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	writeByte(nes, address, cpu->A);
+	nes->writeByte(address, cpu->A);
 }
 
 // STX - Store X Register
 void stx(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	writeByte(nes, address, cpu->X);
+	nes->writeByte(address, cpu->X);
 }
 
 // STY - STore Y Register
 void sty(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	writeByte(nes, address, cpu->Y);
+	nes->writeByte(address, cpu->Y);
 }
 
 // BRK - force interrupt BReaK
 void brk(CPU* cpu, NES* nes, uint16_t address, byte mode) {
-	push16(nes, cpu->PC);
+	nes->push16(cpu->PC);
 	php(cpu, nes, address, mode);
 	sei(cpu, nes, address, mode);
-	cpu->PC = read16(nes, 0xFFFE);
+	cpu->PC = nes->read16(0xFFFE);
 }
 
 // BPL - Branch if PLus (i.e. if positive)
@@ -391,7 +350,7 @@ void clc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 // JSR - Jump to SubRoutine   
 void jsr(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	push16(nes, cpu->PC - 1);
+	nes->push16(cpu->PC - 1);
 	cpu->PC = address;
 }
 
@@ -399,7 +358,7 @@ void jsr(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void plp(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	cpu->flags = (pop(nes) & 0xEF) | 0x20;
+	cpu->flags = (nes->pop() & 0xEF) | 0x20;
 }
 
 // BMI - Branch if MInus (i.e. if negative)
@@ -425,8 +384,8 @@ void sec(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void rti(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	cpu->flags = (pop(nes) & 0xEF) | 0x20;
-	cpu->PC = pop16(nes);
+	cpu->flags = (nes->pop() & 0xEF) | 0x20;
+	cpu->PC = nes->pop16();
 }
 
 // BVC - Branch if oVerflow Clear
@@ -444,7 +403,7 @@ void bvc(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void pha(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	push(nes, cpu->A);
+	nes->push(cpu->A);
 }
 
 // CLI - CLear Interrupt disable
@@ -459,14 +418,14 @@ void cli(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 void rts(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	cpu->PC = pop16(nes) + 1;
+	cpu->PC = nes->pop16() + 1;
 }
 
 // PLA - PuLl Accumulator
 void pla(CPU* cpu, NES* nes, uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
-	cpu->A = pop(nes);
+	cpu->A = nes->pop();
 	setZN(cpu, cpu->A);
 }
 
@@ -905,9 +864,10 @@ constexpr Instruction instructions[256] = {
 	{ 255, "ISC", nop, 2, 0, 7, 0 }
 };
 
-void execute(NES* nes, byte opcode) {
+// Note: move to nes.cpp
+void NES::execute(byte opcode) {
 	const Instruction& instruction = instructions[opcode];
-	CPU* cpu = nes->cpu;
+	CPU* cpu = this->cpu;
 
 	uint16_t address = 0;
 	bool page_crossed = false;
@@ -915,14 +875,14 @@ void execute(NES* nes, byte opcode) {
 
 	switch (instruction.mode) {
 	case modeAbsolute:
-		address = read16(nes, cpu->PC + 1);
+		address = read16(cpu->PC + 1);
 		break;
 	case modeAbsoluteX:
-		address = read16(nes, cpu->PC + 1) + static_cast<uint16_t>(cpu->X);
+		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->X);
 		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->X), address);
 		break;
 	case modeAbsoluteY:
-		address = read16(nes, cpu->PC + 1) + static_cast<uint16_t>(cpu->Y);
+		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->Y);
 		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
 		break;
 	case modeAccumulator:
@@ -935,27 +895,27 @@ void execute(NES* nes, byte opcode) {
 		address = 0;
 		break;
 	case modeIndexedIndirect:
-		address = read16_ff_bug(nes, static_cast<uint16_t>(static_cast<byte>(readByte(nes, cpu->PC + 1) + cpu->X)));
+		address = read16_ff_bug(static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X)));
 		break;
 	case modeIndirect:
-		address = read16_ff_bug(nes, read16(nes, cpu->PC + 1));
+		address = read16_ff_bug(read16(cpu->PC + 1));
 		break;
 	case modeIndirectIndexed:
-		address = read16_ff_bug(nes, static_cast<uint16_t>(readByte(nes, cpu->PC + 1))) + static_cast<uint16_t>(cpu->Y);
+		address = read16_ff_bug(static_cast<uint16_t>(readByte(cpu->PC + 1))) + static_cast<uint16_t>(cpu->Y);
 		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
 		break;
 	case modeRelative:
-		offset = static_cast<uint16_t>(readByte(nes, cpu->PC + 1));
+		offset = static_cast<uint16_t>(readByte(cpu->PC + 1));
 		address = cpu->PC + 2 + offset - ((offset >= 128) << 8);
 		break;
 	case modeZeroPage:
-		address = static_cast<uint16_t>(readByte(nes, cpu->PC + 1));
+		address = static_cast<uint16_t>(readByte(cpu->PC + 1));
 		break;
 	case modeZeroPageX:
-		address = static_cast<uint16_t>(static_cast<byte>(readByte(nes, cpu->PC + 1) + cpu->X));
+		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X));
 		break;
 	case modeZeroPageY:
-		address = static_cast<uint16_t>(static_cast<byte>(readByte(nes, cpu->PC + 1) + cpu->Y));
+		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->Y));
 		break;
 	}
 
@@ -965,7 +925,6 @@ void execute(NES* nes, byte opcode) {
 		cpu->cycles += static_cast<uint64_t>(instruction.page_cross_cycles);
 	}
 
-	instruction.dispatch(cpu, nes, address, instruction.mode);
+	instruction.dispatch(cpu, this, address, instruction.mode);
 }
-
 
