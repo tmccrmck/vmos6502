@@ -10,7 +10,6 @@
 #include "cartridge.h"
 #include "controller.h"
 #include "mapper.h"
-#include "cpu.h"
 #include "apu.h"
 #include "ppu.h"
 
