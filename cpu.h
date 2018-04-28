@@ -26,6 +26,8 @@ public:
 
 	void execute(byte opcode, NES* nes, uint16_t address, const Instruction instruction);
 
+	bool pagesDiffer(uint16_t a, uint16_t b);
+
 	// set zero flag if 'value' is zero
 	void setZ(byte value);
 

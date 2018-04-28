@@ -106,21 +106,20 @@ int main(int argc, char* argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	std::cout << "Initializing GLFW..." << std::endl;
+    std::cout << "Initializing GLFW window..." << std::endl;
+    GLFWwindow* window;
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-
-	std::cout << "Initializing GLFW window..." << std::endl;
-	GLFWwindow* window;
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	window = glfwCreateWindow(512, 480, "vmos", nullptr, nullptr);
-	std::cout << "Window created." << std::endl;
 
 	if (!window) {
 		std::cerr << "ERROR: Failed to create window. Aborting." << std::endl;
 		return EXIT_FAILURE;
 	}
+
+	std::cout << "Window created." << std::endl;
 
 	glfwMakeContextCurrent(window);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
@@ -129,9 +128,10 @@ int main(int argc, char* argv[]) {
 
 	int old_w, old_h, w, h;
 	glfwGetFramebufferSize(window, &old_w, &old_h);
-	std::cout << "Framebuffer reports initial dimensions " << old_w << "x" << old_h << '.' << std::endl;
 
+	std::cout << "Framebuffer reports initial dimensions " << old_w << "x" << old_h << '.' << std::endl;
 	std::cout << "Creating display texture..." << std::endl;
+
 	GLuint texture;
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(1, &texture);
@@ -142,7 +142,6 @@ int main(int argc, char* argv[]) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 	PaAlsa_EnableRealtimeScheduling(nes->apu->stream, 1);
-
 	std::cout << "Starting audio stream..." << std::endl;
 	Pa_StartStream(nes->apu->stream);
 

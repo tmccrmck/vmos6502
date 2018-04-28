@@ -641,7 +641,6 @@ byte NES::readByte(uint16_t address) {
 	}
 	else if (address == 0x4015) {
 		// apu reg read
-		APU* apu = this->apu;
 		byte read_status = 0;
 		if (apu->pulse1.length_val > 0) {
 			read_status |= 1;
@@ -856,11 +855,11 @@ void NES::execute(byte opcode) {
 		break;
 	case modeAbsoluteX:
 		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->X);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->X), address);
+		page_crossed = cpu->pagesDiffer(address - static_cast<uint16_t>(cpu->X), address);
 		break;
 	case modeAbsoluteY:
 		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->Y);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
+		page_crossed = cpu->pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
 		break;
 	case modeAccumulator:
 		address = 0;
@@ -879,7 +878,7 @@ void NES::execute(byte opcode) {
 		break;
 	case modeIndirectIndexed:
 		address = read16_ff_bug(static_cast<uint16_t>(readByte(cpu->PC + 1))) + static_cast<uint16_t>(cpu->Y);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
+		page_crossed = cpu->pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
 		break;
 	case modeRelative:
 		offset = static_cast<uint16_t>(readByte(cpu->PC + 1));

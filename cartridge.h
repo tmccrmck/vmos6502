@@ -6,6 +6,16 @@
 
 typedef uint8_t byte;
 
+struct iNESHeader {
+	uint32_t magic;     // iNES cartridge file magic number
+	byte num_prg;    // number of 16k PRG-ROM banks
+	byte num_chr;    // number of 8k CHR-ROM banks
+	byte ctrl1;
+	byte ctrl2;
+	byte num_ram;    // number of 8k PRG-RAM banks
+	byte padding[7];
+};
+
 struct Cartridge {
 	bool initialized;
 	byte* PRG; // PRG-ROM banks

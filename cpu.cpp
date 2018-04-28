@@ -1,7 +1,7 @@
 #include "nes.h"
 
 // do addresses represent different pages?
-bool pagesDiffer(uint16_t a, uint16_t b) {
+bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
 	return (a & 0xFF00) != (b & 0xFF00);
 }
 

@@ -12,7 +12,6 @@
 #include "mapper.h"
 #include "apu.h"
 #include "ppu.h"
-//#include "cpu.h"
 
 constexpr int INES_MAGIC = 0x1a53454e;
 constexpr double CPU_FREQ = 1789773.0;
@@ -50,16 +49,6 @@ enum AddressingModes {
 	modeZeroPage = 11,
 	modeZeroPageX = 12,
 	modeZeroPageY = 13
-};
-
-struct iNESHeader {
-	uint32_t magic;     // iNES cartridge file magic number
-	byte num_prg;    // number of 16k PRG-ROM banks
-	byte num_chr;    // number of 8k CHR-ROM banks
-	byte ctrl1;
-	byte ctrl2;
-	byte num_ram;    // number of 8k PRG-RAM banks
-	byte padding[7];
 };
 
 bool pagesDiffer(uint16_t a, uint16_t b);
