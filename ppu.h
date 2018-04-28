@@ -4,7 +4,27 @@
 #include <cstdint>
 #include <cstring>
 
+#include "cpu.h"
+#include "mapper.h"
+#include "cartridge.h"
+
 typedef uint8_t byte;
+
+constexpr uint32_t palette[] = { 0xff666666, 0xff882a00, 0xffa71214, 0xffa4003b, 0xff7e005c, 0xff40006e, 0xff00066c, 0xff001d56, 0xff003533, 0xff00480b, 0xff005200, 0xff084f00, 0xff4d4000, 0xff000000, 0xff000000, 0xff000000, 0xffadadad, 0xffd95f15, 0xffff4042, 0xfffe2775, 0xffcc1aa0, 0xff7b1eb7, 0xff2031b5, 0xff004e99, 0xff006d6b, 0xff008738, 0xff00930c, 0xff328f00, 0xff8d7c00, 0xff000000, 0xff000000, 0xff000000, 0xfffffeff, 0xffffb064, 0xffff9092, 0xffff76c6, 0xffff6af3, 0xffcc6efe, 0xff7081fe, 0xff229eea, 0xff00bebc, 0xff00d888, 0xff30e45c, 0xff82e045, 0xffdecd48, 0xff4f4f4f, 0xff000000, 0xff000000, 0xfffffeff, 0xffffdfc0, 0xffffd2d3, 0xffffc8e8, 0xffffc2fb, 0xffeac4fe, 0xffc5ccfe, 0xffa5d8f7, 0xff94e5e4, 0xff96efcf, 0xffabf4bd, 0xffccf3b3, 0xfff2ebb5, 0xffb8b8b8, 0xff000000, 0xff000000 };
+
+constexpr uint16_t mirror_tbl[5][4] = {
+	{ 0, 0, 1, 1 },
+	{ 0, 1, 0, 1 },
+	{ 0, 0, 0, 0 },
+	{ 1, 1, 1, 1 },
+	{ 0, 1, 2, 3 }
+};
+
+enum Interrupts {
+	interruptNone = 1,
+	interruptNMI = 2,
+	interruptIRQ = 3
+};
 
 class PPU {
 public:
@@ -91,6 +111,12 @@ public:
     void writePPUMask(byte x);
     void PPUnmiShift();
     byte readPalette(uint16_t address);
+	void tickPPU(CPU* cpu, Mapper* mapper, Cartridge* cartridge);
+	byte readPPU(uint16_t address, Mapper* mapper, Cartridge* cartridge);
+	void writePPU(uint16_t address, byte value, Mapper* mapper, Cartridge* cartridge);
+	byte readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge);
+
+    void spritePixel(byte &i, byte &sprite);
 };
 
 

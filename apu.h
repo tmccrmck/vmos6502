@@ -108,6 +108,8 @@ public:
     void tickEnvelope();
     void tickSweep();
     void writeRegisterAPU(uint16_t address, byte value);
+
+	void tickAPU(NES* nes);
 };
 
 void dmcRestart(DMC* d);

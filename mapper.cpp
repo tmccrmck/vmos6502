@@ -1,19 +1,5 @@
 #include "mapper.h"
 
-constexpr uint16_t mirror_tbl[5][4] = {
-	{ 0, 0, 1, 1 },
-	{ 0, 1, 0, 1 },
-	{ 0, 0, 0, 0 },
-	{ 1, 1, 1, 1 },
-	{ 0, 1, 2, 3 }
-};
-
-uint16_t mirrorAddress(byte mode, uint16_t address) {
-	address = (address - 0x2000) & 4095;
-	const uint16_t table = address >> 10;
-	const uint16_t offset = address & 1023;
-	return 0x2000 + (mirror_tbl[mode][table] << 10) + offset;
-}
 
 int Mapper1::prgBankOffset(Cartridge* c, int index) {
 	if (index >= 0x80) {

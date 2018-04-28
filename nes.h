@@ -29,12 +29,6 @@ enum Buttons {
 	ButtonRight = 7
 };
 
-enum Interrupts {
-	interruptNone = 1,
-	interruptNMI = 2,
-	interruptIRQ = 3
-};
-
 enum AddressingModes {
 	modeAbsolute = 1,
 	modeAbsoluteX = 2,
@@ -50,9 +44,6 @@ enum AddressingModes {
 	modeZeroPageX = 12,
 	modeZeroPageY = 13
 };
-
-bool pagesDiffer(uint16_t a, uint16_t b);
-uint16_t mirrorAddress(byte mode, uint16_t address);
 
 class NES {
 public:
@@ -70,12 +61,7 @@ public:
     void emulate(double seconds);
     void execute(byte opcode);
 
-    void tickAPU(APU* apu);
-	void tickPPU(CPU* cpu, PPU* ppu);
-    void writePPU(uint16_t address, byte value);
     void writeRegisterPPU(uint16_t address, byte value);
-    byte readPPU(uint16_t address);
-	byte readPPURegister(uint16_t address);
 
     byte readByte(uint16_t address);
     void push16(uint16_t value);
