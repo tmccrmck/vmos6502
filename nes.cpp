@@ -162,7 +162,7 @@ byte NES::readByte(uint16_t address) {
 		return controller2->readController();
 	}
 	else if (address < 0x6000) {
-		// I/O registers
+		// IO registers
 	}
 	else if (address >= 0x6000) {
 		return this->mapper->read(this->cartridge, address);
@@ -223,13 +223,13 @@ void NES::writeByte(uint16_t address, byte value) {
 		this->RAM[address & 2047] = value;
 	}
 	else if (address < 0x4000) {
-		this->writeRegisterPPU(0x2000 + (address & 7), value);
+        ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, nullptr);
 	}
 	else if (address < 0x4014) {
 		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address == 0x4014) {
-		writeRegisterPPU(address, value);
+        ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu);
 	}
 	else if (address == 0x4015) {
 		this->apu->writeRegisterAPU(address, value);
@@ -250,66 +250,6 @@ void NES::writeByte(uint16_t address, byte value) {
 	else {
 		std::cerr << "ERROR: CPU encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
 	}
-}
-
-void NES::writeRegisterPPU(uint16_t address, byte value) {
-	ppu->reg = value;
-	switch (address) {
-        case 0x2000:
-            ppu->writePPUCtrl(value);
-            break;
-        case 0x2001:
-            ppu->writePPUMask(value);
-            break;
-        case 0x2003:
-            ppu->oam_addr = value;
-            break;
-        case 0x2004:
-            ppu->oam_tbl[ppu->oam_addr] = value;
-            ++ppu->oam_addr;
-            break;
-        case 0x2005:
-            // scroll
-            if (ppu->w == 0) {
-                ppu->t = (ppu->t & 0xFFE0) | (static_cast<uint16_t>(value) >> 3);
-                ppu->x = value & 7;
-                ppu->w = 1;
-            }
-            else {
-                ppu->t = (ppu->t & 0x8FFF) | ((static_cast<uint16_t>(value) & 0x07) << 12);
-                ppu->t = (ppu->t & 0xFC1F) | ((static_cast<uint16_t>(value) & 0xF8) << 2);
-                ppu->w = 0;
-            }
-            break;
-        case 0x2006:
-            if (ppu->w == 0) {
-                ppu->t = (ppu->t & 0x80FF) | ((static_cast<uint16_t>(value) & 0x3F) << 8);
-                ppu->w = 1;
-            }
-            else {
-                ppu->t = (ppu->t & 0xFF00) | static_cast<uint16_t>(value);
-                ppu->v = ppu->t;
-                ppu->w = 0;
-            }
-            break;
-        case 0x2007:
-            ppu->writePPU(ppu->v, value, mapper, cartridge);
-            ppu->v += ppu->flag_increment == 0 ? 1 : 32;
-            break;
-        case 0x4014:
-            // DMA
-            CPU* cpu = this->cpu;
-            address = static_cast<uint16_t>(value) << 8;
-            for (int i = 0; i < 256; ++i) {
-                ppu->oam_tbl[ppu->oam_addr] = readByte(address);
-                ++ppu->oam_addr;
-                ++address;
-            }
-            cpu->stall += 513;
-            if (cpu->cycles & 1) {
-                ++cpu->stall;
-            }
-    }
 }
 
 void NES::execute(byte opcode) {
@@ -374,6 +314,16 @@ void NES::execute(byte opcode) {
 	}
 
 	cpu->execute(opcode, this, address, instruction);
+}
+
+void NES::printState() {
+    std::cout << "CPU status: "
+              << "PC=" << cpu->PC <<  std::endl;
+    std::cout << "APU status: "
+              << "DM=" << apu->dmc.enabled << " P1=" << apu->pulse1.enabled << " P2=" << apu->pulse2.enabled << " TR=" << apu->triangle.enabled<< " NO=" << apu->noise.enabled << std::endl;
+    std::cout << "PPU status: "
+              << "BG=" << unsigned(ppu->flag_show_background) << " BL=" << unsigned(ppu->flag_show_left_background) << " SP=" << unsigned(ppu->flag_show_sprites) << " SL="<< unsigned(ppu->flag_show_left_sprites) << std::endl;
+
 }
 
 

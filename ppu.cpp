@@ -396,3 +396,62 @@ byte PPU::readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge
 	return 0;
 }
 
+void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu) {
+	this->reg = value;
+	switch (address) {
+        case 0x2000:
+            this->writePPUCtrl(value);
+            break;
+        case 0x2001:
+            this->writePPUMask(value);
+            break;
+        case 0x2003:
+            this->oam_addr = value;
+            break;
+        case 0x2004:
+            this->oam_tbl[this->oam_addr] = value;
+            ++this->oam_addr;
+            break;
+        case 0x2005:
+            // scroll
+            if (this->w == 0) {
+                this->t = (this->t & 0xFFE0) | (static_cast<uint16_t>(value) >> 3);
+                this->x = value & 7;
+                this->w = 1;
+            }
+            else {
+                this->t = (this->t & 0x8FFF) | ((static_cast<uint16_t>(value) & 0x07) << 12);
+                this->t = (this->t & 0xFC1F) | ((static_cast<uint16_t>(value) & 0xF8) << 2);
+                this->w = 0;
+            }
+            break;
+        case 0x2006:
+            if (this->w == 0) {
+                this->t = (this->t & 0x80FF) | ((static_cast<uint16_t>(value) & 0x3F) << 8);
+                this->w = 1;
+            }
+            else {
+                this->t = (this->t & 0xFF00) | static_cast<uint16_t>(value);
+                this->v = this->t;
+                this->w = 0;
+            }
+            break;
+        case 0x2007:
+            this->writePPU(this->v, value, mapper, cartridge);
+            this->v += this->flag_increment == 0 ? 1 : 32;
+            break;
+        case 0x4014:
+            // DMA
+            address = static_cast<uint16_t>(value) << 8;
+            for (int i = 0; i < 256; ++i) {
+                this->oam_tbl[this->oam_addr] = readPPURegister(address, mapper, cartridge);
+                ++this->oam_addr;
+                ++address;
+            }
+            cpu->stall += 513;
+            if (cpu->cycles & 1) {
+                ++cpu->stall;
+            }
+    }
+}
+

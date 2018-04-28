@@ -61,8 +61,6 @@ public:
     void emulate(double seconds);
     void execute(byte opcode);
 
-    void writeRegisterPPU(uint16_t address, byte value);
-
     byte readByte(uint16_t address);
     void push16(uint16_t value);
     void push(byte value);
@@ -72,27 +70,7 @@ public:
     uint16_t read16_ff_bug(uint16_t address);
     void writeByte(uint16_t address, byte value);
 
-    void printState() {
-		std::cout << "CPU status: "
-			<< "PC=" << cpu->PC <<  std::endl;
-		std::cout << "APU status: "
-			<< "DM=" << apu->dmc.enabled << " P1=" << apu->pulse1.enabled << " P2=" << apu->pulse2.enabled << " TR=" << apu->triangle.enabled<< " NO=" << apu->noise.enabled << std::endl;
-		std::cout << "PPU status: "
-			<< "BG=" << unsigned(ppu->flag_show_background) << " BL=" << unsigned(ppu->flag_show_left_background) << " SP=" << unsigned(ppu->flag_show_sprites) << " SL="<< unsigned(ppu->flag_show_left_sprites) << std::endl;
-		
-	}
+    void printState();
 };
-
-constexpr byte duty_tbl[4][8] = {
-	{ 0, 1, 0, 0, 0, 0, 0, 0 },
-	{ 0, 1, 1, 0, 0, 0, 0, 0 },
-	{ 0, 1, 1, 1, 1, 0, 0, 0 },
-	{ 1, 0, 0, 1, 1, 1, 1, 1 },
-};
-
-void php(CPU* cpu, NES* nes, uint16_t address, byte mode);
-
-void setI(CPU* cpu, bool value);
-byte getI(CPU* cpu);
 
 #endif
