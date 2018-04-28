@@ -5,327 +5,779 @@ bool pagesDiffer(uint16_t a, uint16_t b) {
 	return (a & 0xFF00) != (b & 0xFF00);
 }
 
-constexpr Instruction instructions[256] = {
-	{ 0  , "BRK", &CPU::brk, 6, 1, 7, 0 },
-	{ 1  , "ORA", ora, 7, 2, 6, 0 },
-	{ 2  , "KIL", nop, 6, 0, 2, 0 },
-	{ 3  , "SLO", nop, 7, 0, 8, 0 },
-	{ 4  , "NOP", nop, 11, 2, 3, 0 },
-	{ 5  , "ORA", ora, 11, 2, 3, 0 },
-	{ 6  , "ASL", asl, 11, 2, 5, 0 },
-	{ 7  , "SLO", nop, 11, 0, 5, 0 },
-	{ 8  , "PHP", php, 6, 1, 3, 0 },
-	{ 9  , "ORA", ora, 5, 2, 2, 0 },
-	{ 10 , "ASL", asl, 4, 1, 2, 0 },
-	{ 11 , "ANC", nop, 5, 0, 2, 0 },
-	{ 12 , "NOP", nop, 1, 3, 4, 0 },
-	{ 13 , "ORA", ora, 1, 3, 4, 0 },
-	{ 14 , "ASL", asl, 1, 3, 6, 0 },
-	{ 15 , "SLO", nop, 1, 0, 6, 0 },
-	{ 16 , "BPL", bpl, 10, 2, 2, 1 },
-	{ 17 , "ORA", ora, 9, 2, 5, 1 },
-	{ 18 , "KIL", nop, 6, 0, 2, 0 },
-	{ 19 , "SLO", nop, 9, 0, 8, 0 },
-	{ 20 , "NOP", nop, 12, 2, 4, 0 },
-	{ 21 , "ORA", ora, 12, 2, 4, 0 },
-	{ 22 , "ASL", asl, 12, 2, 6, 0 },
-	{ 23 , "SLO", nop, 12, 0, 6, 0 },
-	{ 24 , "CLC", clc, 6, 1, 2, 0 },
-	{ 25 , "ORA", ora, 3, 3, 4, 1 },
-	{ 26 , "NOP", nop, 6, 1, 2, 0 },
-	{ 27 , "SLO", nop, 3, 0, 7, 0 },
-	{ 28 , "NOP", nop, 2, 3, 4, 1 },
-	{ 29 , "ORA", ora, 2, 3, 4, 1 },
-	{ 30 , "ASL", asl, 2, 3, 7, 0 },
-	{ 31 , "SLO", nop, 2, 0, 7, 0 },
-	{ 32 , "JSR", jsr, 1, 3, 6, 0 },
-	{ 33 , "AND", and_instruction, 7, 2, 6, 0 },
-	{ 34 , "KIL", nop, 6, 0, 2, 0 },
-	{ 35 , "RLA", nop, 7, 0, 8, 0 },
-	{ 36 , "BIT", bit, 11, 2, 3, 0 },
-	{ 37 , "AND", and_instruction, 11, 2, 3, 0 },
-	{ 38 , "ROL", rol, 11, 2, 5, 0 },
-	{ 39 , "RLA", nop, 11, 0, 5, 0 },
-	{ 40 , "PLP", plp, 6, 1, 4, 0 },
-	{ 41 , "AND", and_instruction, 5, 2, 2, 0 },
-	{ 42 , "ROL", rol, 4, 1, 2, 0 },
-	{ 43 , "ANC", nop, 5, 0, 2, 0 },
-	{ 44 , "BIT", bit, 1, 3, 4, 0 },
-	{ 45 , "AND", and_instruction, 1, 3, 4, 0 },
-	{ 46 , "ROL", rol, 1, 3, 6, 0 },
-	{ 47 , "RLA", nop, 1, 0, 6, 0 },
-	{ 48 , "BMI", bmi, 10, 2, 2, 1 },
-	{ 49 , "AND", and_instruction, 9, 2, 5, 1 },
-	{ 50 , "KIL", and_instruction, 6, 0, 2, 0 },
-	{ 51 , "RLA", nop, 9, 0, 8, 0 },
-	{ 52 , "NOP", nop, 12, 2, 4, 0 },
-	{ 53 , "AND", nop, 12, 2, 4, 0 },
-	{ 54 , "ROL", rol, 12, 2, 6, 0 },
-	{ 55 , "RLA", nop, 12, 0, 6, 0 },
-	{ 56 , "SEC", sec, 6, 1, 2, 0 },
-	{ 57 , "AND", and_instruction, 3, 3, 4, 1 },
-	{ 58 , "NOP", nop, 6, 1, 2, 0 },
-	{ 59 , "RLA", nop, 3, 0, 7, 0 },
-	{ 60 , "NOP", nop, 2, 3, 4, 1 },
-	{ 61 , "AND", and_instruction, 2, 3, 4, 1 },
-	{ 62 , "ROL", rol, 2, 3, 7, 0 },
-	{ 63 , "RLA", nop, 2, 0, 7, 0 },
-	{ 64 , "RTI", rti, 6, 1, 6, 0 },
-	{ 65 , "EOR", eor, 7, 2, 6, 0 },
-	{ 66 , "KIL", nop, 6, 0, 2, 0 },
-	{ 67 , "SRE", nop, 7, 0, 8, 0 },
-	{ 68 , "NOP", nop, 11, 2, 3, 0 },
-	{ 69 , "EOR", eor, 11, 2, 3, 0 },
-	{ 70 , "LSR", lsr, 11, 2, 5, 0 },
-	{ 71 , "SRE", nop, 11, 0, 5, 0 },
-	{ 72 , "PHA", pha, 6, 1, 3, 0 },
-	{ 73 , "EOR", eor, 5, 2, 2, 0 },
-	{ 74 , "LSR", lsr, 4, 1, 2, 0 },
-	{ 75 , "ALR", nop, 5, 0, 2, 0 },
-	{ 76 , "JMP", jmp, 1, 3, 3, 0 },
-	{ 77 , "EOR", eor, 1, 3, 4, 0 },
-	{ 78 , "LSR", lsr, 1, 3, 6, 0 },
-	{ 79 , "SRE", nop, 1, 0, 6, 0 },
-	{ 80 , "BVC", bvc, 10, 2, 2, 1 },
-	{ 81 , "EOR", eor, 9, 2, 5, 1 },
-	{ 82 , "KIL", nop, 6, 0, 2, 0 },
-	{ 83 , "SRE", nop, 9, 0, 8, 0 },
-	{ 84 , "NOP", nop, 12, 2, 4, 0 },
-	{ 85 , "EOR", eor, 12, 2, 4, 0 },
-	{ 86 , "LSR", lsr, 12, 2, 6, 0 },
-	{ 87 , "SRE", nop, 12, 0, 6, 0 },
-	{ 88 , "CLI", cli, 6, 1, 2, 0 },
-	{ 89 , "EOR", eor, 3, 3, 4, 1 },
-	{ 90 , "NOP", nop, 6, 1, 2, 0 },
-	{ 91 , "SRE", nop, 3, 0, 7, 0 },
-	{ 92 , "NOP", nop, 2, 3, 4, 1 },
-	{ 93 , "EOR", eor, 2, 3, 4, 1 },
-	{ 94 , "LSR", lsr, 2, 3, 7, 0 },
-	{ 95 , "SRE", nop, 2, 0, 7, 0 },
-	{ 96 , "RTS", rts, 6, 1, 6, 0 },
-	{ 97 , "ADC", adc, 7, 2, 6, 0 },
-	{ 98 , "KIL", nop, 6, 0, 2, 0 },
-	{ 99 , "RRA", nop, 7, 0, 8, 0 },
-	{ 100, "NOP", nop, 11, 2, 3, 0 },
-	{ 101, "ADC", adc, 11, 2, 3, 0 },
-	{ 102, "ROR", ror, 11, 2, 5, 0 },
-	{ 103, "RRA", nop, 11, 0, 5, 0 },
-	{ 104, "PLA", pla, 6, 1, 4, 0 },
-	{ 105, "ADC", adc, 5, 2, 2, 0 },
-	{ 106, "ROR", ror, 4, 1, 2, 0 },
-	{ 107, "ARR", nop, 5, 0, 2, 0 },
-	{ 108, "JMP", jmp, 8, 3, 5, 0 },
-	{ 109, "ADC", adc, 1, 3, 4, 0 },
-	{ 110, "ROR", ror, 1, 3, 6, 0 },
-	{ 111, "RRA", nop, 1, 0, 6, 0 },
-	{ 112, "BVS", bvs, 10, 2, 2, 1 },
-	{ 113, "ADC", adc, 9, 2, 5, 1 },
-	{ 114, "KIL", nop, 6, 0, 2, 0 },
-	{ 115, "RRA", nop, 9, 0, 8, 0 },
-	{ 116, "NOP", nop, 12, 2, 4, 0 },
-	{ 117, "ADC", adc, 12, 2, 4, 0 },
-	{ 118, "ROR", ror, 12, 2, 6, 0 },
-	{ 119, "RRA", nop, 12, 0, 6, 0 },
-	{ 120, "SEI", sei, 6, 1, 2, 0 },
-	{ 121, "ADC", adc, 3, 3, 4, 1 },
-	{ 122, "NOP", nop, 6, 1, 2, 0 },
-	{ 123, "RRA", nop, 3, 0, 7, 0 },
-	{ 124, "NOP", nop, 2, 3, 4, 1 },
-	{ 125, "ADC", adc, 2, 3, 4, 1 },
-	{ 126, "ROR", ror, 2, 3, 7, 0 },
-	{ 127, "RRA", nop, 2, 0, 7, 0 },
-	{ 128, "NOP", nop, 5, 2, 2, 0 },
-	{ 129, "STA", sta, 7, 2, 6, 0 },
-	{ 130, "NOP", nop, 5, 0, 2, 0 },
-	{ 131, "SAX", nop, 7, 0, 6, 0 },
-	{ 132, "STY", sty, 11, 2, 3, 0 },
-	{ 133, "STA", sta, 11, 2, 3, 0 },
-	{ 134, "STX", stx, 11, 2, 3, 0 },
-	{ 135, "SAX", nop, 11, 0, 3, 0 },
-	{ 136, "DEY", dey, 6, 1, 2, 0 },
-	{ 137, "NOP", nop, 5, 0, 2, 0 },
-	{ 138, "TXA", txa, 6, 1, 2, 0 },
-	{ 139, "XAA", nop, 5, 0, 2, 0 },
-	{ 140, "STY", sty, 1, 3, 4, 0 },
-	{ 141, "STA", sta, 1, 3, 4, 0 },
-	{ 142, "STX", stx, 1, 3, 4, 0 },
-	{ 143, "SAX", nop, 1, 0, 4, 0 },
-	{ 144, "BCC", bcc, 10, 2, 2, 1 },
-	{ 145, "STA", sta, 9, 2, 6, 0 },
-	{ 146, "KIL", nop, 6, 0, 2, 0 },
-	{ 147, "AHX", nop, 9, 0, 6, 0 },
-	{ 148, "STY", sty, 12, 2, 4, 0 },
-	{ 149, "STA", sta, 12, 2, 4, 0 },
-	{ 150, "STX", stx, 13, 2, 4, 0 },
-	{ 151, "SAX", nop, 13, 0, 4, 0 },
-	{ 152, "TYA", tya, 6, 1, 2, 0 },
-	{ 153, "STA", sta, 3, 3, 5, 0 },
-	{ 154, "TXS", txs, 6, 1, 2, 0 },
-	{ 155, "TAS", nop, 3, 0, 5, 0 },
-	{ 156, "SHY", nop, 2, 0, 5, 0 },
-	{ 157, "STA", sta, 2, 3, 5, 0 },
-	{ 158, "SHX", nop, 3, 0, 5, 0 },
-	{ 159, "AHX", nop, 3, 0, 5, 0 },
-	{ 160, "LDY", ldy, 5, 2, 2, 0 },
-	{ 161, "LDA", lda, 7, 2, 6, 0 },
-	{ 162, "LDX", ldx, 5, 2, 2, 0 },
-	{ 163, "LAX", nop, 7, 0, 6, 0 },
-	{ 164, "LDY", ldy, 11, 2, 3, 0 },
-	{ 165, "LDA", lda, 11, 2, 3, 0 },
-	{ 166, "LDX", ldx, 11, 2, 3, 0 },
-	{ 167, "LAX", nop, 11, 0, 3, 0 },
-	{ 168, "TAY", tay, 6, 1, 2, 0 },
-	{ 169, "LDA", lda, 5, 2, 2, 0 },
-	{ 170, "TAX", tax, 6, 1, 2, 0 },
-	{ 171, "LAX", nop, 5, 0, 2, 0 },
-	{ 172, "LDY", ldy, 1, 3, 4, 0 },
-	{ 173, "LDA", lda, 1, 3, 4, 0 },
-	{ 174, "LDX", ldx, 1, 3, 4, 0 },
-	{ 175, "LAX", nop, 1, 0, 4, 0 },
-	{ 176, "BCS", bcs, 10, 2, 2, 1 },
-	{ 177, "LDA", lda, 9, 2, 5, 1 },
-	{ 178, "KIL", nop, 6, 0, 2, 0 },
-	{ 179, "LAX", nop, 9, 0, 5, 1 },
-	{ 180, "LDY", ldy, 12, 2, 4, 0 },
-	{ 181, "LDA", lda, 12, 2, 4, 0 },
-	{ 182, "LDX", ldx, 13, 2, 4, 0 },
-	{ 183, "LAX", nop, 13, 0, 4, 0 },
-	{ 184, "CLV", clv, 6, 1, 2, 0 },
-	{ 185, "LDA", lda, 3, 3, 4, 1 },
-	{ 186, "TSX", tsx, 6, 1, 2, 0 },
-	{ 187, "LAS", nop, 3, 0, 4, 1 },
-	{ 188, "LDY", ldy, 2, 3, 4, 1 },
-	{ 189, "LDA", lda, 2, 3, 4, 1 },
-	{ 190, "LDX", ldx, 3, 3, 4, 1 },
-	{ 191, "LAX", nop, 3, 0, 4, 1 },
-	{ 192, "CPY", cpy, 5, 2, 2, 0 },
-	{ 193, "CMP", cmp, 7, 2, 6, 0 },
-	{ 194, "NOP", nop, 5, 0, 2, 0 },
-	{ 195, "DCP", nop, 7, 0, 8, 0 },
-	{ 196, "CPY", cpy, 11, 2, 3, 0 },
-	{ 197, "CMP", cmp, 11, 2, 3, 0 },
-	{ 198, "DEC", dec, 11, 2, 5, 0 },
-	{ 199, "DCP", nop, 11, 0, 5, 0 },
-	{ 200, "INY", iny, 6, 1, 2, 0 },
-	{ 201, "CMP", cmp, 5, 2, 2, 0 },
-	{ 202, "DEX", dex, 6, 1, 2, 0 },
-	{ 203, "AXS", nop, 5, 0, 2, 0 },
-	{ 204, "CPY", cpy, 1, 3, 4, 0 },
-	{ 205, "CMP", cmp, 1, 3, 4, 0 },
-	{ 206, "DEC", dec, 1, 3, 6, 0 },
-	{ 207, "DCP", nop, 1, 0, 6, 0 },
-	{ 208, "BNE", bne, 10, 2, 2, 1 },
-	{ 209, "CMP", cmp, 9, 2, 5, 1 },
-	{ 210, "KIL", nop, 6, 0, 2, 0 },
-	{ 211, "DCP", nop, 9, 0, 8, 0 },
-	{ 212, "NOP", nop, 12, 2, 4, 0 },
-	{ 213, "CMP", cmp, 12, 2, 4, 0 },
-	{ 214, "DEC", dec, 12, 2, 6, 0 },
-	{ 215, "DCP", nop, 12, 0, 6, 0 },
-	{ 216, "CLD", cld, 6, 1, 2, 0 },
-	{ 217, "CMP", cmp, 3, 3, 4, 1 },
-	{ 218, "NOP", nop, 6, 1, 2, 0 },
-	{ 219, "DCP", nop, 3, 0, 7, 0 },
-	{ 220, "NOP", nop, 2, 3, 4, 1 },
-	{ 221, "CMP", cmp, 2, 3, 4, 1 },
-	{ 222, "DEC", dec, 2, 3, 7, 0 },
-	{ 223, "DCP", nop, 2, 0, 7, 0 },
-	{ 224, "CPX", cpx, 5, 2, 2, 0 },
-	{ 225, "SBC", sbc, 7, 2, 6, 0 },
-	{ 226, "NOP", nop, 5, 0, 2, 0 },
-	{ 227, "ISC", nop, 7, 0, 8, 0 },
-	{ 228, "CPX", cpx, 11, 2, 3, 0 },
-	{ 229, "SBC", sbc, 11, 2, 3, 0 },
-	{ 230, "INC", inc, 11, 2, 5, 0 },
-	{ 231, "ISC", nop, 11, 0, 5, 0 },
-	{ 232, "INX", inx, 6, 1, 2, 0 },
-	{ 233, "SBC", sbc, 5, 2, 2, 0 },
-	{ 234, "NOP", nop, 6, 1, 2, 0 },
-	{ 235, "SBC", sbc, 5, 0, 2, 0 },
-	{ 236, "CPX", cpx, 1, 3, 4, 0 },
-	{ 237, "SBC", sbc, 1, 3, 4, 0 },
-	{ 238, "INC", inc, 1, 3, 6, 0 },
-	{ 239, "ISC", nop, 1, 0, 6, 0 },
-	{ 240, "BEQ", beq, 10, 2, 2, 1 },
-	{ 241, "SBC", sbc, 9, 2, 5, 1 },
-	{ 242, "KIL", nop, 6, 0, 2, 0 },
-	{ 243, "ISC", nop, 9, 0, 8, 0 },
-	{ 244, "NOP", nop, 12, 2, 4, 0 },
-	{ 245, "SBC", sbc, 12, 2, 4, 0 },
-	{ 246, "INC", inc, 12, 2, 6, 0 },
-	{ 247, "ISC", nop, 12, 0, 6, 0 },
-	{ 248, "SED", sed, 6, 1, 2, 0 },
-	{ 249, "SBC", sbc, 3, 3, 4, 1 },
-	{ 250, "NOP", nop, 6, 1, 2, 0 },
-	{ 251, "ISC", nop, 3, 0, 7, 0 },
-	{ 252, "NOP", nop, 2, 3, 4, 1 },
-	{ 253, "SBC", sbc, 2, 3, 4, 1 },
-	{ 254, "INC", inc, 2, 3, 7, 0 },
-	{ 255, "ISC", nop, 2, 0, 7, 0 }
-};
-
-// Note: move to nes.cpp
-void NES::execute(byte opcode) {
-	const Instruction& instruction = instructions[opcode];
-	CPU* cpu = this->cpu;
-
-	uint16_t address = 0;
-	bool page_crossed = false;
-	uint16_t offset;
-
-	switch (instruction.mode) {
-	case modeAbsolute:
-		address = read16(cpu->PC + 1);
-		break;
-	case modeAbsoluteX:
-		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->X);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->X), address);
-		break;
-	case modeAbsoluteY:
-		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->Y);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
-		break;
-	case modeAccumulator:
-		address = 0;
-		break;
-	case modeImmediate:
-		address = cpu->PC + 1;
-		break;
-	case modeImplied:
-		address = 0;
-		break;
-	case modeIndexedIndirect:
-		address = read16_ff_bug(static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X)));
-		break;
-	case modeIndirect:
-		address = read16_ff_bug(read16(cpu->PC + 1));
-		break;
-	case modeIndirectIndexed:
-		address = read16_ff_bug(static_cast<uint16_t>(readByte(cpu->PC + 1))) + static_cast<uint16_t>(cpu->Y);
-		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
-		break;
-	case modeRelative:
-		offset = static_cast<uint16_t>(readByte(cpu->PC + 1));
-		address = cpu->PC + 2 + offset - ((offset >= 128) << 8);
-		break;
-	case modeZeroPage:
-		address = static_cast<uint16_t>(readByte(cpu->PC + 1));
-		break;
-	case modeZeroPageX:
-		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X));
-		break;
-	case modeZeroPageY:
-		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->Y));
-		break;
-	}
-
-	cpu->PC += static_cast<uint16_t>(instruction.size);
-	cpu->cycles += static_cast<uint64_t>(instruction.cycles);
-	if (page_crossed) {
-		cpu->cycles += static_cast<uint64_t>(instruction.page_cross_cycles);
-	}
-
-	instruction.dispatch(cpu, this, address, instruction.mode);
+void CPU::execute(byte opcode, NES* nes, uint16_t address, const Instruction instruction) {
+    	switch(opcode){
+		case 0x0:
+			this->brk(nes, address, instruction.mode);
+			break;
+		case 0x1:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x4:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x5:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x6:
+			this->asl(nes, address, instruction.mode);
+			break;
+		case 0x7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x8:
+			this->php(nes, address, instruction.mode);
+			break;
+		case 0x9:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0xa:
+			this->asl(nes, address, instruction.mode);
+			break;
+		case 0xb:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xc:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0xe:
+			this->asl(nes, address, instruction.mode);
+			break;
+		case 0xf:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x10:
+			this->bpl(nes, address, instruction.mode);
+			break;
+		case 0x11:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x12:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x13:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x14:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x15:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x16:
+			this->asl(nes, address, instruction.mode);
+			break;
+		case 0x17:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x18:
+			this->clc(nes, address, instruction.mode);
+			break;
+		case 0x19:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x1a:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x1b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x1c:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x1d:
+			this->ora(nes, address, instruction.mode);
+			break;
+		case 0x1e:
+			this->asl(nes, address, instruction.mode);
+			break;
+		case 0x1f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x20:
+			this->jsr(nes, address, instruction.mode);
+			break;
+		case 0x21:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x22:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x23:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x24:
+			this->bit(nes, address, instruction.mode);
+			break;
+		case 0x25:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x26:
+			this->rol(nes, address, instruction.mode);
+			break;
+		case 0x27:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x28:
+			this->plp(nes, address, instruction.mode);
+			break;
+		case 0x29:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x2a:
+			this->rol(nes, address, instruction.mode);
+			break;
+		case 0x2b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x2c:
+			this->bit(nes, address, instruction.mode);
+			break;
+		case 0x2d:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x2e:
+			this->rol(nes, address, instruction.mode);
+			break;
+		case 0x2f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x30:
+			this->bmi(nes, address, instruction.mode);
+			break;
+		case 0x31:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x32:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x33:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x34:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x35:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x36:
+			this->rol(nes, address, instruction.mode);
+			break;
+		case 0x37:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x38:
+			this->sec(nes, address, instruction.mode);
+			break;
+		case 0x39:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x3a:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x3b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x3c:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x3d:
+			this->and_instruction(nes, address, instruction.mode);
+			break;
+		case 0x3e:
+			this->rol(nes, address, instruction.mode);
+			break;
+		case 0x3f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x40:
+			this->rti(nes, address, instruction.mode);
+			break;
+		case 0x41:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x42:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x43:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x44:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x45:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x46:
+			this->lsr(nes, address, instruction.mode);
+			break;
+		case 0x47:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x48:
+			this->pha(nes, address, instruction.mode);
+			break;
+		case 0x49:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x4a:
+			this->lsr(nes, address, instruction.mode);
+			break;
+		case 0x4b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x4c:
+			this->jmp(nes, address, instruction.mode);
+			break;
+		case 0x4d:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x4e:
+			this->lsr(nes, address, instruction.mode);
+			break;
+		case 0x4f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x50:
+			this->bvc(nes, address, instruction.mode);
+			break;
+		case 0x51:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x52:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x53:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x54:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x55:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x56:
+			this->lsr(nes, address, instruction.mode);
+			break;
+		case 0x57:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x58:
+			this->cli(nes, address, instruction.mode);
+			break;
+		case 0x59:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x5a:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x5b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x5c:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x5d:
+			this->eor(nes, address, instruction.mode);
+			break;
+		case 0x5e:
+			this->lsr(nes, address, instruction.mode);
+			break;
+		case 0x5f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x60:
+			this->rts(nes, address, instruction.mode);
+			break;
+		case 0x61:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x62:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x63:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x64:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x65:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x66:
+			this->ror(nes, address, instruction.mode);
+			break;
+		case 0x67:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x68:
+			this->pla(nes, address, instruction.mode);
+			break;
+		case 0x69:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x6a:
+			this->ror(nes, address, instruction.mode);
+			break;
+		case 0x6b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x6c:
+			this->jmp(nes, address, instruction.mode);
+			break;
+		case 0x6d:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x6e:
+			this->ror(nes, address, instruction.mode);
+			break;
+		case 0x6f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x70:
+			this->bvs(nes, address, instruction.mode);
+			break;
+		case 0x71:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x72:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x73:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x74:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x75:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x76:
+			this->ror(nes, address, instruction.mode);
+			break;
+		case 0x77:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x78:
+			this->sei(nes, address, instruction.mode);
+			break;
+		case 0x79:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x7a:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x7b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x7c:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x7d:
+			this->adc(nes, address, instruction.mode);
+			break;
+		case 0x7e:
+			this->ror(nes, address, instruction.mode);
+			break;
+		case 0x7f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x80:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x81:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x82:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x83:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x84:
+			this->sty(nes, address, instruction.mode);
+			break;
+		case 0x85:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x86:
+			this->stx(nes, address, instruction.mode);
+			break;
+		case 0x87:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x88:
+			this->dey(nes, address, instruction.mode);
+			break;
+		case 0x89:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x8a:
+			this->txa(nes, address, instruction.mode);
+			break;
+		case 0x8b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x8c:
+			this->sty(nes, address, instruction.mode);
+			break;
+		case 0x8d:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x8e:
+			this->stx(nes, address, instruction.mode);
+			break;
+		case 0x8f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x90:
+			this->bcc(nes, address, instruction.mode);
+			break;
+		case 0x91:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x92:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x93:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x94:
+			this->sty(nes, address, instruction.mode);
+			break;
+		case 0x95:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x96:
+			this->stx(nes, address, instruction.mode);
+			break;
+		case 0x97:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x98:
+			this->tya(nes, address, instruction.mode);
+			break;
+		case 0x99:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x9a:
+			this->txs(nes, address, instruction.mode);
+			break;
+		case 0x9b:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x9c:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x9d:
+			this->sta(nes, address, instruction.mode);
+			break;
+		case 0x9e:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0x9f:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xa0:
+			this->ldy(nes, address, instruction.mode);
+			break;
+		case 0xa1:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xa2:
+			this->ldx(nes, address, instruction.mode);
+			break;
+		case 0xa3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xa4:
+			this->ldy(nes, address, instruction.mode);
+			break;
+		case 0xa5:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xa6:
+			this->ldx(nes, address, instruction.mode);
+			break;
+		case 0xa7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xa8:
+			this->tay(nes, address, instruction.mode);
+			break;
+		case 0xa9:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xaa:
+			this->tax(nes, address, instruction.mode);
+			break;
+		case 0xab:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xac:
+			this->ldy(nes, address, instruction.mode);
+			break;
+		case 0xad:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xae:
+			this->ldx(nes, address, instruction.mode);
+			break;
+		case 0xaf:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xb0:
+			this->bcs(nes, address, instruction.mode);
+			break;
+		case 0xb1:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xb2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xb3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xb4:
+			this->ldy(nes, address, instruction.mode);
+			break;
+		case 0xb5:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xb6:
+			this->ldx(nes, address, instruction.mode);
+			break;
+		case 0xb7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xb8:
+			this->clv(nes, address, instruction.mode);
+			break;
+		case 0xb9:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xba:
+			this->tsx(nes, address, instruction.mode);
+			break;
+		case 0xbb:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xbc:
+			this->ldy(nes, address, instruction.mode);
+			break;
+		case 0xbd:
+			this->lda(nes, address, instruction.mode);
+			break;
+		case 0xbe:
+			this->ldx(nes, address, instruction.mode);
+			break;
+		case 0xbf:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xc0:
+			this->cpy(nes, address, instruction.mode);
+			break;
+		case 0xc1:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xc2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xc3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xc4:
+			this->cpy(nes, address, instruction.mode);
+			break;
+		case 0xc5:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xc6:
+			this->dec(nes, address, instruction.mode);
+			break;
+		case 0xc7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xc8:
+			this->iny(nes, address, instruction.mode);
+			break;
+		case 0xc9:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xca:
+			this->dex(nes, address, instruction.mode);
+			break;
+		case 0xcb:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xcc:
+			this->cpy(nes, address, instruction.mode);
+			break;
+		case 0xcd:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xce:
+			this->dec(nes, address, instruction.mode);
+			break;
+		case 0xcf:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd0:
+			this->bne(nes, address, instruction.mode);
+			break;
+		case 0xd1:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xd2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd4:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd5:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xd6:
+			this->dec(nes, address, instruction.mode);
+			break;
+		case 0xd7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xd8:
+			this->cld(nes, address, instruction.mode);
+			break;
+		case 0xd9:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xda:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xdb:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xdc:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xdd:
+			this->cmp(nes, address, instruction.mode);
+			break;
+		case 0xde:
+			this->dec(nes, address, instruction.mode);
+			break;
+		case 0xdf:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xe0:
+			this->cpx(nes, address, instruction.mode);
+			break;
+		case 0xe1:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xe2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xe3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xe4:
+			this->cpx(nes, address, instruction.mode);
+			break;
+		case 0xe5:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xe6:
+			this->inc(nes, address, instruction.mode);
+			break;
+		case 0xe7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xe8:
+			this->inx(nes, address, instruction.mode);
+			break;
+		case 0xe9:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xea:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xeb:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xec:
+			this->cpx(nes, address, instruction.mode);
+			break;
+		case 0xed:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xee:
+			this->inc(nes, address, instruction.mode);
+			break;
+		case 0xef:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xf0:
+			this->beq(nes, address, instruction.mode);
+			break;
+		case 0xf1:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xf2:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xf3:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xf4:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xf5:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xf6:
+			this->inc(nes, address, instruction.mode);
+			break;
+		case 0xf7:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xf8:
+			this->sed(nes, address, instruction.mode);
+			break;
+		case 0xf9:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xfa:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xfb:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xfc:
+			this->nop(nes, address, instruction.mode);
+			break;
+		case 0xfd:
+			this->sbc(nes, address, instruction.mode);
+			break;
+		case 0xfe:
+			this->inc(nes, address, instruction.mode);
+			break;
+		case 0xff:
+			this->nop(nes, address, instruction.mode);
+			break;
+	    default:
+	        break;
+		}
 }
 
 void CPU::setZ(byte value) {
@@ -906,7 +1358,7 @@ void CPU::sed(NES* nes, uint16_t address, byte mode) {
 
 // NOP - No OPeration
 void CPU::nop(NES* nes, uint16_t address, byte mode) {
-	static_cast<void>();
+	static_cast<void>(this);
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);

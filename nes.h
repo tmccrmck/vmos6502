@@ -12,6 +12,7 @@
 #include "mapper.h"
 #include "apu.h"
 #include "ppu.h"
+//#include "cpu.h"
 
 constexpr int INES_MAGIC = 0x1a53454e;
 constexpr double CPU_FREQ = 1789773.0;
@@ -105,18 +106,6 @@ public:
 			<< "BG=" << unsigned(ppu->flag_show_background) << " BL=" << unsigned(ppu->flag_show_left_background) << " SP=" << unsigned(ppu->flag_show_sprites) << " SL="<< unsigned(ppu->flag_show_left_sprites) << std::endl;
 		
 	}
-};
-
-struct Instruction {
-	const byte opcode;
-	const char* name;
-	void(*dispatch)(CPU*, NES*, uint16_t, byte);
-	const byte mode;
-	const byte size;
-	const byte cycles;
-	const byte page_cross_cycles;
-
-	constexpr Instruction(const byte _opcode, const char _name[4], void(*_dispatch)(CPU*, NES*, uint16_t, byte), const byte _mode, const byte _size, const byte _cycles, const byte _page_crossed_cycles) : opcode(_opcode), name(_name), dispatch(_dispatch), mode(_mode), size(_size), cycles(_cycles), page_cross_cycles(_page_crossed_cycles) {}
 };
 
 constexpr byte duty_tbl[4][8] = {

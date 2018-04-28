@@ -377,7 +377,7 @@ void NES::tickPPU(CPU* cpu, PPU* ppu) {
 
 
 void triggerIRQ(CPU* cpu) {
-	if (getI(cpu) == 0) {
+	if (cpu->getI() == 0) {
 		cpu->interrupt = interruptIRQ;
 	}
 }
@@ -558,16 +558,16 @@ void NES::emulate(double seconds) {
 
 			if (cpu->interrupt == interruptNMI) {
 				push16(cpu->PC);
-				php(cpu, this, 0, 0);
+				cpu->php(this, 0, 0);
 				cpu->PC = read16(0xFFFA);
-				setI(cpu, true);
+				cpu->setI(true);
 				cpu->cycles += 7;
 			}
 			else if (cpu->interrupt == interruptIRQ) {
 				push16(cpu->PC);
-				php(cpu, this, 0, 0);
+				cpu->php(this, 0, 0);
 				cpu->PC = read16(0xFFFE);
-				setI(cpu, true);
+				cpu->setI(true);
 				cpu->cycles += 7;
 			}
 			cpu->interrupt = interruptNone;
@@ -841,4 +841,68 @@ void NES::writeRegisterPPU(uint16_t address, byte value) {
 		}
 	}
 }
+
+void NES::execute(byte opcode) {
+	const Instruction& instruction = instructions[opcode];
+	CPU* cpu = this->cpu;
+
+	uint16_t address = 0;
+	bool page_crossed = false;
+	uint16_t offset;
+
+	switch (instruction.mode) {
+	case modeAbsolute:
+		address = read16(cpu->PC + 1);
+		break;
+	case modeAbsoluteX:
+		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->X);
+		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->X), address);
+		break;
+	case modeAbsoluteY:
+		address = read16(cpu->PC + 1) + static_cast<uint16_t>(cpu->Y);
+		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
+		break;
+	case modeAccumulator:
+		address = 0;
+		break;
+	case modeImmediate:
+		address = cpu->PC + 1;
+		break;
+	case modeImplied:
+		address = 0;
+		break;
+	case modeIndexedIndirect:
+		address = read16_ff_bug(static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X)));
+		break;
+	case modeIndirect:
+		address = read16_ff_bug(read16(cpu->PC + 1));
+		break;
+	case modeIndirectIndexed:
+		address = read16_ff_bug(static_cast<uint16_t>(readByte(cpu->PC + 1))) + static_cast<uint16_t>(cpu->Y);
+		page_crossed = pagesDiffer(address - static_cast<uint16_t>(cpu->Y), address);
+		break;
+	case modeRelative:
+		offset = static_cast<uint16_t>(readByte(cpu->PC + 1));
+		address = cpu->PC + 2 + offset - ((offset >= 128) << 8);
+		break;
+	case modeZeroPage:
+		address = static_cast<uint16_t>(readByte(cpu->PC + 1));
+		break;
+	case modeZeroPageX:
+		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->X));
+		break;
+	case modeZeroPageY:
+		address = static_cast<uint16_t>(static_cast<byte>(readByte(cpu->PC + 1) + cpu->Y));
+		break;
+	}
+
+	cpu->PC += static_cast<uint16_t>(instruction.size);
+	cpu->cycles += static_cast<uint64_t>(instruction.cycles);
+	if (page_crossed) {
+		cpu->cycles += static_cast<uint64_t>(instruction.page_cross_cycles);
+	}
+
+	cpu->execute(opcode, this, address, instruction);
+}
+
 

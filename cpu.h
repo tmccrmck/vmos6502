@@ -4,7 +4,9 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include "nes.h"
+
+//#include "nes.h"
+#include "instruction.h"
 
 class NES;
 
@@ -21,6 +23,8 @@ public:
 	int stall;
 
 	CPU() : cycles(0), PC(0), SP(0), A(0), X(0), Y(0), flags(0), interrupt(0), stall(0) {}
+
+	void execute(byte opcode, NES* nes, uint16_t address, const Instruction instruction);
 
 	// set zero flag if 'value' is zero
 	void setZ(byte value);
