@@ -6,19 +6,19 @@
 #include <cstdlib>
 
 #include "instruction.h"
-
+#include "nes.h"
 class NES;
 
 class CPU {
 public:
 	uint64_t cycles;
-	uint16_t PC;       // program counter
-	uint8_t SP;        // stack pointer
-	uint8_t A;         // accumulator
-	uint8_t X;         // X register
-	uint8_t Y;         // Y register
-	uint8_t flags;     // flags register
-	uint8_t interrupt; // interrupt type
+	uint16_t PC;
+	uint8_t SP;
+	uint8_t A;
+	uint8_t X;
+	uint8_t Y;
+	uint8_t flags;
+	uint8_t interrupt;
 	int stall;
 
 	CPU() : cycles(0), PC(0), SP(0), A(0), X(0), Y(0), flags(0), interrupt(0), stall(0) {}

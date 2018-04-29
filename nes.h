@@ -18,6 +18,10 @@ constexpr double CPU_FREQ = 1789773.0;
 constexpr double FRAME_CTR_FREQ = CPU_FREQ / 240.0;
 constexpr double SAMPLE_RATE = CPU_FREQ / (44100.0);
 
+class CPU;
+class PPU;
+class Mapper;
+
 enum Buttons {
 	ButtonA = 0,
 	ButtonB = 1,

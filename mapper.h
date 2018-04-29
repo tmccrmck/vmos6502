@@ -1,10 +1,12 @@
 #ifndef VMOS6502_MAPPER_H
 #define VMOS6502_MAPPER_H
 
-#include "cpu.h"
-#include "cartridge.h"
 #include <iostream>
 
+#include "cpu.h"
+#include "cartridge.h"
+
+class CPU;
 enum MirrorModes {
 	MirrorHorizontal = 0,
 	MirrorVertical = 1,

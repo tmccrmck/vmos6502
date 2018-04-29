@@ -1,8 +1,10 @@
 #ifndef VMOS6502_APU_H
 #define VMOS6502_APU_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <portaudio.h>
+
+class NES;
 
 class Pulse {
 public:

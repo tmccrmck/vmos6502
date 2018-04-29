@@ -223,17 +223,18 @@ void NES::writeByte(uint16_t address, byte value) {
 		this->RAM[address & 2047] = value;
 	}
 	else if (address < 0x4000) {
-        ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, nullptr);
+        ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, cpu, this);
 	}
 	else if (address < 0x4014) {
 		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address == 0x4014) {
-        ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu);
+        ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu, this);
 	}
 	else if (address == 0x4015) {
 		this->apu->writeRegisterAPU(address, value);
-	}
+
+	class NES;}
 	else if (address == 0x4016) {
 		controller1->writeController(value);
 		controller2->writeController(value);

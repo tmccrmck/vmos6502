@@ -3,10 +3,16 @@
 
 #include <cstdint>
 #include <cstring>
+#include <iostream>
+#include <algorithm>
 
-#include "cpu.h"
+
 #include "mapper.h"
 #include "cartridge.h"
+#include "cpu.h"
+
+class CPU;
+class Mapper;
 
 typedef uint8_t byte;
 
@@ -118,7 +124,7 @@ public:
 	byte readPPU(uint16_t address, Mapper* mapper, Cartridge* cartridge);
 	void writePPU(uint16_t address, byte value, Mapper* mapper, Cartridge* cartridge);
 	byte readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge);
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu);
+    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu, NES* nes);
 };
 
 #endif //VMOS6502_PPU_H

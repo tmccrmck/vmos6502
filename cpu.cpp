@@ -1,4 +1,4 @@
-#include "nes.h"
+#include "cpu.h"
 
 // do addresses represent different pages?
 bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
