@@ -1,12 +1,6 @@
 #ifndef VMOS6502_NES_H
 #define VMOS6502_NES_H
 
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-
 #include "cartridge.h"
 #include "controller.h"
 #include "mapper.h"

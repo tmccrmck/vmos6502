@@ -162,15 +162,15 @@ byte NES::readByte(uint16_t address) {
 		return controller2->readController();
 	}
 	else if (address < 0x6000) {
-		// IO registers
+		return 0;
 	}
 	else if (address >= 0x6000) {
 		return this->mapper->read(this->cartridge, address);
 	}
 	else {
 		std::cerr << "ERROR: CPU encountered unrecognized read (address 0x" << std::hex << address << std::dec << ')' << std::endl;
+		return 0;
 	}
-	return 0;
 }
 
 // push uint16_t onto stack

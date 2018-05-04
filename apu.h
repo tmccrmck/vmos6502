@@ -93,7 +93,7 @@ struct DMC {
 
 class APU {
 public:
-	PaStream* stream;
+	PaStream* stream{};
 	Pulse pulse1;
 	Pulse pulse2;
 	Triangle triangle;
@@ -104,7 +104,7 @@ public:
 	uint8_t frame_val;
 	bool frame_IRQ;
 
-	APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+	APU();
 
 	void tickLength();
     void tickEnvelope();

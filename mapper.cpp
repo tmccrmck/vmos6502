@@ -1,6 +1,5 @@
 #include "mapper.h"
 
-
 int Mapper1::prgBankOffset(Cartridge* c, int index) {
 	if (index >= 0x80) {
 		index -= 0x100;

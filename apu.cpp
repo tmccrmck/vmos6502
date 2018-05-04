@@ -460,3 +460,5 @@ void APU::tickAPU(NES* nes) {
 	}
 }
 
+APU::APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+
