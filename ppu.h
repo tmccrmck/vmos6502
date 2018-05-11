@@ -11,8 +11,12 @@
 #include "mapper.h"
 #include "cartridge.h"
 #include "cpu.h"
+#include "nes.h"
 
-class CPU;
+//template <class Mem>
+//class CPU;
+
+//class NES;
 class Mapper;
 
 typedef uint8_t byte;
@@ -128,11 +132,11 @@ public:
     byte readPalette(uint16_t address);
     void spritePixel(byte &i, byte &sprite);
 
-	void tickPPU(CPU* cpu, Mapper* mapper, Cartridge* cartridge);
+	void tickPPU(CPU<NES>* cpu, Mapper* mapper, Cartridge* cartridge);
 	byte readPPU(uint16_t address, Mapper* mapper, Cartridge* cartridge);
 	void writePPU(uint16_t address, byte value, Mapper* mapper, Cartridge* cartridge);
 	byte readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge);
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu, NES* nes);
+    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu, NES* nes);
 };
 
 #endif //VMOS6502_PPU_H

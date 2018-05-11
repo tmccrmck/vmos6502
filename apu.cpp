@@ -28,21 +28,9 @@ constexpr byte duty_tbl[4][8] = {
 	{ 1, 0, 0, 1, 1, 1, 1, 1 },
 };
 
-void triggerIRQ(CPU* cpu) {
+void triggerIRQ(CPU<NES>* cpu) {
 	if (cpu->getI() == 0) {
 		cpu->interrupt = interruptIRQ;
-	}
-}
-
-void Mapper4::updateCounter(CPU* cpu) {
-	if (counter == 0) {
-		counter = reload;
-	}
-	else {
-		--counter;
-		if (counter == 0 && IRQ_enable) {
-			triggerIRQ(cpu);
-		}
 	}
 }
 

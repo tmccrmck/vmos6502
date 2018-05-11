@@ -1,20 +1,27 @@
 #ifndef VMOS6502_NES_H
 #define VMOS6502_NES_H
 
+#include <iostream>
+//#include <memory>
+#include <cstring>
+
 #include "cartridge.h"
 #include "controller.h"
 #include "mapper.h"
 #include "apu.h"
 #include "ppu.h"
+#include "cpu.h"
 
 constexpr int INES_MAGIC = 0x1a53454e;
 constexpr double CPU_FREQ = 1789773.0;
 constexpr double FRAME_CTR_FREQ = CPU_FREQ / 240.0;
 constexpr double SAMPLE_RATE = CPU_FREQ / (44100.0);
 
-class CPU;
+
 class PPU;
 class Mapper;
+class Mapper1;
+class Mapper2;
 
 enum Buttons {
 	ButtonA = 0,
@@ -27,26 +34,10 @@ enum Buttons {
 	ButtonRight = 7
 };
 
-enum AddressingModes {
-	modeAbsolute = 1,
-	modeAbsoluteX = 2,
-	modeAbsoluteY = 3,
-	modeAccumulator = 4,
-	modeImmediate = 5,
-	modeImplied = 6,
-	modeIndexedIndirect = 7,
-	modeIndirect = 8,
-	modeIndirectIndexed = 9,
-	modeRelative = 10,
-	modeZeroPage = 11,
-	modeZeroPageX = 12,
-	modeZeroPageY = 13
-};
-
 class NES {
 public:
 	bool initialized;
-	CPU* cpu;
+	CPU<NES>* cpu;
 	APU* apu;
 	PPU* ppu;
 	Cartridge* cartridge;

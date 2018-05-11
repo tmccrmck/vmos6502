@@ -6,23 +6,38 @@
 #include <cstdlib>
 
 #include "instruction.h"
-#include "nes.h"
-class NES;
 
+enum AddressingModes {
+	modeAbsolute = 1,
+	modeAbsoluteX = 2,
+	modeAbsoluteY = 3,
+	modeAccumulator = 4,
+	modeImmediate = 5,
+	modeImplied = 6,
+	modeIndexedIndirect = 7,
+	modeIndirect = 8,
+	modeIndirectIndexed = 9,
+	modeRelative = 10,
+	modeZeroPage = 11,
+	modeZeroPageX = 12,
+	modeZeroPageY = 13
+};
+
+template <typename Mem>
 class CPU {
 public:
 	uint64_t cycles;
-	uint16_t PC;
-	uint8_t SP;
-	uint8_t A;
-	uint8_t X;
-	uint8_t Y;
+	uint16_t pc;
+	uint8_t sp;
+	uint8_t a;
+	uint8_t x;
+	uint8_t y;
 	uint8_t flags;
 	uint8_t interrupt;
 	int stall;
 
-	CPU() : cycles(0), PC(0), SP(0), A(0), X(0), Y(0), flags(0), interrupt(0), stall(0) {}
-	void execute(byte opcode, NES* nes, uint16_t address, Instruction instruction);
+	CPU() : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0) {}
+	void execute(byte opcode, Mem* nes, uint16_t address, Instruction instruction);
 	bool pagesDiffer(uint16_t a, uint16_t b);
 
 	// set zero flag if 'value' is zero
@@ -79,171 +94,171 @@ public:
 	void branchDelay(uint16_t address, uint16_t pc);
 
 	// ADC - ADd with Carry
-	void adc(NES* nes, uint16_t address, byte mode);
+	void adc(Mem* nes, uint16_t address, byte mode);
 
 	// AND - logical AND
 	// Nonstandard name to disambiguate from 'and' label
-	void and_instruction(NES* nes, uint16_t address, byte mode);
+	void and_instruction(Mem* nes, uint16_t address, byte mode);
 
 	// ASL - Arithmetic Shift Left
-	void asl(NES* nes, uint16_t address, byte mode);
+	void asl(Mem* nes, uint16_t address, byte mode);
 
 	// BIT - BIt Test
-	void bit(NES* nes, uint16_t address, byte mode);
+	void bit(Mem* nes, uint16_t address, byte mode);
 
 	// CMP - CoMPare
-	void cmp(NES* nes, uint16_t address, byte mode);
+	void cmp(Mem* nes, uint16_t address, byte mode);
 
 	// CPX - ComPare X register
-	void cpx(NES* nes, uint16_t address, byte mode);
+	void cpx(Mem* nes, uint16_t address, byte mode);
 
 	// CPY - ComPare Y register
-	void cpy(NES* nes, uint16_t address, byte mode);
+	void cpy(Mem* nes, uint16_t address, byte mode);
 
 	// DEC - DECrement memory
-	void dec(NES* nes, uint16_t address, byte mode);
+	void dec(Mem* nes, uint16_t address, byte mode);
 
 	// EOR - Exclusive OR
-	void eor(NES* nes, uint16_t address, byte mode);
+	void eor(Mem* nes, uint16_t address, byte mode);
 
 	// INC - INCrement memory
-	void inc(NES* nes, uint16_t address, byte mode);
+	void inc(Mem* nes, uint16_t address, byte mode);
 
 	// JMP - JuMP
-	void jmp(NES* nes, uint16_t address, byte mode);
+	void jmp(Mem* nes, uint16_t address, byte mode);
 
 	// LDA - LoaD Accumulator
-	void lda(NES* nes, uint16_t address, byte mode);
+	void lda(Mem* nes, uint16_t address, byte mode);
 
 	// LDX - LoaD X register
-	void ldx(NES* nes, uint16_t address, byte mode);
+	void ldx(Mem* nes, uint16_t address, byte mode);
 
 	// LDY - LoaD Y register
-	void ldy(NES* nes, uint16_t address, byte mode);
+	void ldy(Mem* nes, uint16_t address, byte mode);
 
 	// LSR - Logical Shift Right
-	void lsr(NES* nes, uint16_t address, byte mode);
+	void lsr(Mem* nes, uint16_t address, byte mode);
 
 	// ORA - logical OR with Accumulator
-	void ora(NES* nes, uint16_t address, byte mode);
+	void ora(Mem* nes, uint16_t address, byte mode);
 
 	// PHP - PusH Processor status
-	void php(NES* nes, uint16_t address, byte mode);
+	void php(Mem* nes, uint16_t address, byte mode);
 
 	// ROL - ROtate Left
-	void rol(NES* nes, uint16_t address, byte mode);
+	void rol(Mem* nes, uint16_t address, byte mode);
 
 	// ROR - ROtate Right
-	void ror(NES* nes, uint16_t address, byte mode);
+	void ror(Mem* nes, uint16_t address, byte mode);
 
 	// SBC - SuBtract with Carry
-	void sbc(NES* nes, uint16_t address, byte mode);
+	void sbc(Mem* nes, uint16_t address, byte mode);
 
 	// SEI - SEt Interrupt disable
-	void sei(NES* nes, uint16_t address, byte mode);
+	void sei(Mem* nes, uint16_t address, byte mode);
 
 	// STA - STore Accumulator
-	void sta(NES* nes, uint16_t address, byte mode);
+	void sta(Mem* nes, uint16_t address, byte mode);
 
 	// STX - Store X Register
-	void stx(NES* nes, uint16_t address, byte mode);
+	void stx(Mem* nes, uint16_t address, byte mode);
 
 	// STY - STore Y Register
-	void sty(NES* nes, uint16_t address, byte mode);
+	void sty(Mem* nes, uint16_t address, byte mode);
 
 	// BRK - force interrupt BReaK
-	void brk(NES* nes, uint16_t address, byte mode);
+	void brk(Mem* nes, uint16_t address, byte mode);
 
 	// BPL - Branch if PLus (i.e. if positive)
-	void bpl(NES* nes, uint16_t address, byte mode);
+	void bpl(Mem* nes, uint16_t address, byte mode);
 
 	// CLC - CLear Carry flag
-	void clc(NES* nes, uint16_t address, byte mode);
+	void clc(Mem* nes, uint16_t address, byte mode);
 
 	// JSR - Jump to SubRoutine   
-	void jsr(NES* nes, uint16_t address, byte mode);
+	void jsr(Mem* nes, uint16_t address, byte mode);
 	// PLP - PuLl Processor status
-	void plp(NES* nes, uint16_t address, byte mode);
+	void plp(Mem* nes, uint16_t address, byte mode);
 	// BMI - Branch if MInus (i.e. if negative)
-	void bmi(NES* nes, uint16_t address, byte mode);
+	void bmi(Mem* nes, uint16_t address, byte mode);
 
 	// SEC - SEt Carry flag
-	void sec(NES* nes, uint16_t address, byte mode);
+	void sec(Mem* nes, uint16_t address, byte mode);
 
 	// RTI - ReTurn from Interrupt
-	void rti(NES* nes, uint16_t address, byte mode);
+	void rti(Mem* nes, uint16_t address, byte mode);
 
 	// BVC - Branch if oVerflow Clear
-	void bvc(NES* nes, uint16_t address, byte mode);
+	void bvc(Mem* nes, uint16_t address, byte mode);
 
 	// PHA - PusH Accumulator
-	void pha(NES* nes, uint16_t address, byte mode);
+	void pha(Mem* nes, uint16_t address, byte mode);
 	// CLI - CLear Interrupt disable
-	void cli(NES* nes, uint16_t address, byte mode);
+	void cli(Mem* nes, uint16_t address, byte mode);
 
 	// RTS - ReTurn from Subroutine
-	void rts(NES* nes, uint16_t address, byte mode);
+	void rts(Mem* nes, uint16_t address, byte mode);
 	// PLA - PuLl Accumulator
-	void pla(NES* nes, uint16_t address, byte mode);
+	void pla(Mem* nes, uint16_t address, byte mode);
 
 	// BVS - Branch if oVerflow Set
-	void bvs(NES* nes, uint16_t address, byte mode);
+	void bvs(Mem* nes, uint16_t address, byte mode);
 
 	// DEY - DEcrement Y register
-	void dey(NES* nes, uint16_t address, byte mode);
+	void dey(Mem* nes, uint16_t address, byte mode);
 
 	// TXA - Transfer X to Accumulator
-	void txa(NES* nes, uint16_t address, byte mode);
+	void txa(Mem* nes, uint16_t address, byte mode);
 
 	// BCC - Branch if Carry Clear
-	void bcc(NES* nes, uint16_t address, byte mode);
+	void bcc(Mem* nes, uint16_t address, byte mode);
 
 	// TYA - Transfer Y to Accumulator
-	void tya(NES* nes, uint16_t address, byte mode);
+	void tya(Mem* nes, uint16_t address, byte mode);
 	
 
 	// BCS - Branch if Carry Set
-	void bcs(NES* nes, uint16_t address, byte mode);
+	void bcs(Mem* nes, uint16_t address, byte mode);
 	// TAY - Transfer Accumulator to Y
-	void tay(NES* nes, uint16_t address, byte mode);
+	void tay(Mem* nes, uint16_t address, byte mode);
 	
 
 	// TXS - Transfer X to Stack pointer
-	void txs(NES* nes, uint16_t address, byte mode);
+	void txs(Mem* nes, uint16_t address, byte mode);
 	// TAX - Transfer Accumulator to X
-	void tax(NES* nes, uint16_t address, byte mode);
+	void tax(Mem* nes, uint16_t address, byte mode);
 	
 
 	// CLV - CLear oVerflow flag
-	void clv(NES* nes, uint16_t address, byte mode);
+	void clv(Mem* nes, uint16_t address, byte mode);
 	// TSX - Transfer Stack pointer to X
-	void tsx(NES* nes, uint16_t address, byte mode);
+	void tsx(Mem* nes, uint16_t address, byte mode);
 	
 
 	// INY - INcrement Y register
-	void iny(NES* nes, uint16_t address, byte mode);
+	void iny(Mem* nes, uint16_t address, byte mode);
 	
 
 	// DEX - DEcrement X register
-	void dex(NES* nes, uint16_t address, byte mode);
+	void dex(Mem* nes, uint16_t address, byte mode);
 	
 
 	// BNE - Branch if Not Equal
-	void bne(NES* nes, uint16_t address, byte mode);
+	void bne(Mem* nes, uint16_t address, byte mode);
 	// CLD - CLear Decimal mode
-	void cld(NES* nes, uint16_t address, byte mode);
+	void cld(Mem* nes, uint16_t address, byte mode);
 
 	// INX - INcrement X register
-	void inx(NES* nes, uint16_t address, byte mode);
+	void inx(Mem* nes, uint16_t address, byte mode);
 
 	// BEQ - Branch if EQual
-	void beq(NES* nes, uint16_t address, byte mode);
+	void beq(Mem* nes, uint16_t address, byte mode);
 
 	// SED - SEt Decimal flag
-	void sed(NES* nes, uint16_t address, byte mode);
+	void sed(Mem* nes, uint16_t address, byte mode);
 
 	// NOP - No OPeration
-	void nop(NES* nes, uint16_t address, byte mode);
+	void nop(Mem* nes, uint16_t address, byte mode);
 };
 
 #endif //VMOS6502_CPU_H
