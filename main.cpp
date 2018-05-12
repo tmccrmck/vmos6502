@@ -68,7 +68,9 @@ int main(int argc, char* argv[]) {
 	std::string sram (argv[1]);
     std::string sram_path = sram + ".srm";
 
-	std::unique_ptr<NES> nes = std::make_unique<NES>(sram, sram_path);
+	//std::unique_ptr<NES> nes = std::make_unique<NES>(sram, sram_path);
+	NES* nes = new NES(sram, sram_path);
+
 	if (!nes->initialized) return EXIT_FAILURE;
 
 	PaError err = Pa_Initialize();
@@ -216,6 +218,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Terminating PortAudio..." << std::endl;
 	Pa_Sleep(500L);
 	Pa_Terminate();
+    delete(nes);
 
 	return EXIT_SUCCESS;
 }

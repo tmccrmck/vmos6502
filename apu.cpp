@@ -28,8 +28,9 @@ constexpr byte duty_tbl[4][8] = {
 	{ 1, 0, 0, 1, 1, 1, 1, 1 },
 };
 
+// note use getI
 void triggerIRQ(CPU<NES>* cpu) {
-	if (cpu->getI() == 0) {
+	if ((cpu->flags & 4) >> 2 == 0) {
 		cpu->interrupt = interruptIRQ;
 	}
 }

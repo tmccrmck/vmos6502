@@ -20,8 +20,7 @@ constexpr double SAMPLE_RATE = CPU_FREQ / (44100.0);
 
 class PPU;
 class Mapper;
-class Mapper1;
-class Mapper2;
+//template <class Mem> class CPU;
 
 enum Buttons {
 	ButtonA = 0,
@@ -58,8 +57,6 @@ public:
     uint16_t read16(uint16_t address);
     uint16_t read16_ff_bug(uint16_t address);
     void writeByte(uint16_t address, byte value);
-
-    void printState();
 };
 
 #endif
