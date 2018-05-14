@@ -393,7 +393,7 @@ byte PPU::readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge
 	return 0;
 }
 
-void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu, NES* nes) {
+void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu) {
 	this->reg = value;
 	switch (address) {
         case 0x2000:
@@ -441,7 +441,7 @@ void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartrid
             // DMA
             address = static_cast<uint16_t>(value) << 8;
             for (int i = 0; i < 256; ++i) {
-                this->oam_tbl[this->oam_addr] = nes->readByte(address);
+                this->oam_tbl[this->oam_addr] = cpu->readb(address);
                 ++this->oam_addr;
                 ++address;
             }

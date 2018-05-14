@@ -2,7 +2,6 @@
 #define VMOS6502_NES_H
 
 #include <iostream>
-//#include <memory>
 #include <cstring>
 
 #include "cartridge.h"
@@ -11,12 +10,6 @@
 #include "apu.h"
 #include "ppu.h"
 #include "cpu.h"
-
-constexpr int INES_MAGIC = 0x1a53454e;
-constexpr double CPU_FREQ = 1789773.0;
-constexpr double FRAME_CTR_FREQ = CPU_FREQ / 240.0;
-constexpr double SAMPLE_RATE = CPU_FREQ / (44100.0);
-
 
 class PPU;
 class Mapper;

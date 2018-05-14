@@ -5,7 +5,7 @@
 
 #include "cpu.h"
 #include "cartridge.h"
-#include "nes.h"
+#include "ppu.h"
 
 class NES;
 

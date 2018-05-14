@@ -43,7 +43,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 		mapper = new Mapper2(prg_banks, 0, prg_banks - 1);
 	}
 	else if (cartridge->mapper == 1) {
-		Mapper1* m = new Mapper1();
+        auto * m = new Mapper1();
 		m->shift_reg = 0x10;
 		m->prg_offsets[1] = m->prgBankOffset(cartridge, -1);
 		mapper = m;
@@ -102,7 +102,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 }
 
 void NES::emulate(double seconds) {
-	int cycles = static_cast<int>(CPU_FREQ * seconds + 0.5);
+    auto cycles = static_cast<int>(CPU_FREQ * seconds + 0.5);
 
 	while (cycles > 0) {
 		int cpuCycles = 0;
@@ -145,7 +145,7 @@ void NES::emulate(double seconds) {
 		}
 
 		for (int i = 0; i < cpuCycles; ++i) {
-			this->apu->tickAPU(this);
+			this->apu->tickAPU(this->cpu);
 		}
 		cycles -= cpuCycles;
 	}
@@ -204,7 +204,7 @@ void dmcRestart(DMC* d) {
 	d->cur_len = d->samp_len;
 }
 
-// famous 6502 memory indirect jump bug: only the low byte wraps on an xxFF read instead of the whole word incrementing
+// 6502 indirect memory bug - only low bytes
 uint16_t NES::read16_ff_bug(uint16_t address) {
 	const uint16_t a = address;
 	const uint16_t b = (a & 0xFF00) | static_cast<uint16_t>(static_cast<byte>(static_cast<byte>(a) + 1));
@@ -224,13 +224,13 @@ void NES::writeByte(uint16_t address, byte value) {
 		this->RAM[address & 2047] = value;
 	}
 	else if (address < 0x4000) {
-		ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, cpu, this);
+		ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, cpu);
 	}
 	else if (address < 0x4014) {
 		this->apu->writeRegisterAPU(address, value);
 	}
 	else if (address == 0x4014) {
-		ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu, this);
+		ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu);
 	}
 	else if (address == 0x4015) {
 		this->apu->writeRegisterAPU(address, value);

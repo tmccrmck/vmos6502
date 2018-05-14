@@ -1,10 +1,14 @@
 #ifndef VMOS6502_CARTRIDGE_H
 #define VMOS6502_CARTRIDGE_H
 
+#include <iostream>
+#include <cstring>
 #include <cstdint>
 #include <string>
 
 typedef uint8_t byte;
+
+constexpr int INES_MAGIC = 0x1a53454e;
 
 struct iNESHeader {
 	uint32_t magic;     // iNES cartridge file magic number

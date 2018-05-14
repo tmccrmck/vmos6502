@@ -4,6 +4,7 @@ template<typename Mem>
 byte CPU<Mem>::readb(uint16_t addr) {
 	return nes->readByte(addr);
 }
+
 // do addresses represent different pages?
 template <class Mem>
 bool CPU<Mem>::pagesDiffer(uint16_t a, uint16_t b) {
@@ -885,7 +886,7 @@ template <class Mem>
 void CPU<Mem>::adc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = this->a;
-	const byte b = nes->readByte(address);
+	const byte b = readb(address);
 	const byte c = getC();
 	this->a = a + b + c;
 	setZN(this->a);
@@ -898,7 +899,7 @@ void CPU<Mem>::adc(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::and_instruction(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->a &= nes->readByte(address);
+	this->a &= readb(address);
 	setZN(this->a);
 }
 
@@ -911,7 +912,7 @@ void CPU<Mem>::asl(uint16_t address, byte mode) {
 		setZN(this->a);
 	}
 	else {
-		byte value = nes->readByte(address);
+		byte value = readb(address);
 		setC((value >> 7) & 1);
 		value <<= 1;
 		nes->writeByte(address, value);
@@ -923,7 +924,7 @@ void CPU<Mem>::asl(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::bit(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address);
+	const byte value = readb(address);
 	setV((value >> 6) & 1);
 	setZ(value & this->a);
 	setN(value);
@@ -933,7 +934,7 @@ void CPU<Mem>::bit(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::cmp(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address);
+	const byte value = readb(address);
 	compare(this->a, value);
 }
 
@@ -941,7 +942,7 @@ void CPU<Mem>::cmp(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::cpx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address);
+	const byte value = readb(address);
 	compare(this->x, value);
 }
 
@@ -949,7 +950,7 @@ void CPU<Mem>::cpx(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::cpy(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address);
+	const byte value = readb(address);
 	compare(this->y, value);
 }
 
@@ -957,7 +958,7 @@ void CPU<Mem>::cpy(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::dec(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address) - 1;
+	const byte value = readb(address) - 1;
 	nes->writeByte(address, value);
 	setZN(value);
 }
@@ -967,7 +968,7 @@ void CPU<Mem>::dec(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::eor(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->a ^= nes->readByte(address);
+	this->a ^= readb(address);
 	setZN(this->a);
 }
 
@@ -975,7 +976,7 @@ void CPU<Mem>::eor(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::inc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	const byte value = nes->readByte(address) + 1;
+	const byte value = readb(address) + 1;
 	nes->writeByte(address, value);
 	setZN(value);
 }
@@ -992,7 +993,7 @@ void CPU<Mem>::jmp(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::lda(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->a = nes->readByte(address);
+	this->a = readb(address);
 	setZN(this->a);
 }
 
@@ -1000,7 +1001,7 @@ void CPU<Mem>::lda(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::ldx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->x = nes->readByte(address);
+	this->x = readb(address);
 	setZN(this->x);
 }
 
@@ -1008,7 +1009,7 @@ void CPU<Mem>::ldx(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::ldy(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->y = nes->readByte(address);
+	this->y = readb(address);
 	setZN(this->y);
 }
 
@@ -1021,7 +1022,7 @@ void CPU<Mem>::lsr(uint16_t address, byte mode) {
 		setZN(this->a);
 	}
 	else {
-		byte value = nes->readByte(address);
+		byte value = readb(address);
 		setC(value & 1);
 		value >>= 1;
 		nes->writeByte(address, value);
@@ -1033,7 +1034,7 @@ void CPU<Mem>::lsr(uint16_t address, byte mode) {
 template <class Mem>
 void CPU<Mem>::ora(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	this->a |= nes->readByte(address);
+	this->a |= readb(address);
 	setZN(this->a);
 }
 
@@ -1056,7 +1057,7 @@ void CPU<Mem>::rol(uint16_t address, byte mode) {
 	}
 	else {
 		const byte c = getC();
-		byte value = nes->readByte(address);
+		byte value = readb(address);
 		setC((value >> 7) & 1);
 		value = (value << 1) | c;
 		nes->writeByte(address, value);
@@ -1075,7 +1076,7 @@ void CPU<Mem>::ror(uint16_t address, byte mode) {
 	}
 	else {
 		const byte c = getC();
-		byte value = nes->readByte(address);
+		byte value = readb(address);
 		setC(value & 1);
 		value = (value >> 1) | (c << 7);
 		nes->writeByte(address, value);
@@ -1088,7 +1089,7 @@ template <class Mem>
 void CPU<Mem>::sbc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = this->a;
-	const byte b = nes->readByte(address);
+	const byte b = readb(address);
 	const byte c = getC();
 	this->a = a - b - (1 - c);
 	setZN(this->a);

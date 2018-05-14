@@ -7,16 +7,14 @@
 #include <algorithm>
 #include <array>
 
-
 #include "mapper.h"
 #include "cartridge.h"
 #include "cpu.h"
-#include "nes.h"
 
 //template <class Mem>
 //class CPU;
 
-//class NES;
+class NES;
 class Mapper;
 
 typedef uint8_t byte;
@@ -37,12 +35,6 @@ constexpr std::array<std::array<uint16_t, 4>, 5> mirror_tbl = {{
 	{ 1, 1, 1, 1 },
 	{ 0, 1, 2, 3 }
 }};
-
-enum Interrupts {
-	interruptNone = 1,
-	interruptNMI = 2,
-	interruptIRQ = 3
-};
 
 class PPU {
 public:
@@ -136,7 +128,7 @@ public:
 	byte readPPU(uint16_t address, Mapper* mapper, Cartridge* cartridge);
 	void writePPU(uint16_t address, byte value, Mapper* mapper, Cartridge* cartridge);
 	byte readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge);
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu, NES* nes);
+    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu);
 };
 
 #endif //VMOS6502_PPU_H

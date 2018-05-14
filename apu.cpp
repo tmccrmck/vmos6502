@@ -1,4 +1,4 @@
-#include "nes.h"
+#include "apu.h"
 
 constexpr byte length_tbl[] = {
 	10, 254, 20, 2, 40, 4, 80, 6, 160, 8, 60, 10, 14, 12, 26, 14,
@@ -299,7 +299,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
 	}
 }
 
-void APU::tickAPU(NES* nes) {
+void APU::tickAPU(CPU<NES>* cpu) {
 	uint64_t cycle1 = this->cycle;
 	++this->cycle;
 	uint64_t cycle2 = this->cycle;
@@ -326,8 +326,8 @@ void APU::tickAPU(NES* nes) {
 		if (d->enabled) {
 			// tick reader
 			if (d->cur_len > 0 && d->bit_count == 0) {
-				nes->cpu->stall += 4;
-				d->shift_reg = nes->readByte(d->cur_addr);
+				cpu->stall += 4;
+				d->shift_reg = cpu->readb(d->cur_addr);
 				d->bit_count = 8;
 				++d->cur_addr;
 				if (d->cur_addr == 0) {
@@ -396,7 +396,7 @@ void APU::tickAPU(NES* nes) {
 					this->tickSweep();
 					this->tickLength();
 					if (this->frame_IRQ) {
-						triggerIRQ(nes->cpu);
+						triggerIRQ(cpu);
 					}
 					break;
 				}

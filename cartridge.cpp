@@ -1,4 +1,4 @@
-#include "nes.h"
+#include "cartridge.h"
 
 Cartridge::Cartridge(const std::string path, const std::string SRAM_path) : initialized(false) {
 	FILE* fp = fopen(path.c_str(), "rb");
@@ -7,7 +7,7 @@ Cartridge::Cartridge(const std::string path, const std::string SRAM_path) : init
 		return;
 	}
 
-	iNESHeader header;
+	iNESHeader header{};
 	size_t elems_read = fread(&header, sizeof(header), 1, fp);
 	if (elems_read != 1) {
 		std::cerr << "ERROR: failed to read ROM header!" << std::endl;

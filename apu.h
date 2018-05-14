@@ -3,8 +3,15 @@
 
 #include <cstdint>
 #include <portaudio.h>
+#include "cpu.h"
+
+typedef uint8_t byte;
 
 class NES;
+
+constexpr double CPU_FREQ = 1789773.0;
+constexpr double FRAME_CTR_FREQ = CPU_FREQ / 240.0;
+constexpr double SAMPLE_RATE = CPU_FREQ / (44100.0);
 
 class Pulse {
 public:
@@ -111,11 +118,12 @@ public:
     void tickSweep();
     void writeRegisterAPU(uint16_t address, byte value);
 
-	void tickAPU(NES* nes);
+	void tickAPU(CPU<NES>* cpu);
 };
 
 void dmcRestart(DMC* d);
 
+// TODO: make class method
 void tickEnvelope(APU* apu);
 void tickSweep(APU* apu);
 void tickLength(APU* apu);

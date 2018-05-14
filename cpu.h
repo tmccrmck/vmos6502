@@ -7,6 +7,12 @@
 
 #include "instruction.h"
 
+enum Interrupts {
+	interruptNone = 1,
+	interruptNMI = 2,
+	interruptIRQ = 3
+};
+
 enum AddressingModes {
 	modeAbsolute = 1,
 	modeAbsoluteX = 2,
@@ -37,9 +43,7 @@ public:
 	int stall;
     Mem* nes;
 
-    explicit CPU(Mem* nes) : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0){
-        this->nes = nes;
-    }
+    explicit CPU(Mem* nes_) : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0), nes(nes_){ }
 
     void executeOpcode(byte opcode, uint16_t address, Instruction instruction);
 	bool pagesDiffer(uint16_t a, uint16_t b);
