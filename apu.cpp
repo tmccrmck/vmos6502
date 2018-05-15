@@ -29,7 +29,7 @@ constexpr byte duty_tbl[4][8] = {
 };
 
 // note use getI
-void triggerIRQ(CPU<NES>* cpu) {
+void triggerIRQ(CPU* cpu) {
 	if ((cpu->flags & 4) >> 2 == 0) {
 		cpu->interrupt = interruptIRQ;
 	}
@@ -299,7 +299,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
 	}
 }
 
-void APU::tickAPU(CPU<NES>* cpu) {
+void APU::tickAPU(CPU* cpu) {
 	uint64_t cycle1 = this->cycle;
 	++this->cycle;
 	uint64_t cycle2 = this->cycle;

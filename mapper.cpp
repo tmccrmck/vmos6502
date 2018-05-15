@@ -114,14 +114,14 @@ int Mapper4::prgBankOffset(Cartridge* c, int index) {
 	return offset;
 }
 
-void triggerIRQ2(CPU<NES>* cpu) {
+void triggerIRQ2(CPU* cpu) {
     auto i = (cpu->flags & 4) >> 2;
 	if (i == 0) {
 		cpu->interrupt = interruptIRQ;
 	}
 }
 
-void Mapper4::updateCounter(CPU<NES>* cpu) {
+void Mapper4::updateCounter(CPU* cpu) {
 	if (counter == 0) {
 		counter = reload;
 	}

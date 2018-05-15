@@ -8,6 +8,7 @@
 typedef uint8_t byte;
 
 class NES;
+class CPU;
 
 constexpr double CPU_FREQ = 1789773.0;
 constexpr double FRAME_CTR_FREQ = CPU_FREQ / 240.0;
@@ -118,7 +119,7 @@ public:
     void tickSweep();
     void writeRegisterAPU(uint16_t address, byte value);
 
-	void tickAPU(CPU<NES>* cpu);
+	void tickAPU(CPU* cpu);
 };
 
 void dmcRestart(DMC* d);

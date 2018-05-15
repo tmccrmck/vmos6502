@@ -11,6 +11,7 @@
 #include "ppu.h"
 #include "cpu.h"
 
+class APU;
 class PPU;
 class Mapper;
 //template <class Mem> class CPU;
@@ -29,7 +30,7 @@ enum Buttons {
 class NES {
 public:
 	bool initialized;
-	CPU<NES>* cpu;
+	CPU* cpu;
 	APU* apu;
 	PPU* ppu;
 	Cartridge* cartridge;

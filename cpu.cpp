@@ -1,18 +1,17 @@
 #include "cpu.h"
 
-template<typename Mem>
-byte CPU<Mem>::readb(uint16_t addr) {
+byte CPU::readb(uint16_t addr) {
 	return nes->readByte(addr);
 }
 
 // do addresses represent different pages?
-template <class Mem>
-bool CPU<Mem>::pagesDiffer(uint16_t a, uint16_t b) {
+
+bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
 	return (a & 0xFF00) != (b & 0xFF00);
 }
 
-template <class Mem>
-void CPU<Mem>::executeOpcode(byte opcode, uint16_t address, Instruction instruction) {
+
+void CPU::executeOpcode(byte opcode, uint16_t address, Instruction instruction) {
     	switch(opcode){
 		case 0x0:
 			this->brk(address, instruction.mode);
@@ -787,94 +786,94 @@ void CPU<Mem>::executeOpcode(byte opcode, uint16_t address, Instruction instruct
 		}
 }
 
-template <class Mem>
-void CPU<Mem>::setZ(byte value) {
+
+void CPU::setZ(byte value) {
 	this->flags = (this->flags & (~(1 << 1))) | (static_cast<byte>(value == 0) << 1);
 }
 
-template <class Mem>
-byte CPU<Mem>::getZ() {
+
+byte CPU::getZ() {
 	return (this->flags & 2) >> 1;
 }
 
-template <class Mem>
-void CPU<Mem>::setN(byte value) {
+
+void CPU::setN(byte value) {
 	this->flags = (this->flags & (~(1 << 7))) | (value & 128);
 }
 
-template <class Mem>
-byte CPU<Mem>::getN() {
+
+byte CPU::getN() {
 	return (this->flags & 128) >> 7;
 }
 
-template <class Mem>
-void CPU<Mem>::setZN(byte value) {
+
+void CPU::setZN(byte value) {
 	setZ(value);
 	setN(value);
 }
 
-template <class Mem>
-void CPU<Mem>::setC(bool value) {
+
+void CPU::setC(bool value) {
 	this->flags = (this->flags & (~(1))) | static_cast<byte>(value);
 }
 
-template <class Mem>
-byte CPU<Mem>::getC() {
+
+byte CPU::getC() {
 	return this->flags & 1;
 }
 
-template <class Mem>
-void CPU<Mem>::setI(bool value) {
+
+void CPU::setI(bool value) {
 	this->flags = (this->flags & (~(1 << 2))) | (static_cast<byte>(value) << 2);
 }
 
-template <class Mem>
-inline byte CPU<Mem>::getI() {
+
+byte CPU::getI() {
 	return (this->flags & 4) >> 2;
 }
 
-template <class Mem>
-void CPU<Mem>::setD(bool value) {
+
+void CPU::setD(bool value) {
 	this->flags = (this->flags & (~(1 << 3))) | (static_cast<byte>(value) << 3);
 }
 
-template <class Mem>
-byte CPU<Mem>::getD() {
+
+byte CPU::getD() {
 	return (this->flags & 8) >> 3;
 }
 
-template <class Mem>
-void CPU<Mem>::setB(bool value) {
+
+void CPU::setB(bool value) {
 	this->flags = (this->flags & (~(1 << 4))) | (static_cast<byte>(value) << 4);
 }
 
-template <class Mem>
-byte CPU<Mem>::getB() {
+
+byte CPU::getB() {
 	return (this->flags & 16) >> 4;
 }
 
 // set overflow flag if 'value' is true
-template <class Mem>
-void CPU<Mem>::setV(bool value) {
+
+void CPU::setV(bool value) {
 	this->flags = (this->flags & (~(1 << 6))) | (static_cast<byte>(value) << 6);
 }
 
 // get overflow flag
-template <class Mem>
-byte CPU<Mem>::getV() {
+
+byte CPU::getV() {
 	return (this->flags & 64) >> 6;
 }
 
-template <class Mem>
-void CPU<Mem>::compare(byte a, byte b) {
+
+void CPU::compare(byte a, byte b) {
 	setZN(a - b);
 	setC(a >= b);
 }
 
 // 1 cycle for taking a branch
 // 1 cycle if the branch is to a new page
-template <class Mem>
-void CPU<Mem>::branchDelay(uint16_t address, uint16_t pc) {
+
+void CPU::branchDelay(uint16_t address, uint16_t pc) {
 	++this->cycles;
 	if (pagesDiffer(pc, address)) {
 		++this->cycles;
@@ -882,8 +881,8 @@ void CPU<Mem>::branchDelay(uint16_t address, uint16_t pc) {
 }
 
 // ADC - ADd with Carry
-template <class Mem>
-void CPU<Mem>::adc(uint16_t address, byte mode) {
+
+void CPU::adc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
@@ -896,16 +895,16 @@ void CPU<Mem>::adc(uint16_t address, byte mode) {
 
 // AND - logical AND
 // Nonstandard name to disambiguate from 'and' label
-template <class Mem>
-void CPU<Mem>::and_instruction(uint16_t address, byte mode) {
+
+void CPU::and_instruction(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->a &= readb(address);
 	setZN(this->a);
 }
 
 // ASL - Arithmetic Shift Left
-template <class Mem>
-void CPU<Mem>::asl(uint16_t address, byte mode) {
+
+void CPU::asl(uint16_t address, byte mode) {
 	if (mode == modeAccumulator) {
 		setC((this->a >> 7) & 1);
 		this->a <<= 1;
@@ -921,8 +920,8 @@ void CPU<Mem>::asl(uint16_t address, byte mode) {
 }
 
 // BIT - BIt Test
-template <class Mem>
-void CPU<Mem>::bit(uint16_t address, byte mode) {
+
+void CPU::bit(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address);
 	setV((value >> 6) & 1);
@@ -931,32 +930,32 @@ void CPU<Mem>::bit(uint16_t address, byte mode) {
 }
 
 // CMP - CoMPare
-template <class Mem>
-void CPU<Mem>::cmp(uint16_t address, byte mode) {
+
+void CPU::cmp(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->a, value);
 }
 
 // CPX - ComPare X register
-template <class Mem>
-void CPU<Mem>::cpx(uint16_t address, byte mode) {
+
+void CPU::cpx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->x, value);
 }
 
 // CPY - ComPare Y register
-template <class Mem>
-void CPU<Mem>::cpy(uint16_t address, byte mode) {
+
+void CPU::cpy(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->y, value);
 }
 
 // DEC - DECrement memory
-template <class Mem>
-void CPU<Mem>::dec(uint16_t address, byte mode) {
+
+void CPU::dec(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address) - 1;
 	nes->writeByte(address, value);
@@ -965,16 +964,16 @@ void CPU<Mem>::dec(uint16_t address, byte mode) {
 
 
 // EOR - Exclusive OR
-template <class Mem>
-void CPU<Mem>::eor(uint16_t address, byte mode) {
+
+void CPU::eor(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->a ^= readb(address);
 	setZN(this->a);
 }
 
 // INC - INCrement memory
-template <class Mem>
-void CPU<Mem>::inc(uint16_t address, byte mode) {
+
+void CPU::inc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address) + 1;
 	nes->writeByte(address, value);
@@ -982,40 +981,40 @@ void CPU<Mem>::inc(uint16_t address, byte mode) {
 }
 
 // JMP - JuMP
-template <class Mem>
-void CPU<Mem>::jmp(uint16_t address, byte mode) {
+
+void CPU::jmp(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	this->pc = address;
 }
 
 // LDA - LoaD Accumulator
-template <class Mem>
-void CPU<Mem>::lda(uint16_t address, byte mode) {
+
+void CPU::lda(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->a = readb(address);
 	setZN(this->a);
 }
 
 // LDX - LoaD X register
-template <class Mem>
-void CPU<Mem>::ldx(uint16_t address, byte mode) {
+
+void CPU::ldx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->x = readb(address);
 	setZN(this->x);
 }
 
 // LDY - LoaD Y register
-template <class Mem>
-void CPU<Mem>::ldy(uint16_t address, byte mode) {
+
+void CPU::ldy(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->y = readb(address);
 	setZN(this->y);
 }
 
 // LSR - Logical Shift Right
-template <class Mem>
-void CPU<Mem>::lsr(uint16_t address, byte mode) {
+
+void CPU::lsr(uint16_t address, byte mode) {
 	if (mode == modeAccumulator) {
 		setC(this->a & 1);
 		this->a >>= 1;
@@ -1031,24 +1030,24 @@ void CPU<Mem>::lsr(uint16_t address, byte mode) {
 }
 
 // ORA - logical OR with Accumulator
-template <class Mem>
-void CPU<Mem>::ora(uint16_t address, byte mode) {
+
+void CPU::ora(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	this->a |= readb(address);
 	setZN(this->a);
 }
 
 // PHP - PusH Processor status
-template <class Mem>
-void CPU<Mem>::php(uint16_t address, byte mode) {
+
+void CPU::php(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	nes->push(this->flags | 0x10);
 }
 
 // ROL - ROtate Left
-template <class Mem>
-void CPU<Mem>::rol(uint16_t address, byte mode) {
+
+void CPU::rol(uint16_t address, byte mode) {
 	if (mode == modeAccumulator) {
 		const byte c = getC();
 		setC((this->a >> 7) & 1);
@@ -1066,8 +1065,8 @@ void CPU<Mem>::rol(uint16_t address, byte mode) {
 }
 
 // ROR - ROtate Right
-template <class Mem>
-void CPU<Mem>::ror(uint16_t address, byte mode) {
+
+void CPU::ror(uint16_t address, byte mode) {
 	if (mode == modeAccumulator) {
 		const byte c = getC();
 		setC(this->a & 1);
@@ -1085,8 +1084,8 @@ void CPU<Mem>::ror(uint16_t address, byte mode) {
 }
 
 // SBC - SuBtract with Carry
-template <class Mem>
-void CPU<Mem>::sbc(uint16_t address, byte mode) {
+
+void CPU::sbc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
@@ -1098,8 +1097,8 @@ void CPU<Mem>::sbc(uint16_t address, byte mode) {
 }
 
 // SEI - SEt Interrupt disable
-template <class Mem>
-void CPU<Mem>::sei(uint16_t address, byte mode) {
+
+void CPU::sei(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1107,29 +1106,29 @@ void CPU<Mem>::sei(uint16_t address, byte mode) {
 }
 
 // STA - STore Accumulator
-template <class Mem>
-void CPU<Mem>::sta(uint16_t address, byte mode) {
+
+void CPU::sta(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	nes->writeByte(address, this->a);
 }
 
 // STX - Store X Register
-template <class Mem>
-void CPU<Mem>::stx(uint16_t address, byte mode) {
+
+void CPU::stx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	nes->writeByte(address, this->x);
 }
 
 // STY - STore Y Register
-template <class Mem>
-void CPU<Mem>::sty(uint16_t address, byte mode) {
+
+void CPU::sty(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	nes->writeByte(address, this->y);
 }
 
 // BRK - force interrupt BReaK
-template <class Mem>
-void CPU<Mem>::brk(uint16_t address, byte mode) {
+
+void CPU::brk(uint16_t address, byte mode) {
 	nes->push16(this->pc);
 	php(address, mode);
 	sei(address, mode);
@@ -1137,8 +1136,8 @@ void CPU<Mem>::brk(uint16_t address, byte mode) {
 }
 
 // BPL - Branch if PLus (i.e. if positive)
-template <class Mem>
-void CPU<Mem>::bpl(uint16_t address, byte mode) {
+
+void CPU::bpl(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getN() == 0) {
@@ -1149,8 +1148,8 @@ void CPU<Mem>::bpl(uint16_t address, byte mode) {
 }
 
 // CLC - CLear Carry flag
-template <class Mem>
-void CPU<Mem>::clc(uint16_t address, byte mode) {
+
+void CPU::clc(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1158,24 +1157,24 @@ void CPU<Mem>::clc(uint16_t address, byte mode) {
 }
 
 // JSR - Jump to SubRoutine   
-template <class Mem>
-void CPU<Mem>::jsr(uint16_t address, byte mode) {
+
+void CPU::jsr(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	nes->push16(this->pc - 1);
 	this->pc = address;
 }
 
 // PLP - PuLl Processor status
-template <class Mem>
-void CPU<Mem>::plp(uint16_t address, byte mode) {
+
+void CPU::plp(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
 }
 
 // BMI - Branch if MInus (i.e. if negative)
-template <class Mem>
-void CPU<Mem>::bmi(uint16_t address, byte mode) {
+
+void CPU::bmi(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getN()) {
@@ -1186,8 +1185,8 @@ void CPU<Mem>::bmi(uint16_t address, byte mode) {
 }
 
 // SEC - SEt Carry flag
-template <class Mem>
-void CPU<Mem>::sec(uint16_t address, byte mode) {
+
+void CPU::sec(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1195,8 +1194,8 @@ void CPU<Mem>::sec(uint16_t address, byte mode) {
 }
 
 // RTI - ReTurn from Interrupt
-template <class Mem>
-void CPU<Mem>::rti(uint16_t address, byte mode) {
+
+void CPU::rti(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
@@ -1204,8 +1203,8 @@ void CPU<Mem>::rti(uint16_t address, byte mode) {
 }
 
 // BVC - Branch if oVerflow Clear
-template <class Mem>
-void CPU<Mem>::bvc(uint16_t address, byte mode) {
+
+void CPU::bvc(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getV() == 0) {
@@ -1216,16 +1215,16 @@ void CPU<Mem>::bvc(uint16_t address, byte mode) {
 }
 
 // PHA - PusH Accumulator
-template <class Mem>
-void CPU<Mem>::pha(uint16_t address, byte mode) {
+
+void CPU::pha(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	nes->push(this->a);
 }
 
 // CLI - CLear Interrupt disable
-template <class Mem>
-void CPU<Mem>::cli(uint16_t address, byte mode) {
+
+void CPU::cli(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1233,16 +1232,16 @@ void CPU<Mem>::cli(uint16_t address, byte mode) {
 }
 
 // RTS - ReTurn from Subroutine
-template <class Mem>
-void CPU<Mem>::rts(uint16_t address, byte mode) {
+
+void CPU::rts(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	this->pc = nes->pop16() + 1;
 }
 
 // PLA - PuLl Accumulator
-template <class Mem>
-void CPU<Mem>::pla(uint16_t address, byte mode) {
+
+void CPU::pla(uint16_t address, byte mode) {
 	static_cast<void>(address);
 	static_cast<void>(mode);
 	this->a = nes->pop();
@@ -1250,8 +1249,8 @@ void CPU<Mem>::pla(uint16_t address, byte mode) {
 }
 
 // BVS - Branch if oVerflow Set
-template <class Mem>
-void CPU<Mem>::bvs(uint16_t address, byte mode) {
+
+void CPU::bvs(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getV()) {
@@ -1262,8 +1261,8 @@ void CPU<Mem>::bvs(uint16_t address, byte mode) {
 }
 
 // DEY - DEcrement Y register
-template <class Mem>
-void CPU<Mem>::dey(uint16_t address, byte mode) {
+
+void CPU::dey(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1272,8 +1271,8 @@ void CPU<Mem>::dey(uint16_t address, byte mode) {
 }
 
 // TXA - Transfer X to Accumulator
-template <class Mem>
-void CPU<Mem>::txa(uint16_t address, byte mode) {
+
+void CPU::txa(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1282,8 +1281,8 @@ void CPU<Mem>::txa(uint16_t address, byte mode) {
 }
 
 // BCC - Branch if Carry Clear
-template <class Mem>
-void CPU<Mem>::bcc(uint16_t address, byte mode) {
+
+void CPU::bcc(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getC() == 0) {
@@ -1294,8 +1293,8 @@ void CPU<Mem>::bcc(uint16_t address, byte mode) {
 }
 
 // TYA - Transfer Y to Accumulator
-template <class Mem>
-void CPU<Mem>::tya(uint16_t address, byte mode) {
+
+void CPU::tya(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1304,8 +1303,8 @@ void CPU<Mem>::tya(uint16_t address, byte mode) {
 }
 
 // BCS - Branch if Carry Set
-template <class Mem>
-void CPU<Mem>::bcs(uint16_t address, byte mode) {
+
+void CPU::bcs(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getC()) {
@@ -1316,8 +1315,8 @@ void CPU<Mem>::bcs(uint16_t address, byte mode) {
 }
 
 // TAY - Transfer Accumulator to Y
-template <class Mem>
-void CPU<Mem>::tay(uint16_t address, byte mode) {
+
+void CPU::tay(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1326,8 +1325,8 @@ void CPU<Mem>::tay(uint16_t address, byte mode) {
 }
 
 // TXS - Transfer X to Stack pointer
-template <class Mem>
-void CPU<Mem>::txs(uint16_t address, byte mode) {
+
+void CPU::txs(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1335,8 +1334,8 @@ void CPU<Mem>::txs(uint16_t address, byte mode) {
 }
 
 // TAX - Transfer Accumulator to X
-template <class Mem>
-void CPU<Mem>::tax(uint16_t address, byte mode) {
+
+void CPU::tax(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1345,8 +1344,8 @@ void CPU<Mem>::tax(uint16_t address, byte mode) {
 }
 
 // CLV - CLear oVerflow flag
-template <class Mem>
-void CPU<Mem>::clv(uint16_t address, byte mode) {
+
+void CPU::clv(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1354,8 +1353,8 @@ void CPU<Mem>::clv(uint16_t address, byte mode) {
 }
 
 // TSX - Transfer Stack pointer to X
-template <class Mem>
-void CPU<Mem>::tsx(uint16_t address, byte mode) {
+
+void CPU::tsx(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1364,8 +1363,8 @@ void CPU<Mem>::tsx(uint16_t address, byte mode) {
 }
 
 // INY - INcrement Y register
-template <class Mem>
-void CPU<Mem>::iny(uint16_t address, byte mode) {
+
+void CPU::iny(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1374,8 +1373,8 @@ void CPU<Mem>::iny(uint16_t address, byte mode) {
 }
 
 // DEX - DEcrement X register
-template <class Mem>
-void CPU<Mem>::dex(uint16_t address, byte mode) {
+
+void CPU::dex(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1384,8 +1383,8 @@ void CPU<Mem>::dex(uint16_t address, byte mode) {
 }
 
 // BNE - Branch if Not Equal
-template <class Mem>
-void CPU<Mem>::bne(uint16_t address, byte mode) {
+
+void CPU::bne(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getZ() == 0) {
@@ -1396,8 +1395,8 @@ void CPU<Mem>::bne(uint16_t address, byte mode) {
 }
 
 // CLD - CLear Decimal mode
-template <class Mem>
-void CPU<Mem>::cld(uint16_t address, byte mode) {
+
+void CPU::cld(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1405,8 +1404,8 @@ void CPU<Mem>::cld(uint16_t address, byte mode) {
 }
 
 // INX - INcrement X register
-template <class Mem>
-void CPU<Mem>::inx(uint16_t address, byte mode) {
+
+void CPU::inx(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1415,8 +1414,8 @@ void CPU<Mem>::inx(uint16_t address, byte mode) {
 }
 
 // BEQ - Branch if EQual
-template <class Mem>
-void CPU<Mem>::beq(uint16_t address, byte mode) {
+
+void CPU::beq(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(mode);
 	if (getZ()) {
@@ -1427,8 +1426,8 @@ void CPU<Mem>::beq(uint16_t address, byte mode) {
 }
 
 // SED - SEt Decimal flag
-template <class Mem>
-void CPU<Mem>::sed(uint16_t address, byte mode) {
+
+void CPU::sed(uint16_t address, byte mode) {
 	static_cast<void>(nes);
 	static_cast<void>(address);
 	static_cast<void>(mode);
@@ -1436,8 +1435,8 @@ void CPU<Mem>::sed(uint16_t address, byte mode) {
 }
 
 // NOP - No OPeration
-template <class Mem>
-void CPU<Mem>::nop(uint16_t address, byte mode) {
+
+void CPU::nop(uint16_t address, byte mode) {
 	static_cast<void>(this);
 	static_cast<void>(nes);
 	static_cast<void>(address);

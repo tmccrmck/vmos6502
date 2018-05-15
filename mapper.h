@@ -23,7 +23,7 @@ enum MirrorModes {
 struct Mapper {
 	virtual uint8_t read(Cartridge* cartridge, uint16_t address) = 0;
 	virtual void write(Cartridge* cartridge, uint16_t address, uint8_t value) = 0;
-	virtual void updateCounter(CPU<NES>* cpu) = 0;
+	virtual void updateCounter(CPU* cpu) = 0;
 };
 
 struct Mapper1 : public Mapper {
@@ -89,7 +89,7 @@ struct Mapper1 : public Mapper {
 		}
 	}
 
-	void updateCounter(CPU<NES>* cpu) override {
+	void updateCounter(CPU* cpu) override {
 		static_cast<void>(cpu);
 	}
 
@@ -139,7 +139,7 @@ struct Mapper2 : public Mapper {
 		}
 	}
 
-	void updateCounter(CPU<NES>* cpu) override {
+	void updateCounter(CPU* cpu) override {
 		static_cast<void>(cpu);
 	}
 
@@ -190,7 +190,7 @@ struct Mapper3 : public Mapper {
 			std::cerr << "ERROR: Mapper3 encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
 		}
 	}
-	void updateCounter(CPU<NES>* cpu) override {
+	void updateCounter(CPU* cpu) override {
 		static_cast<void>(cpu);
 	}
 
@@ -290,7 +290,7 @@ struct Mapper4 : public Mapper {
 		}
 	}
 
-    void updateCounter(CPU<NES>* cpu) override;
+    void updateCounter(CPU* cpu) override;
 
 	Mapper4() : reg(0), regs{ 0, 0, 0, 0, 0, 0, 0, 0 }, prg_mode(0), chr_mode(0), prg_offsets{ 0, 0, 0, 0 }, chr_offsets{ 0, 0, 0, 0, 0, 0, 0, 0 }, reload(0), counter(0), IRQ_enable(false) {}
 };
@@ -340,7 +340,7 @@ struct Mapper7 : public Mapper {
 		}
 	}
 
-	void updateCounter(CPU<NES>* cpu) override {
+	void updateCounter(CPU* cpu) override {
 		static_cast<void>(cpu);
 	}
 

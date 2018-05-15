@@ -6,6 +6,9 @@
 #include <cstdlib>
 
 #include "instruction.h"
+#include "nes.h"
+
+class NES;
 
 enum Interrupts {
 	interruptNone = 1,
@@ -29,7 +32,6 @@ enum AddressingModes {
 	modeZeroPageY = 13
 };
 
-template <typename Mem>
 class CPU {
 public:
 	uint64_t cycles;
@@ -41,9 +43,9 @@ public:
 	uint8_t flags;
 	uint8_t interrupt;
 	int stall;
-    Mem* nes;
+    NES* nes;
 
-    explicit CPU(Mem* nes_) : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0), nes(nes_){ }
+    explicit CPU(NES* nes_) : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0), nes(nes_){ }
 
     void executeOpcode(byte opcode, uint16_t address, Instruction instruction);
 	bool pagesDiffer(uint16_t a, uint16_t b);

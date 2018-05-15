@@ -75,7 +75,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 	std::cout << "Mapper " << static_cast<int>(cartridge->mapper) << " activated." << std::endl;
 
 	std::cout << "Initializing NES CPU..." << std::endl;
-	cpu = new CPU<NES>(this);
+	cpu = new CPU(this);
 
 	cpu->pc = read16(0xFFFC);
 	cpu->sp = 0xFD;
@@ -106,7 +106,7 @@ void NES::emulate(double seconds) {
 
 	while (cycles > 0) {
 		int cpuCycles = 0;
-		CPU<NES>* cpu = this->cpu;
+		CPU* cpu = this->cpu;
 
 		if (cpu->stall > 0) {
 			--cpu->stall;

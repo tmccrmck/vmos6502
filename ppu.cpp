@@ -79,7 +79,7 @@ byte PPU::readPPU(uint16_t address, Mapper* mapper, Cartridge* cartridge) {
 	return 0;
 }
 
-void PPU::tickPPU(CPU<NES>* cpu, Mapper* mapper, Cartridge* cartridge) {
+void PPU::tickPPU(CPU* cpu, Mapper* mapper, Cartridge* cartridge) {
 	if (this->nmi_delay > 0) {
 		this->nmi_delay--;
 		if (this->nmi_delay == 0 && this->nmi_out && this->nmi_occurred) {
@@ -393,7 +393,7 @@ byte PPU::readPPURegister(uint16_t address, Mapper* mapper, Cartridge* cartridge
 	return 0;
 }
 
-void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU<NES> *cpu) {
+void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu) {
 	this->reg = value;
 	switch (address) {
         case 0x2000:
