@@ -1,11 +1,16 @@
 #include "cpu.h"
 
+// These methods are meant to abstract away NES class
 byte CPU::readb(uint16_t addr) {
 	return nes->readByte(addr);
 }
 
-// do addresses represent different pages?
+void CPU::writeb(uint16_t addr, byte value) {
+    nes->writeByte(addr, value);
+}
 
+
+// do addresses represent different pages?
 bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
 	return (a & 0xFF00) != (b & 0xFF00);
 }
@@ -914,7 +919,7 @@ void CPU::asl(uint16_t address, byte mode) {
 		byte value = readb(address);
 		setC((value >> 7) & 1);
 		value <<= 1;
-		nes->writeByte(address, value);
+		writeb(address, value);
 		setZN(value);
 	}
 }
@@ -958,7 +963,7 @@ void CPU::cpy(uint16_t address, byte mode) {
 void CPU::dec(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address) - 1;
-	nes->writeByte(address, value);
+	writeb(address, value);
 	setZN(value);
 }
 
@@ -976,7 +981,7 @@ void CPU::eor(uint16_t address, byte mode) {
 void CPU::inc(uint16_t address, byte mode) {
 	static_cast<void>(mode);
 	const byte value = readb(address) + 1;
-	nes->writeByte(address, value);
+	writeb(address, value);
 	setZN(value);
 }
 
@@ -1024,7 +1029,7 @@ void CPU::lsr(uint16_t address, byte mode) {
 		byte value = readb(address);
 		setC(value & 1);
 		value >>= 1;
-		nes->writeByte(address, value);
+		writeb(address, value);
 		setZN(value);
 	}
 }
@@ -1059,7 +1064,7 @@ void CPU::rol(uint16_t address, byte mode) {
 		byte value = readb(address);
 		setC((value >> 7) & 1);
 		value = (value << 1) | c;
-		nes->writeByte(address, value);
+		writeb(address, value);
 		setZN(value);
 	}
 }
@@ -1078,7 +1083,7 @@ void CPU::ror(uint16_t address, byte mode) {
 		byte value = readb(address);
 		setC(value & 1);
 		value = (value >> 1) | (c << 7);
-		nes->writeByte(address, value);
+		writeb(address, value);
 		setZN(value);
 	}
 }
@@ -1109,21 +1114,21 @@ void CPU::sei(uint16_t address, byte mode) {
 
 void CPU::sta(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	nes->writeByte(address, this->a);
+	writeb(address, this->a);
 }
 
 // STX - Store X Register
 
 void CPU::stx(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	nes->writeByte(address, this->x);
+	writeb(address, this->x);
 }
 
 // STY - STore Y Register
 
 void CPU::sty(uint16_t address, byte mode) {
 	static_cast<void>(mode);
-	nes->writeByte(address, this->y);
+	writeb(address, this->y);
 }
 
 // BRK - force interrupt BReaK

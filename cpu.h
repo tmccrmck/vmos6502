@@ -50,6 +50,7 @@ public:
     void executeOpcode(byte opcode, uint16_t address, Instruction instruction);
 	bool pagesDiffer(uint16_t a, uint16_t b);
 	byte readb(uint16_t addr);
+    void writeb(uint16_t addr, byte value);
 
 	// set zero flag if 'value' is zero
 	void setZ(byte value);
