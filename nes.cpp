@@ -199,11 +199,6 @@ byte NES::readByte(uint16_t address) {
 	}
 }
 
-void dmcRestart(DMC* d) {
-	d->cur_addr = d->samp_addr;
-	d->cur_len = d->samp_len;
-}
-
 // 6502 indirect memory bug - only low bytes
 uint16_t NES::read16_ff_bug(uint16_t address) {
 	const uint16_t a = address;

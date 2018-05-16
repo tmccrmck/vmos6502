@@ -82,7 +82,8 @@ struct Noise {
 	Noise() : enabled(false), mode(false), shift_reg(0), length_enabled(false), length_val(0), timer_period(0), timer_val(0), envelope_enabled(false), envelope_loop(false), envelope_start(false), envelope_period(0), envelope_val(0), envelope_vol(0), const_vol(0) {}
 };
 
-struct DMC {
+class DMC {
+public:
 	bool enabled;
 	uint8_t value;
 	uint16_t samp_addr;
@@ -97,6 +98,12 @@ struct DMC {
 	bool irq;
 
 	DMC() : enabled(false), value(0), samp_addr(0), samp_len(0), cur_addr(0), cur_len(0), shift_reg(0), bit_count(0), tick_period(0), tick_val(0), loop(false), irq(false) {}
+
+    void restart() {
+    	this->cur_addr = this->samp_addr;
+    	this->cur_len = this->samp_len;
+    }
+
 };
 
 class APU {
@@ -124,8 +131,4 @@ public:
 
 void dmcRestart(DMC* d);
 
-// TODO: make class method
-void tickEnvelope(APU* apu);
-void tickSweep(APU* apu);
-void tickLength(APU* apu);
 #endif //VMOS6502_APU_H

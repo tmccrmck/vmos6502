@@ -283,7 +283,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
 			}
 			else {
 				if (this->dmc.cur_len == 0) {
-					dmcRestart(&this->dmc);
+					this->dmc.restart();
 				}
 			}
 			break;
@@ -335,7 +335,7 @@ void APU::tickAPU(CPU* cpu) {
 				}
 				--d->cur_len;
 				if (d->cur_len == 0 && d->loop) {
-					dmcRestart(d);
+					d->restart();
 				}
 			}
 

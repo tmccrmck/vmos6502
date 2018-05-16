@@ -14,7 +14,6 @@
 class APU;
 class PPU;
 class Mapper;
-//template <class Mem> class CPU;
 
 enum Buttons {
 	ButtonA = 0,
