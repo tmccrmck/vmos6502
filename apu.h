@@ -3,6 +3,8 @@
 
 #include <cstdint>
 #include <portaudio.h>
+#include <array>
+
 #include "cpu.h"
 
 typedef uint8_t byte;
@@ -119,7 +121,7 @@ public:
 	uint8_t frame_val;
 	bool frame_IRQ;
 
-	APU();
+    APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
 
 	void tickLength();
     void tickEnvelope();
