@@ -888,7 +888,7 @@ void CPU::branchDelay(uint16_t address, uint16_t pc) {
 // ADC - ADd with Carry
 
 void CPU::adc(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
 	const byte c = getC();
@@ -902,7 +902,7 @@ void CPU::adc(uint16_t address, byte mode) {
 // Nonstandard name to disambiguate from 'and' label
 
 void CPU::and_instruction(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->a &= readb(address);
 	setZN(this->a);
 }
@@ -927,7 +927,7 @@ void CPU::asl(uint16_t address, byte mode) {
 // BIT - BIt Test
 
 void CPU::bit(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address);
 	setV((value >> 6) & 1);
 	setZ(value & this->a);
@@ -937,7 +937,7 @@ void CPU::bit(uint16_t address, byte mode) {
 // CMP - CoMPare
 
 void CPU::cmp(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->a, value);
 }
@@ -945,7 +945,7 @@ void CPU::cmp(uint16_t address, byte mode) {
 // CPX - ComPare X register
 
 void CPU::cpx(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->x, value);
 }
@@ -953,7 +953,7 @@ void CPU::cpx(uint16_t address, byte mode) {
 // CPY - ComPare Y register
 
 void CPU::cpy(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->y, value);
 }
@@ -961,7 +961,7 @@ void CPU::cpy(uint16_t address, byte mode) {
 // DEC - DECrement memory
 
 void CPU::dec(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address) - 1;
 	writeb(address, value);
 	setZN(value);
@@ -971,7 +971,7 @@ void CPU::dec(uint16_t address, byte mode) {
 // EOR - Exclusive OR
 
 void CPU::eor(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->a ^= readb(address);
 	setZN(this->a);
 }
@@ -979,7 +979,7 @@ void CPU::eor(uint16_t address, byte mode) {
 // INC - INCrement memory
 
 void CPU::inc(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte value = readb(address) + 1;
 	writeb(address, value);
 	setZN(value);
@@ -988,15 +988,15 @@ void CPU::inc(uint16_t address, byte mode) {
 // JMP - JuMP
 
 void CPU::jmp(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	this->pc = address;
 }
 
 // LDA - LoaD Accumulator
 
 void CPU::lda(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->a = readb(address);
 	setZN(this->a);
 }
@@ -1004,7 +1004,7 @@ void CPU::lda(uint16_t address, byte mode) {
 // LDX - LoaD X register
 
 void CPU::ldx(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->x = readb(address);
 	setZN(this->x);
 }
@@ -1012,7 +1012,7 @@ void CPU::ldx(uint16_t address, byte mode) {
 // LDY - LoaD Y register
 
 void CPU::ldy(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->y = readb(address);
 	setZN(this->y);
 }
@@ -1037,7 +1037,7 @@ void CPU::lsr(uint16_t address, byte mode) {
 // ORA - logical OR with Accumulator
 
 void CPU::ora(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	this->a |= readb(address);
 	setZN(this->a);
 }
@@ -1045,8 +1045,8 @@ void CPU::ora(uint16_t address, byte mode) {
 // PHP - PusH Processor status
 
 void CPU::php(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	nes->push(this->flags | 0x10);
 }
 
@@ -1091,7 +1091,7 @@ void CPU::ror(uint16_t address, byte mode) {
 // SBC - SuBtract with Carry
 
 void CPU::sbc(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
 	const byte c = getC();
@@ -1104,30 +1104,30 @@ void CPU::sbc(uint16_t address, byte mode) {
 // SEI - SEt Interrupt disable
 
 void CPU::sei(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setI(true);
 }
 
 // STA - STore Accumulator
 
 void CPU::sta(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	writeb(address, this->a);
 }
 
 // STX - Store X Register
 
 void CPU::stx(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	writeb(address, this->x);
 }
 
 // STY - STore Y Register
 
 void CPU::sty(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	writeb(address, this->y);
 }
 
@@ -1143,8 +1143,8 @@ void CPU::brk(uint16_t address, byte mode) {
 // BPL - Branch if PLus (i.e. if positive)
 
 void CPU::bpl(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getN() == 0) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1155,16 +1155,16 @@ void CPU::bpl(uint16_t address, byte mode) {
 // CLC - CLear Carry flag
 
 void CPU::clc(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setC(false);
 }
 
 // JSR - Jump to SubRoutine   
 
 void CPU::jsr(uint16_t address, byte mode) {
-	static_cast<void>(mode);
+	//static_cast<void>(mode);
 	nes->push16(this->pc - 1);
 	this->pc = address;
 }
@@ -1172,16 +1172,16 @@ void CPU::jsr(uint16_t address, byte mode) {
 // PLP - PuLl Processor status
 
 void CPU::plp(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
 }
 
 // BMI - Branch if MInus (i.e. if negative)
 
 void CPU::bmi(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getN()) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1192,17 +1192,17 @@ void CPU::bmi(uint16_t address, byte mode) {
 // SEC - SEt Carry flag
 
 void CPU::sec(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setC(true);
 }
 
 // RTI - ReTurn from Interrupt
 
 void CPU::rti(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
 	this->pc = nes->pop16();
 }
@@ -1210,8 +1210,8 @@ void CPU::rti(uint16_t address, byte mode) {
 // BVC - Branch if oVerflow Clear
 
 void CPU::bvc(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getV() == 0) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1222,33 +1222,33 @@ void CPU::bvc(uint16_t address, byte mode) {
 // PHA - PusH Accumulator
 
 void CPU::pha(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	nes->push(this->a);
 }
 
 // CLI - CLear Interrupt disable
 
 void CPU::cli(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setI(false);
 }
 
 // RTS - ReTurn from Subroutine
 
 void CPU::rts(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->pc = nes->pop16() + 1;
 }
 
 // PLA - PuLl Accumulator
 
 void CPU::pla(uint16_t address, byte mode) {
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->a = nes->pop();
 	setZN(this->a);
 }
@@ -1256,8 +1256,8 @@ void CPU::pla(uint16_t address, byte mode) {
 // BVS - Branch if oVerflow Set
 
 void CPU::bvs(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getV()) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1268,9 +1268,9 @@ void CPU::bvs(uint16_t address, byte mode) {
 // DEY - DEcrement Y register
 
 void CPU::dey(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	--this->y;
 	setZN(this->y);
 }
@@ -1278,9 +1278,9 @@ void CPU::dey(uint16_t address, byte mode) {
 // TXA - Transfer X to Accumulator
 
 void CPU::txa(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->a = this->x;
 	setZN(this->a);
 }
@@ -1288,8 +1288,8 @@ void CPU::txa(uint16_t address, byte mode) {
 // BCC - Branch if Carry Clear
 
 void CPU::bcc(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getC() == 0) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1300,9 +1300,9 @@ void CPU::bcc(uint16_t address, byte mode) {
 // TYA - Transfer Y to Accumulator
 
 void CPU::tya(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->a = this->y;
 	setZN(this->a);
 }
@@ -1310,8 +1310,8 @@ void CPU::tya(uint16_t address, byte mode) {
 // BCS - Branch if Carry Set
 
 void CPU::bcs(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getC()) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1322,9 +1322,9 @@ void CPU::bcs(uint16_t address, byte mode) {
 // TAY - Transfer Accumulator to Y
 
 void CPU::tay(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->y = this->a;
 	setZN(this->y);
 }
@@ -1332,18 +1332,18 @@ void CPU::tay(uint16_t address, byte mode) {
 // TXS - Transfer X to Stack pointer
 
 void CPU::txs(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->sp = this->x;
 }
 
 // TAX - Transfer Accumulator to X
 
 void CPU::tax(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->x = this->a;
 	setZN(this->x);
 }
@@ -1351,18 +1351,18 @@ void CPU::tax(uint16_t address, byte mode) {
 // CLV - CLear oVerflow flag
 
 void CPU::clv(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setV(false);
 }
 
 // TSX - Transfer Stack pointer to X
 
 void CPU::tsx(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	this->x = this->sp;
 	setZN(this->x);
 }
@@ -1370,9 +1370,9 @@ void CPU::tsx(uint16_t address, byte mode) {
 // INY - INcrement Y register
 
 void CPU::iny(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	++this->y;
 	setZN(this->y);
 }
@@ -1380,9 +1380,9 @@ void CPU::iny(uint16_t address, byte mode) {
 // DEX - DEcrement X register
 
 void CPU::dex(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	--this->x;
 	setZN(this->x);
 }
@@ -1390,8 +1390,8 @@ void CPU::dex(uint16_t address, byte mode) {
 // BNE - Branch if Not Equal
 
 void CPU::bne(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getZ() == 0) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1402,18 +1402,18 @@ void CPU::bne(uint16_t address, byte mode) {
 // CLD - CLear Decimal mode
 
 void CPU::cld(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setD(false);
 }
 
 // INX - INcrement X register
 
 void CPU::inx(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	++this->x;
 	setZN(this->x);
 }
@@ -1421,8 +1421,8 @@ void CPU::inx(uint16_t address, byte mode) {
 // BEQ - Branch if EQual
 
 void CPU::beq(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(mode);
 	if (getZ()) {
 		const uint16_t pc = this->pc;
 		this->pc = address;
@@ -1433,18 +1433,18 @@ void CPU::beq(uint16_t address, byte mode) {
 // SED - SEt Decimal flag
 
 void CPU::sed(uint16_t address, byte mode) {
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 	setD(true);
 }
 
 // NOP - No OPeration
 
 void CPU::nop(uint16_t address, byte mode) {
-	static_cast<void>(this);
-	static_cast<void>(nes);
-	static_cast<void>(address);
-	static_cast<void>(mode);
+	//static_cast<void>(this);
+	//static_cast<void>(nes);
+	//static_cast<void>(address);
+	//static_cast<void>(mode);
 }
 

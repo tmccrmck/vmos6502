@@ -90,7 +90,7 @@ struct Mapper1 : public Mapper {
 	}
 
 	void updateCounter(CPU* cpu) override {
-		static_cast<void>(cpu);
+		//static_cast<void>(cpu);
 	}
 
 	Mapper1() : shift_reg(0), control(0), prg_mode(0), chr_mode(0), prg_bank(0), chr_bank0(0), chr_bank1(0), prg_offsets{ 0, 0 }, chr_offsets{ 0, 0 } {}
@@ -140,7 +140,7 @@ struct Mapper2 : public Mapper {
 	}
 
 	void updateCounter(CPU* cpu) override {
-		static_cast<void>(cpu);
+		//static_cast<void>(cpu);
 	}
 
 	Mapper2(int _prgBanks, int _prgBank1, int _prgBank2) : prg_banks(_prgBanks), prg_bank1(_prgBank1), prg_bank2(_prgBank2) {}
@@ -191,7 +191,7 @@ struct Mapper3 : public Mapper {
 		}
 	}
 	void updateCounter(CPU* cpu) override {
-		static_cast<void>(cpu);
+		//static_cast<void>(cpu);
 	}
 
 	Mapper3(int _chrBank, int _prgBank1, int _prgBank2) : chr_bank(_chrBank), prg_bank1(_prgBank1), prg_bank2(_prgBank2) {}
@@ -341,7 +341,7 @@ struct Mapper7 : public Mapper {
 	}
 
 	void updateCounter(CPU* cpu) override {
-		static_cast<void>(cpu);
+		//static_cast<void>(cpu);
 	}
 
 	Mapper7() : prg_bank(0) {}
