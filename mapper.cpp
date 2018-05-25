@@ -114,13 +114,6 @@ int Mapper4::prgBankOffset(Cartridge* c, int index) {
 	return offset;
 }
 
-void triggerIRQ2(CPU* cpu) {
-    auto i = (cpu->flags & 4) >> 2;
-	if (i == 0) {
-		cpu->interrupt = interruptIRQ;
-	}
-}
-
 int Mapper4::chrBankOffset(Cartridge* cartridge, int index) {
 	if (index >= 0x80) {
 		index -= 0x100;

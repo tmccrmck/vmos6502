@@ -131,6 +131,4 @@ public:
 	void tickAPU(CPU* cpu);
 };
 
-void dmcRestart(DMC* d);
-
 #endif //VMOS6502_APU_H

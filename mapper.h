@@ -3,14 +3,9 @@
 
 #include <iostream>
 
-#include "cpu.h"
 #include "cartridge.h"
-#include "ppu.h"
 
 class NES;
-
-//template <class Mem>
-//class CPU;
 
 enum MirrorModes {
 	MirrorHorizontal = 0,
