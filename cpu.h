@@ -106,56 +106,56 @@ public:
 	void branchDelay(uint16_t address, uint16_t pc);
 
 	// ADC - ADd with Carry
-	void adc(uint16_t address, byte mode);
+	void adc(uint16_t address);
 
 	// AND - logical AND
 	// Nonstandard name to disambiguate from 'and' label
-	void and_instruction(uint16_t address, byte mode);
+	void and_instruction(uint16_t address);
 
 	// ASL - Arithmetic Shift Left
 	void asl(uint16_t address, byte mode);
 
 	// BIT - BIt Test
-	void bit(uint16_t address, byte mode);
+	void bit(uint16_t address);
 
 	// CMP - CoMPare
-	void cmp(uint16_t address, byte mode);
+	void cmp(uint16_t address);
 
 	// CPX - ComPare X register
-	void cpx(uint16_t address, byte mode);
+	void cpx(uint16_t address);
 
 	// CPY - ComPare Y register
-	void cpy(uint16_t address, byte mode);
+	void cpy(uint16_t address);
 
 	// DEC - DECrement memory
-	void dec(uint16_t address, byte mode);
+	void dec(uint16_t address);
 
 	// EOR - Exclusive OR
-	void eor(uint16_t address, byte mode);
+	void eor(uint16_t address);
 
 	// INC - INCrement memory
-	void inc(uint16_t address, byte mode);
+	void inc(uint16_t address);
 
 	// JMP - JuMP
-	void jmp(uint16_t address, byte mode);
+	void jmp(uint16_t address);
 
 	// LDA - LoaD Accumulator
-	void lda(uint16_t address, byte mode);
+	void lda(uint16_t address);
 
 	// LDX - LoaD X register
-	void ldx(uint16_t address, byte mode);
+	void ldx(uint16_t address);
 
 	// LDY - LoaD Y register
-	void ldy(uint16_t address, byte mode);
+	void ldy(uint16_t address);
 
 	// LSR - Logical Shift Right
 	void lsr(uint16_t address, byte mode);
 
 	// ORA - logical OR with Accumulator
-	void ora(uint16_t address, byte mode);
+	void ora(uint16_t address);
 
 	// PHP - PusH Processor status
-	void php(uint16_t address, byte mode);
+	void php();
 
 	// ROL - ROtate Left
 	void rol(uint16_t address, byte mode);
@@ -164,113 +164,113 @@ public:
 	void ror(uint16_t address, byte mode);
 
 	// SBC - SuBtract with Carry
-	void sbc(uint16_t address, byte mode);
+	void sbc(uint16_t address);
 
 	// SEI - SEt Interrupt disable
-	void sei(uint16_t address, byte mode);
+	void sei();
 
 	// STA - STore Accumulator
-	void sta(uint16_t address, byte mode);
+	void sta(uint16_t address);
 
 	// STX - Store X Register
-	void stx(uint16_t address, byte mode);
+	void stx(uint16_t address);
 
 	// STY - STore Y Register
-	void sty(uint16_t address, byte mode);
+	void sty(uint16_t address);
 
 	// BRK - force interrupt BReaK
-	void brk(uint16_t address, byte mode);
+	void brk();
 
 	// BPL - Branch if PLus (i.e. if positive)
-	void bpl(uint16_t address, byte mode);
+	void bpl(uint16_t address);
 
 	// CLC - CLear Carry flag
-	void clc(uint16_t address, byte mode);
+	void clc();
 
 	// JSR - Jump to SubRoutine   
-	void jsr(uint16_t address, byte mode);
+	void jsr(uint16_t address);
 	// PLP - PuLl Processor status
-	void plp(uint16_t address, byte mode);
+	void plp();
 	// BMI - Branch if MInus (i.e. if negative)
-	void bmi(uint16_t address, byte mode);
+	void bmi(uint16_t address);
 
 	// SEC - SEt Carry flag
-	void sec(uint16_t address, byte mode);
+	void sec();
 
 	// RTI - ReTurn from Interrupt
-	void rti(uint16_t address, byte mode);
+	void rti();
 
 	// BVC - Branch if oVerflow Clear
-	void bvc(uint16_t address, byte mode);
+	void bvc(uint16_t address);
 
 	// PHA - PusH Accumulator
-	void pha(uint16_t address, byte mode);
+	void pha();
 	// CLI - CLear Interrupt disable
-	void cli(uint16_t address, byte mode);
+	void cli();
 
 	// RTS - ReTurn from Subroutine
-	void rts(uint16_t address, byte mode);
+	void rts();
 	// PLA - PuLl Accumulator
-	void pla(uint16_t address, byte mode);
+	void pla();
 
 	// BVS - Branch if oVerflow Set
-	void bvs(uint16_t address, byte mode);
+	void bvs(uint16_t address);
 
 	// DEY - DEcrement Y register
-	void dey(uint16_t address, byte mode);
+	void dey();
 
 	// TXA - Transfer X to Accumulator
-	void txa(uint16_t address, byte mode);
+	void txa();
 
 	// BCC - Branch if Carry Clear
-	void bcc(uint16_t address, byte mode);
+	void bcc(uint16_t address);
 
 	// TYA - Transfer Y to Accumulator
-	void tya(uint16_t address, byte mode);
+	void tya();
 	
 
 	// BCS - Branch if Carry Set
-	void bcs(uint16_t address, byte mode);
+	void bcs(uint16_t address);
 	// TAY - Transfer Accumulator to Y
-	void tay(uint16_t address, byte mode);
+	void tay();
 	
 
 	// TXS - Transfer X to Stack pointer
-	void txs(uint16_t address, byte mode);
+	void txs();
 	// TAX - Transfer Accumulator to X
-	void tax(uint16_t address, byte mode);
+	void tax();
 	
 
 	// CLV - CLear oVerflow flag
-	void clv(uint16_t address, byte mode);
+	void clv();
 	// TSX - Transfer Stack pointer to X
-	void tsx(uint16_t address, byte mode);
+	void tsx();
 	
 
 	// INY - INcrement Y register
-	void iny(uint16_t address, byte mode);
+	void iny();
 	
 
 	// DEX - DEcrement X register
-	void dex(uint16_t address, byte mode);
+	void dex();
 	
 
 	// BNE - Branch if Not Equal
-	void bne(uint16_t address, byte mode);
+	void bne(uint16_t address);
 	// CLD - CLear Decimal mode
-	void cld(uint16_t address, byte mode);
+	void cld();
 
 	// INX - INcrement X register
-	void inx(uint16_t address, byte mode);
+	void inx();
 
 	// BEQ - Branch if EQual
-	void beq(uint16_t address, byte mode);
+	void beq(uint16_t address);
 
 	// SED - SEt Decimal flag
-	void sed(uint16_t address, byte mode);
+	void sed();
 
 	// NOP - No OPeration
-	void nop(uint16_t address, byte mode);
+	void nop();
 };
 
 #endif //VMOS6502_CPU_H

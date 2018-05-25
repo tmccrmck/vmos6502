@@ -116,14 +116,14 @@ void NES::emulate(double seconds) {
 			uint64_t startCycles = cpu->cycles;
 			if (cpu->interrupt == interruptNMI) {
 				push16(cpu->pc);
-				cpu->php(0, 0);
+				cpu->php();
 				cpu->pc = read16(0xFFFA);
 				cpu->setI(true);
 				cpu->cycles += 7;
 			}
 			else if (cpu->interrupt == interruptIRQ) {
 				push16(cpu->pc);
-				cpu->php(0, 0);
+				cpu->php();
 				cpu->pc = read16(0xFFFE);
 				cpu->setI(true);
 				cpu->cycles += 7;
@@ -138,10 +138,6 @@ void NES::emulate(double seconds) {
 		for (int i = 0; i < ppuCycles; ++i) {
 			PPU* ppu = this->ppu;
 			ppu->tickPPU(this->cpu, mapper, cartridge);
-
-			if ((ppu->cycle == 280) && (ppu->scanline <= 239 || ppu->scanline >= 261) && (ppu->flag_show_background != 0 || ppu->flag_show_sprites != 0)) {
-				this->mapper->updateCounter(this->cpu);
-			}
 		}
 
 		for (int i = 0; i < cpuCycles; ++i) {

@@ -19,772 +19,772 @@ bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
 void CPU::executeOpcode(byte opcode, uint16_t address, Instruction instruction) {
     	switch(opcode){
 		case 0x0:
-			this->brk(address, instruction.mode);
+			this->brk();
 			break;
 		case 0x1:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x4:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x5:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x6:
 			this->asl(address, instruction.mode);
 			break;
 		case 0x7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x8:
-			this->php(address, instruction.mode);
+			this->php();
 			break;
 		case 0x9:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0xa:
 			this->asl(address, instruction.mode);
 			break;
 		case 0xb:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xc:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0xe:
 			this->asl(address, instruction.mode);
 			break;
 		case 0xf:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x10:
-			this->bpl(address, instruction.mode);
+			this->bpl(address);
 			break;
 		case 0x11:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x12:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x13:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x14:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x15:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x16:
 			this->asl(address, instruction.mode);
 			break;
 		case 0x17:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x18:
-			this->clc(address, instruction.mode);
+			this->clc();
 			break;
 		case 0x19:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x1a:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x1b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x1c:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x1d:
-			this->ora(address, instruction.mode);
+			this->ora(address);
 			break;
 		case 0x1e:
 			this->asl(address, instruction.mode);
 			break;
 		case 0x1f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x20:
-			this->jsr(address, instruction.mode);
+			this->jsr(address);
 			break;
 		case 0x21:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x22:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x23:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x24:
-			this->bit(address, instruction.mode);
+			this->bit(address);
 			break;
 		case 0x25:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x26:
 			this->rol(address, instruction.mode);
 			break;
 		case 0x27:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x28:
-			this->plp(address, instruction.mode);
+			this->plp();
 			break;
 		case 0x29:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x2a:
 			this->rol(address, instruction.mode);
 			break;
 		case 0x2b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x2c:
-			this->bit(address, instruction.mode);
+			this->bit(address);
 			break;
 		case 0x2d:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x2e:
 			this->rol(address, instruction.mode);
 			break;
 		case 0x2f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x30:
-			this->bmi(address, instruction.mode);
+			this->bmi(address);
 			break;
 		case 0x31:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x32:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x33:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x34:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x35:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x36:
 			this->rol(address, instruction.mode);
 			break;
 		case 0x37:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x38:
-			this->sec(address, instruction.mode);
+			this->sec();
 			break;
 		case 0x39:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x3a:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x3b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x3c:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x3d:
-			this->and_instruction(address, instruction.mode);
+			this->and_instruction(address);
 			break;
 		case 0x3e:
 			this->rol(address, instruction.mode);
 			break;
 		case 0x3f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x40:
-			this->rti(address, instruction.mode);
+			this->rti();
 			break;
 		case 0x41:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x42:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x43:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x44:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x45:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x46:
 			this->lsr(address, instruction.mode);
 			break;
 		case 0x47:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x48:
-			this->pha(address, instruction.mode);
+			this->pha();
 			break;
 		case 0x49:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x4a:
 			this->lsr(address, instruction.mode);
 			break;
 		case 0x4b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x4c:
-			this->jmp(address, instruction.mode);
+			this->jmp(address);
 			break;
 		case 0x4d:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x4e:
 			this->lsr(address, instruction.mode);
 			break;
 		case 0x4f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x50:
-			this->bvc(address, instruction.mode);
+			this->bvc(address);
 			break;
 		case 0x51:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x52:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x53:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x54:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x55:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x56:
 			this->lsr(address, instruction.mode);
 			break;
 		case 0x57:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x58:
-			this->cli(address, instruction.mode);
+			this->cli();
 			break;
 		case 0x59:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x5a:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x5b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x5c:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x5d:
-			this->eor(address, instruction.mode);
+			this->eor(address);
 			break;
 		case 0x5e:
 			this->lsr(address, instruction.mode);
 			break;
 		case 0x5f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x60:
-			this->rts(address, instruction.mode);
+			this->rts();
 			break;
 		case 0x61:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x62:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x63:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x64:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x65:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x66:
 			this->ror(address, instruction.mode);
 			break;
 		case 0x67:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x68:
-			this->pla(address, instruction.mode);
+			this->pla();
 			break;
 		case 0x69:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x6a:
 			this->ror(address, instruction.mode);
 			break;
 		case 0x6b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x6c:
-			this->jmp(address, instruction.mode);
+			this->jmp(address);
 			break;
 		case 0x6d:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x6e:
 			this->ror(address, instruction.mode);
 			break;
 		case 0x6f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x70:
-			this->bvs(address, instruction.mode);
+			this->bvs(address);
 			break;
 		case 0x71:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x72:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x73:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x74:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x75:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x76:
 			this->ror(address, instruction.mode);
 			break;
 		case 0x77:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x78:
-			this->sei(address, instruction.mode);
+			this->sei();
 			break;
 		case 0x79:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x7a:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x7b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x7c:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x7d:
-			this->adc(address, instruction.mode);
+			this->adc(address);
 			break;
 		case 0x7e:
 			this->ror(address, instruction.mode);
 			break;
 		case 0x7f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x80:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x81:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x82:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x83:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x84:
-			this->sty(address, instruction.mode);
+			this->sty(address);
 			break;
 		case 0x85:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x86:
-			this->stx(address, instruction.mode);
+			this->stx(address);
 			break;
 		case 0x87:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x88:
-			this->dey(address, instruction.mode);
+			this->dey();
 			break;
 		case 0x89:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x8a:
-			this->txa(address, instruction.mode);
+			this->txa();
 			break;
 		case 0x8b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x8c:
-			this->sty(address, instruction.mode);
+			this->sty(address);
 			break;
 		case 0x8d:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x8e:
-			this->stx(address, instruction.mode);
+			this->stx(address);
 			break;
 		case 0x8f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x90:
-			this->bcc(address, instruction.mode);
+			this->bcc(address);
 			break;
 		case 0x91:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x92:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x93:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x94:
-			this->sty(address, instruction.mode);
+			this->sty(address);
 			break;
 		case 0x95:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x96:
-			this->stx(address, instruction.mode);
+			this->stx(address);
 			break;
 		case 0x97:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x98:
-			this->tya(address, instruction.mode);
+			this->tya();
 			break;
 		case 0x99:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x9a:
-			this->txs(address, instruction.mode);
+			this->txs();
 			break;
 		case 0x9b:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x9c:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x9d:
-			this->sta(address, instruction.mode);
+			this->sta(address);
 			break;
 		case 0x9e:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0x9f:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xa0:
-			this->ldy(address, instruction.mode);
+			this->ldy(address);
 			break;
 		case 0xa1:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xa2:
-			this->ldx(address, instruction.mode);
+			this->ldx(address);
 			break;
 		case 0xa3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xa4:
-			this->ldy(address, instruction.mode);
+			this->ldy(address);
 			break;
 		case 0xa5:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xa6:
-			this->ldx(address, instruction.mode);
+			this->ldx(address);
 			break;
 		case 0xa7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xa8:
-			this->tay(address, instruction.mode);
+			this->tay();
 			break;
 		case 0xa9:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xaa:
-			this->tax(address, instruction.mode);
+			this->tax();
 			break;
 		case 0xab:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xac:
-			this->ldy(address, instruction.mode);
+			this->ldy(address);
 			break;
 		case 0xad:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xae:
-			this->ldx(address, instruction.mode);
+			this->ldx(address);
 			break;
 		case 0xaf:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xb0:
-			this->bcs(address, instruction.mode);
+			this->bcs(address);
 			break;
 		case 0xb1:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xb2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xb3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xb4:
-			this->ldy(address, instruction.mode);
+			this->ldy(address);
 			break;
 		case 0xb5:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xb6:
-			this->ldx(address, instruction.mode);
+			this->ldx(address);
 			break;
 		case 0xb7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xb8:
-			this->clv(address, instruction.mode);
+			this->clv();
 			break;
 		case 0xb9:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xba:
-			this->tsx(address, instruction.mode);
+			this->tsx();
 			break;
 		case 0xbb:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xbc:
-			this->ldy(address, instruction.mode);
+			this->ldy(address);
 			break;
 		case 0xbd:
-			this->lda(address, instruction.mode);
+			this->lda(address);
 			break;
 		case 0xbe:
-			this->ldx(address, instruction.mode);
+			this->ldx(address);
 			break;
 		case 0xbf:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xc0:
-			this->cpy(address, instruction.mode);
+			this->cpy(address);
 			break;
 		case 0xc1:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xc2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xc3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xc4:
-			this->cpy(address, instruction.mode);
+			this->cpy(address);
 			break;
 		case 0xc5:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xc6:
-			this->dec(address, instruction.mode);
+			this->dec(address);
 			break;
 		case 0xc7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xc8:
-			this->iny(address, instruction.mode);
+			this->iny();
 			break;
 		case 0xc9:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xca:
-			this->dex(address, instruction.mode);
+			this->dex();
 			break;
 		case 0xcb:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xcc:
-			this->cpy(address, instruction.mode);
+			this->cpy(address);
 			break;
 		case 0xcd:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xce:
-			this->dec(address, instruction.mode);
+			this->dec(address);
 			break;
 		case 0xcf:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd0:
-			this->bne(address, instruction.mode);
+			this->bne(address);
 			break;
 		case 0xd1:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xd2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd4:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd5:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xd6:
-			this->dec(address, instruction.mode);
+			this->dec(address);
 			break;
 		case 0xd7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xd8:
-			this->cld(address, instruction.mode);
+			this->cld();
 			break;
 		case 0xd9:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xda:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xdb:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xdc:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xdd:
-			this->cmp(address, instruction.mode);
+			this->cmp(address);
 			break;
 		case 0xde:
-			this->dec(address, instruction.mode);
+			this->dec(address);
 			break;
 		case 0xdf:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xe0:
-			this->cpx(address, instruction.mode);
+			this->cpx(address);
 			break;
 		case 0xe1:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xe2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xe3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xe4:
-			this->cpx(address, instruction.mode);
+			this->cpx(address);
 			break;
 		case 0xe5:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xe6:
-			this->inc(address, instruction.mode);
+			this->inc(address);
 			break;
 		case 0xe7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xe8:
-			this->inx(address, instruction.mode);
+			this->inx();
 			break;
 		case 0xe9:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xea:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xeb:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xec:
-			this->cpx(address, instruction.mode);
+			this->cpx(address);
 			break;
 		case 0xed:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xee:
-			this->inc(address, instruction.mode);
+			this->inc(address);
 			break;
 		case 0xef:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xf0:
-			this->beq(address, instruction.mode);
+			this->beq(address);
 			break;
 		case 0xf1:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xf2:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xf3:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xf4:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xf5:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xf6:
-			this->inc(address, instruction.mode);
+			this->inc(address);
 			break;
 		case 0xf7:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xf8:
-			this->sed(address, instruction.mode);
+			this->sed();
 			break;
 		case 0xf9:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xfa:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xfb:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xfc:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 		case 0xfd:
-			this->sbc(address, instruction.mode);
+			this->sbc(address);
 			break;
 		case 0xfe:
-			this->inc(address, instruction.mode);
+			this->inc(address);
 			break;
 		case 0xff:
-			this->nop(address, instruction.mode);
+			this->nop();
 			break;
 	    default:
 	        break;
@@ -887,7 +887,7 @@ void CPU::branchDelay(uint16_t address, uint16_t pc) {
 
 // ADC - ADd with Carry
 
-void CPU::adc(uint16_t address, byte mode) {
+void CPU::adc(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
@@ -901,7 +901,7 @@ void CPU::adc(uint16_t address, byte mode) {
 // AND - logical AND
 // Nonstandard name to disambiguate from 'and' label
 
-void CPU::and_instruction(uint16_t address, byte mode) {
+void CPU::and_instruction(uint16_t address) {
 	//static_cast<void>(mode);
 	this->a &= readb(address);
 	setZN(this->a);
@@ -926,7 +926,7 @@ void CPU::asl(uint16_t address, byte mode) {
 
 // BIT - BIt Test
 
-void CPU::bit(uint16_t address, byte mode) {
+void CPU::bit(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address);
 	setV((value >> 6) & 1);
@@ -936,7 +936,7 @@ void CPU::bit(uint16_t address, byte mode) {
 
 // CMP - CoMPare
 
-void CPU::cmp(uint16_t address, byte mode) {
+void CPU::cmp(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->a, value);
@@ -944,7 +944,7 @@ void CPU::cmp(uint16_t address, byte mode) {
 
 // CPX - ComPare X register
 
-void CPU::cpx(uint16_t address, byte mode) {
+void CPU::cpx(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->x, value);
@@ -952,7 +952,7 @@ void CPU::cpx(uint16_t address, byte mode) {
 
 // CPY - ComPare Y register
 
-void CPU::cpy(uint16_t address, byte mode) {
+void CPU::cpy(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address);
 	compare(this->y, value);
@@ -960,7 +960,7 @@ void CPU::cpy(uint16_t address, byte mode) {
 
 // DEC - DECrement memory
 
-void CPU::dec(uint16_t address, byte mode) {
+void CPU::dec(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address) - 1;
 	writeb(address, value);
@@ -970,7 +970,7 @@ void CPU::dec(uint16_t address, byte mode) {
 
 // EOR - Exclusive OR
 
-void CPU::eor(uint16_t address, byte mode) {
+void CPU::eor(uint16_t address) {
 	//static_cast<void>(mode);
 	this->a ^= readb(address);
 	setZN(this->a);
@@ -978,7 +978,7 @@ void CPU::eor(uint16_t address, byte mode) {
 
 // INC - INCrement memory
 
-void CPU::inc(uint16_t address, byte mode) {
+void CPU::inc(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte value = readb(address) + 1;
 	writeb(address, value);
@@ -987,7 +987,7 @@ void CPU::inc(uint16_t address, byte mode) {
 
 // JMP - JuMP
 
-void CPU::jmp(uint16_t address, byte mode) {
+void CPU::jmp(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	this->pc = address;
@@ -995,7 +995,7 @@ void CPU::jmp(uint16_t address, byte mode) {
 
 // LDA - LoaD Accumulator
 
-void CPU::lda(uint16_t address, byte mode) {
+void CPU::lda(uint16_t address) {
 	//static_cast<void>(mode);
 	this->a = readb(address);
 	setZN(this->a);
@@ -1003,7 +1003,7 @@ void CPU::lda(uint16_t address, byte mode) {
 
 // LDX - LoaD X register
 
-void CPU::ldx(uint16_t address, byte mode) {
+void CPU::ldx(uint16_t address) {
 	//static_cast<void>(mode);
 	this->x = readb(address);
 	setZN(this->x);
@@ -1011,7 +1011,7 @@ void CPU::ldx(uint16_t address, byte mode) {
 
 // LDY - LoaD Y register
 
-void CPU::ldy(uint16_t address, byte mode) {
+void CPU::ldy(uint16_t address) {
 	//static_cast<void>(mode);
 	this->y = readb(address);
 	setZN(this->y);
@@ -1036,7 +1036,7 @@ void CPU::lsr(uint16_t address, byte mode) {
 
 // ORA - logical OR with Accumulator
 
-void CPU::ora(uint16_t address, byte mode) {
+void CPU::ora(uint16_t address) {
 	//static_cast<void>(mode);
 	this->a |= readb(address);
 	setZN(this->a);
@@ -1044,7 +1044,7 @@ void CPU::ora(uint16_t address, byte mode) {
 
 // PHP - PusH Processor status
 
-void CPU::php(uint16_t address, byte mode) {
+void CPU::php() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	nes->push(this->flags | 0x10);
@@ -1090,7 +1090,7 @@ void CPU::ror(uint16_t address, byte mode) {
 
 // SBC - SuBtract with Carry
 
-void CPU::sbc(uint16_t address, byte mode) {
+void CPU::sbc(uint16_t address) {
 	//static_cast<void>(mode);
 	const byte a = this->a;
 	const byte b = readb(address);
@@ -1103,7 +1103,7 @@ void CPU::sbc(uint16_t address, byte mode) {
 
 // SEI - SEt Interrupt disable
 
-void CPU::sei(uint16_t address, byte mode) {
+void CPU::sei() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1112,37 +1112,37 @@ void CPU::sei(uint16_t address, byte mode) {
 
 // STA - STore Accumulator
 
-void CPU::sta(uint16_t address, byte mode) {
+void CPU::sta(uint16_t address) {
 	//static_cast<void>(mode);
 	writeb(address, this->a);
 }
 
 // STX - Store X Register
 
-void CPU::stx(uint16_t address, byte mode) {
+void CPU::stx(uint16_t address) {
 	//static_cast<void>(mode);
 	writeb(address, this->x);
 }
 
 // STY - STore Y Register
 
-void CPU::sty(uint16_t address, byte mode) {
+void CPU::sty(uint16_t address) {
 	//static_cast<void>(mode);
 	writeb(address, this->y);
 }
 
 // BRK - force interrupt BReaK
 
-void CPU::brk(uint16_t address, byte mode) {
+void CPU::brk() {
 	nes->push16(this->pc);
-	php(address, mode);
-	sei(address, mode);
+	php();
+	sei();
 	this->pc = nes->read16(0xFFFE);
 }
 
 // BPL - Branch if PLus (i.e. if positive)
 
-void CPU::bpl(uint16_t address, byte mode) {
+void CPU::bpl(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getN() == 0) {
@@ -1154,7 +1154,7 @@ void CPU::bpl(uint16_t address, byte mode) {
 
 // CLC - CLear Carry flag
 
-void CPU::clc(uint16_t address, byte mode) {
+void CPU::clc() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1163,7 +1163,7 @@ void CPU::clc(uint16_t address, byte mode) {
 
 // JSR - Jump to SubRoutine   
 
-void CPU::jsr(uint16_t address, byte mode) {
+void CPU::jsr(uint16_t address) {
 	//static_cast<void>(mode);
 	nes->push16(this->pc - 1);
 	this->pc = address;
@@ -1171,7 +1171,7 @@ void CPU::jsr(uint16_t address, byte mode) {
 
 // PLP - PuLl Processor status
 
-void CPU::plp(uint16_t address, byte mode) {
+void CPU::plp() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
@@ -1179,7 +1179,7 @@ void CPU::plp(uint16_t address, byte mode) {
 
 // BMI - Branch if MInus (i.e. if negative)
 
-void CPU::bmi(uint16_t address, byte mode) {
+void CPU::bmi(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getN()) {
@@ -1191,7 +1191,7 @@ void CPU::bmi(uint16_t address, byte mode) {
 
 // SEC - SEt Carry flag
 
-void CPU::sec(uint16_t address, byte mode) {
+void CPU::sec() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1200,7 +1200,7 @@ void CPU::sec(uint16_t address, byte mode) {
 
 // RTI - ReTurn from Interrupt
 
-void CPU::rti(uint16_t address, byte mode) {
+void CPU::rti() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	this->flags = (nes->pop() & 0xEF) | 0x20;
@@ -1209,7 +1209,7 @@ void CPU::rti(uint16_t address, byte mode) {
 
 // BVC - Branch if oVerflow Clear
 
-void CPU::bvc(uint16_t address, byte mode) {
+void CPU::bvc(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getV() == 0) {
@@ -1221,7 +1221,7 @@ void CPU::bvc(uint16_t address, byte mode) {
 
 // PHA - PusH Accumulator
 
-void CPU::pha(uint16_t address, byte mode) {
+void CPU::pha() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	nes->push(this->a);
@@ -1229,7 +1229,7 @@ void CPU::pha(uint16_t address, byte mode) {
 
 // CLI - CLear Interrupt disable
 
-void CPU::cli(uint16_t address, byte mode) {
+void CPU::cli() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1238,7 +1238,7 @@ void CPU::cli(uint16_t address, byte mode) {
 
 // RTS - ReTurn from Subroutine
 
-void CPU::rts(uint16_t address, byte mode) {
+void CPU::rts() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	this->pc = nes->pop16() + 1;
@@ -1246,7 +1246,7 @@ void CPU::rts(uint16_t address, byte mode) {
 
 // PLA - PuLl Accumulator
 
-void CPU::pla(uint16_t address, byte mode) {
+void CPU::pla() {
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
 	this->a = nes->pop();
@@ -1255,7 +1255,7 @@ void CPU::pla(uint16_t address, byte mode) {
 
 // BVS - Branch if oVerflow Set
 
-void CPU::bvs(uint16_t address, byte mode) {
+void CPU::bvs(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getV()) {
@@ -1267,7 +1267,7 @@ void CPU::bvs(uint16_t address, byte mode) {
 
 // DEY - DEcrement Y register
 
-void CPU::dey(uint16_t address, byte mode) {
+void CPU::dey() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1277,7 +1277,7 @@ void CPU::dey(uint16_t address, byte mode) {
 
 // TXA - Transfer X to Accumulator
 
-void CPU::txa(uint16_t address, byte mode) {
+void CPU::txa() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1287,7 +1287,7 @@ void CPU::txa(uint16_t address, byte mode) {
 
 // BCC - Branch if Carry Clear
 
-void CPU::bcc(uint16_t address, byte mode) {
+void CPU::bcc(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getC() == 0) {
@@ -1299,7 +1299,7 @@ void CPU::bcc(uint16_t address, byte mode) {
 
 // TYA - Transfer Y to Accumulator
 
-void CPU::tya(uint16_t address, byte mode) {
+void CPU::tya() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1309,7 +1309,7 @@ void CPU::tya(uint16_t address, byte mode) {
 
 // BCS - Branch if Carry Set
 
-void CPU::bcs(uint16_t address, byte mode) {
+void CPU::bcs(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getC()) {
@@ -1321,7 +1321,7 @@ void CPU::bcs(uint16_t address, byte mode) {
 
 // TAY - Transfer Accumulator to Y
 
-void CPU::tay(uint16_t address, byte mode) {
+void CPU::tay() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1331,7 +1331,7 @@ void CPU::tay(uint16_t address, byte mode) {
 
 // TXS - Transfer X to Stack pointer
 
-void CPU::txs(uint16_t address, byte mode) {
+void CPU::txs() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1340,7 +1340,7 @@ void CPU::txs(uint16_t address, byte mode) {
 
 // TAX - Transfer Accumulator to X
 
-void CPU::tax(uint16_t address, byte mode) {
+void CPU::tax() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1350,7 +1350,7 @@ void CPU::tax(uint16_t address, byte mode) {
 
 // CLV - CLear oVerflow flag
 
-void CPU::clv(uint16_t address, byte mode) {
+void CPU::clv() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1359,7 +1359,7 @@ void CPU::clv(uint16_t address, byte mode) {
 
 // TSX - Transfer Stack pointer to X
 
-void CPU::tsx(uint16_t address, byte mode) {
+void CPU::tsx() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1369,7 +1369,7 @@ void CPU::tsx(uint16_t address, byte mode) {
 
 // INY - INcrement Y register
 
-void CPU::iny(uint16_t address, byte mode) {
+void CPU::iny() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1379,7 +1379,7 @@ void CPU::iny(uint16_t address, byte mode) {
 
 // DEX - DEcrement X register
 
-void CPU::dex(uint16_t address, byte mode) {
+void CPU::dex() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1389,7 +1389,7 @@ void CPU::dex(uint16_t address, byte mode) {
 
 // BNE - Branch if Not Equal
 
-void CPU::bne(uint16_t address, byte mode) {
+void CPU::bne(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getZ() == 0) {
@@ -1401,7 +1401,7 @@ void CPU::bne(uint16_t address, byte mode) {
 
 // CLD - CLear Decimal mode
 
-void CPU::cld(uint16_t address, byte mode) {
+void CPU::cld() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1410,7 +1410,7 @@ void CPU::cld(uint16_t address, byte mode) {
 
 // INX - INcrement X register
 
-void CPU::inx(uint16_t address, byte mode) {
+void CPU::inx() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1420,7 +1420,7 @@ void CPU::inx(uint16_t address, byte mode) {
 
 // BEQ - Branch if EQual
 
-void CPU::beq(uint16_t address, byte mode) {
+void CPU::beq(uint16_t address) {
 	//static_cast<void>(nes);
 	//static_cast<void>(mode);
 	if (getZ()) {
@@ -1432,7 +1432,7 @@ void CPU::beq(uint16_t address, byte mode) {
 
 // SED - SEt Decimal flag
 
-void CPU::sed(uint16_t address, byte mode) {
+void CPU::sed() {
 	//static_cast<void>(nes);
 	//static_cast<void>(address);
 	//static_cast<void>(mode);
@@ -1441,7 +1441,7 @@ void CPU::sed(uint16_t address, byte mode) {
 
 // NOP - No OPeration
 
-void CPU::nop(uint16_t address, byte mode) {
+void CPU::nop() {
 	//static_cast<void>(this);
 	//static_cast<void>(nes);
 	//static_cast<void>(address);

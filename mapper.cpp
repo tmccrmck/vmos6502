@@ -121,18 +121,6 @@ void triggerIRQ2(CPU* cpu) {
 	}
 }
 
-void Mapper4::updateCounter(CPU* cpu) {
-	if (counter == 0) {
-		counter = reload;
-	}
-	else {
-		--counter;
-		if (counter == 0 && IRQ_enable) {
-			triggerIRQ2(cpu);
-		}
-	}
-}
-
 int Mapper4::chrBankOffset(Cartridge* cartridge, int index) {
 	if (index >= 0x80) {
 		index -= 0x100;

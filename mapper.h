@@ -23,7 +23,6 @@ enum MirrorModes {
 struct Mapper {
 	virtual uint8_t read(Cartridge* cartridge, uint16_t address) = 0;
 	virtual void write(Cartridge* cartridge, uint16_t address, uint8_t value) = 0;
-	virtual void updateCounter(CPU* cpu) = 0;
 };
 
 struct Mapper1 : public Mapper {
@@ -89,10 +88,6 @@ struct Mapper1 : public Mapper {
 		}
 	}
 
-	void updateCounter(CPU* cpu) override {
-		//static_cast<void>(cpu);
-	}
-
 	Mapper1() : shift_reg(0), control(0), prg_mode(0), chr_mode(0), prg_bank(0), chr_bank0(0), chr_bank1(0), prg_offsets{ 0, 0 }, chr_offsets{ 0, 0 } {}
 };
 
@@ -137,10 +132,6 @@ struct Mapper2 : public Mapper {
 		else {
 			std::cerr << "ERROR: Mapper2 encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
 		}
-	}
-
-	void updateCounter(CPU* cpu) override {
-		//static_cast<void>(cpu);
 	}
 
 	Mapper2(int _prgBanks, int _prgBank1, int _prgBank2) : prg_banks(_prgBanks), prg_bank1(_prgBank1), prg_bank2(_prgBank2) {}
@@ -189,9 +180,6 @@ struct Mapper3 : public Mapper {
 		else {
 			std::cerr << "ERROR: Mapper3 encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
 		}
-	}
-	void updateCounter(CPU* cpu) override {
-		//static_cast<void>(cpu);
 	}
 
 	Mapper3(int _chrBank, int _prgBank1, int _prgBank2) : chr_bank(_chrBank), prg_bank1(_prgBank1), prg_bank2(_prgBank2) {}
@@ -290,8 +278,6 @@ struct Mapper4 : public Mapper {
 		}
 	}
 
-    void updateCounter(CPU* cpu) override;
-
 	Mapper4() : reg(0), regs{ 0, 0, 0, 0, 0, 0, 0, 0 }, prg_mode(0), chr_mode(0), prg_offsets{ 0, 0, 0, 0 }, chr_offsets{ 0, 0, 0, 0, 0, 0, 0, 0 }, reload(0), counter(0), IRQ_enable(false) {}
 };
 
@@ -338,10 +324,6 @@ struct Mapper7 : public Mapper {
 		else {
 			std::cerr << "ERROR: Mapper7 encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')' << std::endl;
 		}
-	}
-
-	void updateCounter(CPU* cpu) override {
-		//static_cast<void>(cpu);
 	}
 
 	Mapper7() : prg_bank(0) {}
