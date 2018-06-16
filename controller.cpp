@@ -7,7 +7,7 @@
 byte Controller::readController() {
     const byte value = (this->index < 8 && ((this->buttons >> this->index) & 1));
     ++this->index;
-    if ((this->strobe & 1) == 1 ){
+    if ((this->strobe & 1) == 1) {
         this->index = 0;
     }
     return value;
