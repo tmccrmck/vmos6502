@@ -146,7 +146,7 @@ public:
 
     void writeRegisterAPU(uint16_t address, byte value);
 
-    void tickAPU(CPU *cpu);
+    void tickAPU(CPU& cpu);
 };
 
 #endif //VMOS6502_APU_H

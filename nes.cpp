@@ -134,7 +134,7 @@ void NES::emulate(double seconds) {
         }
 
         for (int i = 0; i < cpuCycles; ++i) {
-            this->apu->tickAPU(this->cpu);
+            this->apu->tickAPU(*cpu);
         }
         cycles -= cpuCycles;
     }

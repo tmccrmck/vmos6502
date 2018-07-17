@@ -86,27 +86,20 @@ constexpr std::array<std::array<byte, 8>, 4> duty_tbl = {{
                                                                  {1, 0, 0, 1, 1, 1, 1, 1},
                                                          }};
 
-// note use getI
-void triggerIRQ(CPU *cpu) {
-    if ((cpu->flags & 4) >> 2 == 0) {
-        cpu->interrupt = interruptIRQ;
-    }
-}
-
-void pulseTickEnvelope(Pulse *p) {
-    if (p->envelope_start) {
-        p->envelope_vol = 15;
-        p->envelope_val = p->envelope_period;
-        p->envelope_start = false;
-    } else if (p->envelope_val > 0) {
-        --p->envelope_val;
+void pulseTickEnvelope(Pulse &p) {
+    if (p.envelope_start) {
+        p.envelope_vol = 15;
+        p.envelope_val = p.envelope_period;
+        p.envelope_start = false;
+    } else if (p.envelope_val > 0) {
+        --p.envelope_val;
     } else {
-        if (p->envelope_vol > 0) {
-            --p->envelope_vol;
-        } else if (p->envelope_loop) {
-            p->envelope_vol = 15;
+        if (p.envelope_vol > 0) {
+            --p.envelope_vol;
+        } else if (p.envelope_loop) {
+            p.envelope_vol = 15;
         }
-        p->envelope_val = p->envelope_period;
+        p.envelope_val = p.envelope_period;
     }
 }
 
@@ -205,33 +198,32 @@ void APU::tickSweep() {
 }
 
 void APU::tickEnvelope() {
-    pulseTickEnvelope(&this->pulse1);
-    pulseTickEnvelope(&this->pulse2);
+    pulseTickEnvelope(this->pulse1);
+    pulseTickEnvelope(this->pulse2);
 
-    Triangle *t = &this->triangle;
-    if (t->counter_reload) {
-        t->counter_val = t->counter_period;
-    } else if (t->counter_val > 0) {
-        --t->counter_val;
+    if (triangle.counter_reload) {
+        triangle.counter_val = triangle.counter_period;
+    } else if (triangle.counter_val > 0) {
+        --triangle.counter_val;
     }
-    if (t->length_enabled) {
-        t->counter_reload = false;
+    if (triangle.length_enabled) {
+        triangle.counter_reload = false;
     }
 
-    Noise *n = &this->noise;
-    if (n->envelope_start) {
-        n->envelope_vol = 15;
-        n->envelope_val = n->envelope_period;
-        n->envelope_start = false;
-    } else if (n->envelope_val > 0) {
-        --n->envelope_val;
+    //Noise *n = &this->noise;
+    if (noise.envelope_start) {
+        noise.envelope_vol = 15;
+        noise.envelope_val = noise.envelope_period;
+        noise.envelope_start = false;
+    } else if (noise.envelope_val > 0) {
+        --noise.envelope_val;
     } else {
-        if (n->envelope_vol > 0) {
-            --n->envelope_vol;
-        } else if (n->envelope_loop) {
-            n->envelope_vol = 15;
+        if (noise.envelope_vol > 0) {
+            --noise.envelope_vol;
+        } else if (noise.envelope_loop) {
+            noise.envelope_vol = 15;
         }
-        n->envelope_val = n->envelope_period;
+        noise.envelope_val = noise.envelope_period;
     }
 }
 
@@ -345,7 +337,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
     }
 }
 
-void APU::tickAPU(CPU *cpu) {
+void APU::tickAPU(CPU &cpu) {
     uint64_t cycle1 = this->cycle;
     ++this->cycle;
     uint64_t cycle2 = this->cycle;
@@ -355,66 +347,63 @@ void APU::tickAPU(CPU *cpu) {
         this->pulse1.tickPulseTimer();
         this->pulse2.tickPulseTimer();
 
-        Noise *n = &this->noise;
-        if (n->timer_val == 0) {
-            n->timer_val = n->timer_period;
-            byte shift = n->mode ? 6 : 1;
-            uint16_t b1 = n->shift_reg & 1;
-            uint16_t b2 = (n->shift_reg >> shift) & 1;
-            n->shift_reg >>= 1;
-            n->shift_reg |= (b1 ^ b2) << 14;
+        if (noise.timer_val == 0) {
+            noise.timer_val = noise.timer_period;
+            byte shift = noise.mode ? 6 : 1;
+            uint16_t b1 = noise.shift_reg & 1;
+            uint16_t b2 = (noise.shift_reg >> shift) & 1;
+            noise.shift_reg >>= 1;
+            noise.shift_reg |= (b1 ^ b2) << 14;
         } else {
-            --n->timer_val;
+            --noise.timer_val;
         }
 
-        DMC *d = &this->dmc;
-        if (d->enabled) {
+        if (dmc.enabled) {
             // tick reader
-            if (d->cur_len > 0 && d->bit_count == 0) {
-                cpu->stall += 4;
-                d->shift_reg = cpu->readb(d->cur_addr);
-                d->bit_count = 8;
-                ++d->cur_addr;
-                if (d->cur_addr == 0) {
-                    d->cur_addr = 0x8000;
+            if (dmc.cur_len > 0 && dmc.bit_count == 0) {
+                cpu.stall += 4;
+                dmc.shift_reg = cpu.readb(dmc.cur_addr);
+                dmc.bit_count = 8;
+                ++dmc.cur_addr;
+                if (dmc.cur_addr == 0) {
+                    dmc.cur_addr = 0x8000;
                 }
-                --d->cur_len;
-                if (d->cur_len == 0 && d->loop) {
-                    d->restart();
+                --dmc.cur_len;
+                if (dmc.cur_len == 0 && dmc.loop) {
+                    dmc.restart();
                 }
             }
 
-            if (d->tick_val == 0) {
-                d->tick_val = d->tick_period;
+            if (dmc.tick_val == 0) {
+                dmc.tick_val = dmc.tick_period;
 
                 // tick shifter
-                if (d->bit_count != 0) {
-                    if ((d->shift_reg & 1) == 1) {
-                        if (d->value <= 125) {
-                            d->value += 2;
+                if (dmc.bit_count != 0) {
+                    if ((dmc.shift_reg & 1) == 1) {
+                        if (dmc.value <= 125) {
+                            dmc.value += 2;
                         }
                     } else {
-                        if (d->value >= 2) {
-                            d->value -= 2;
+                        if (dmc.value >= 2) {
+                            dmc.value -= 2;
                         }
                     }
-                    d->shift_reg >>= 1;
-                    --d->bit_count;
+                    dmc.shift_reg >>= 1;
+                    --dmc.bit_count;
                 }
             } else {
-                --d->tick_val;
+                --dmc.tick_val;
             }
         }
     }
 
-    Triangle *t = &this->triangle;
-    if (t->timer_val == 0) {
-        t->timer_val = t->timer_period;
-        if (t->length_val > 0 && t->counter_val > 0) {
-            t->duty_val = (t->duty_val + 1) & 31;
+    if (triangle.timer_val == 0) {
+        triangle.timer_val = triangle.timer_period;
+        if (triangle.length_val > 0 && triangle.counter_val > 0) {
+            triangle.duty_val = (triangle.duty_val + 1) & 31;
         }
     } else {
-        --t->timer_val;
+        --triangle.timer_val;
     }
 
     const int f1 = static_cast<int>(static_cast<double>(cycle1) / FRAME_CTR_FREQ);
@@ -438,7 +427,7 @@ void APU::tickAPU(CPU *cpu) {
                     this->tickSweep();
                     this->tickLength();
                     if (this->frame_IRQ) {
-                        triggerIRQ(cpu);
+                        cpu.triggerIRQ();
                     }
                     break;
             }
@@ -466,16 +455,15 @@ void APU::tickAPU(CPU *cpu) {
         const byte p1_output = this->pulse1.pulseOutput();
         const byte p2_output = this->pulse2.pulseOutput();
 
-        const byte tri_output = (!t->enabled || t->length_val == 0 || t->counter_val == 0) ? 0 : tri_table[t->duty_val];
+        const byte tri_output = (!triangle.enabled || triangle.length_val == 0 || triangle.counter_val == 0) ? 0 : tri_table[triangle.duty_val];
 
-        Noise *n = &this->noise;
         byte noise_out;
-        if (!n->enabled || n->length_val == 0 || (n->shift_reg & 1) == 1) {
+        if (!noise.enabled || noise.length_val == 0 || (noise.shift_reg & 1) == 1) {
             noise_out = 0;
-        } else if (n->envelope_enabled) {
-            noise_out = n->envelope_vol;
+        } else if (noise.envelope_enabled) {
+            noise_out = noise.envelope_vol;
         } else {
-            noise_out = n->const_vol;
+            noise_out = noise.const_vol;
         }
 
         const byte dOut = this->dmc.value;

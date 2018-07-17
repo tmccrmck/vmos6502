@@ -282,6 +282,10 @@ public:
 
     // NOP - No OPeration
     void nop();
+
+    // note use getI
+    void triggerIRQ();
+
 };
 
 #endif //VMOS6502_CPU_H

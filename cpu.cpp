@@ -1341,3 +1341,9 @@ void CPU::sed() {
 void CPU::nop() {
 }
 
+void CPU::triggerIRQ() {
+    if (this->getI() == 0) {
+        this->interrupt = interruptIRQ;
+    }
+}
+
