@@ -140,15 +140,15 @@ public:
 
     void spritePixel(byte &i, byte &sprite);
 
-    void tickPPU(CPU *cpu, Mapper *mapper, Cartridge *cartridge);
+    void tickPPU(CPU *cpu, Mapper *mapper);
 
-    byte readPPU(uint16_t address, Mapper *mapper, Cartridge *cartridge);
+    byte readPPU(uint16_t address, Mapper *mapper);
 
-    void writePPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge);
+    void writePPU(uint16_t address, byte value, Mapper *mapper);
 
-    byte readPPURegister(uint16_t address, Mapper *mapper, Cartridge *cartridge);
+    byte readPPURegister(uint16_t address, Mapper *mapper);
 
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu);
+    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, CPU *cpu);
 };
 
 #endif //VMOS6502_PPU_H

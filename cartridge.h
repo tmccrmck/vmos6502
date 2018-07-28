@@ -33,7 +33,7 @@ struct Cartridge {
     byte mirror; // mirroring mode
     byte battery_present; // battery present
 
-    Cartridge(const std::string path, const std::string SRAM_path);
+    Cartridge(std::string path, std::string SRAM_path);
 };
 
 #endif //VMOS6502_CARTRIDGE_H

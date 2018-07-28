@@ -61,12 +61,13 @@ byte PPU::readPalette(uint16_t address) {
     return this->palette_tbl[address];
 }
 
-byte PPU::readPPU(uint16_t address, Mapper *mapper, Cartridge *cartridge) {
+byte PPU::readPPU(uint16_t address, Mapper *mapper) {
     address &= 16383;
     if (address < 0x2000) {
-        return mapper->read(cartridge, address);
+        return mapper->read(address);
     } else if (address < 0x3F00) {
-        byte mode = cartridge->mirror;
+        // TODO: actually use cartridge mirror value
+        byte mode = /* mapper->cartridge->mirror; */ 1;
         return this->name_tbl[mirrorAddress(mode, address) & 2047];
     } else if (address < 0x4000) {
         return this->readPalette(address & 31);
@@ -77,7 +78,7 @@ byte PPU::readPPU(uint16_t address, Mapper *mapper, Cartridge *cartridge) {
     return 0;
 }
 
-void PPU::tickPPU(CPU *cpu, Mapper *mapper, Cartridge *cartridge) {
+void PPU::tickPPU(CPU *cpu, Mapper *mapper) {
     if (this->nmi_delay > 0) {
         this->nmi_delay--;
         if (this->nmi_delay == 0 && this->nmi_out && this->nmi_occurred) {
@@ -161,26 +162,26 @@ void PPU::tickPPU(CPU *cpu, Mapper *mapper, Cartridge *cartridge) {
             if (pcm8 == 1) {
                 const uint16_t v = this->v;
                 const uint16_t address = 0x2000 | (v & 0x0FFF);
-                this->name_tbl_u8 = readPPU(address, mapper, cartridge);
+                this->name_tbl_u8 = readPPU(address, mapper);
             } else if (pcm8 == 3) {
                 const uint16_t v = this->v;
                 const uint16_t address = 0x23C0 | (v & 0x0C00) | ((v >> 4) & 0x38) | ((v >> 2) & 0x07);
                 const int shift = ((v >> 4) & 4) | (v & 2);
-                this->attrib_tbl_u8 = ((readPPU(address, mapper, cartridge) >> shift) & 3) << 2;
+                this->attrib_tbl_u8 = ((readPPU(address, mapper) >> shift) & 3) << 2;
             } else if (pcm8 == 5) {
                 const uint16_t fineY = (this->v >> 12) & 7;
                 const byte table = this->flag_background_tbl;
                 const byte tile = this->name_tbl_u8;
                 const uint16_t address =
                         (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
-                this->low_tile_u8 = readPPU(address, mapper, cartridge);
+                this->low_tile_u8 = readPPU(address, mapper);
             } else if (pcm8 == 7) {
                 const uint16_t fineY = (this->v >> 12) & 7;
                 const byte table = this->flag_background_tbl;
                 const byte tile = this->name_tbl_u8;
                 const uint16_t address =
                         (static_cast<uint16_t>(table) << 12) + (static_cast<uint16_t>(tile) << 4) + fineY;
-                this->high_tile_u8 = readPPU(address + 8, mapper, cartridge);
+                this->high_tile_u8 = readPPU(address + 8, mapper);
             } else if (pcm8 == 0) {
                 uint32_t data = 0;
                 for (int i = 0; i < 8; ++i) {
@@ -270,8 +271,8 @@ void PPU::tickPPU(CPU *cpu, Mapper *mapper, Cartridge *cartridge) {
                                   static_cast<uint16_t>(row);
                     }
                     byte atts = (attributes & 3) << 2;
-                    byte low_tile_u8 = readPPU(address, mapper, cartridge);
-                    byte high_tile_u8 = readPPU(address + 8, mapper, cartridge);
+                    byte low_tile_u8 = readPPU(address, mapper);
+                    byte high_tile_u8 = readPPU(address + 8, mapper);
 
                     for (int j = 0; j < 8; ++j) {
                         byte p1, p2;
@@ -323,12 +324,13 @@ void PPU::tickPPU(CPU *cpu, Mapper *mapper, Cartridge *cartridge) {
     }
 }
 
-void PPU::writePPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge) {
+void PPU::writePPU(uint16_t address, byte value, Mapper *mapper) {
     address &= 16383;
     if (address < 0x2000) {
-        mapper->write(cartridge, address, value);
+        mapper->write(address, value);
     } else if (address < 0x3F00) {
-        const byte mode = cartridge->mirror;
+        // TODO actually use cartridge mirror
+        const byte mode = /* mapper->cartridge->mirror; */ 1;
         this->name_tbl[mirrorAddress(mode, address) & 2047] = value;
     } else if (address < 0x4000) {
         // palette
@@ -343,7 +345,7 @@ void PPU::writePPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cart
     }
 }
 
-byte PPU::readPPURegister(uint16_t address, Mapper *mapper, Cartridge *cartridge) {
+byte PPU::readPPURegister(uint16_t address, Mapper *mapper) {
     if (address == 0x2002) {
         byte status = reg & 0x1F;
         status |= this->flag_sprite_overflow << 5;
@@ -358,14 +360,14 @@ byte PPU::readPPURegister(uint16_t address, Mapper *mapper, Cartridge *cartridge
     } else if (address == 0x2004) {
         return this->oam_tbl[this->oam_addr];
     } else if (address == 0x2007) {
-        byte value = this->readPPU(this->v, mapper, cartridge);
+        byte value = this->readPPU(this->v, mapper);
         // buffered read
         if ((this->v & 16383) < 0x3F00) {
             byte buffered = this->buffered_data;
             this->buffered_data = value;
             value = buffered;
         } else {
-            this->buffered_data = readPPU(this->v - 0x1000, mapper, cartridge);
+            this->buffered_data = readPPU(this->v - 0x1000, mapper);
         }
 
         this->v += this->flag_increment == 0 ? 1 : 32;
@@ -374,7 +376,7 @@ byte PPU::readPPURegister(uint16_t address, Mapper *mapper, Cartridge *cartridge
     return 0;
 }
 
-void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartridge *cartridge, CPU *cpu) {
+void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, CPU *cpu) {
     this->reg = value;
     switch (address) {
         case 0x2000:
@@ -413,7 +415,7 @@ void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, Cartrid
             }
             break;
         case 0x2007:
-            this->writePPU(this->v, value, mapper, cartridge);
+            this->writePPU(this->v, value, mapper);
             this->v += this->flag_increment == 0 ? 1 : 32;
             break;
         case 0x4014:

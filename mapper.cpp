@@ -1,18 +1,18 @@
 #include "mapper.h"
 
-int Mapper1::prgBankOffset(Cartridge *c, int index) {
+int Mapper1::prgBankOffset(int index) {
     if (index >= 0x80) {
         index -= 0x100;
     }
-    index %= c->prg_size >> 14;
+    index %= cartridge->prg_size >> 14;
     int offset = index << 14;
     if (offset < 0) {
-        offset += c->prg_size;
+        offset += cartridge->prg_size;
     }
     return offset;
 }
 
-int Mapper1::chrBankOffset(Cartridge *cartridge, int index) {
+int Mapper1::chrBankOffset(int index) {
     if (index >= 0x80) {
         index -= 0x100;
     }
@@ -30,37 +30,37 @@ int Mapper1::chrBankOffset(Cartridge *cartridge, int index) {
 //
 // CHR ROM bank mode  0  : switch 8k
 //                    1  : switch two 4k banks
-void Mapper1::updateOffsets(Cartridge *cartridge) {
+void Mapper1::updateOffsets() {
     switch (prg_mode) {
         case 0:
         case 1:
-            prg_offsets[0] = prgBankOffset(cartridge, static_cast<int>(prg_bank & 0xFE));
-            prg_offsets[1] = prgBankOffset(cartridge, static_cast<int>(prg_bank | 0x01));
+            prg_offsets[0] = prgBankOffset(static_cast<int>(prg_bank & 0xFE));
+            prg_offsets[1] = prgBankOffset(static_cast<int>(prg_bank | 0x01));
             break;
         case 2:
             prg_offsets[0] = 0;
-            prg_offsets[1] = prgBankOffset(cartridge, static_cast<int>(prg_bank));
+            prg_offsets[1] = prgBankOffset(static_cast<int>(prg_bank));
             break;
         case 3:
-            prg_offsets[0] = prgBankOffset(cartridge, static_cast<int>(prg_bank));
-            prg_offsets[1] = prgBankOffset(cartridge, -1);
+            prg_offsets[0] = prgBankOffset(static_cast<int>(prg_bank));
+            prg_offsets[1] = prgBankOffset(-1);
             break;
     }
 
     switch (chr_mode) {
         case 0:
-            chr_offsets[0] = chrBankOffset(cartridge, static_cast<int>(chr_bank0 & 0xFE));
-            chr_offsets[1] = chrBankOffset(cartridge, static_cast<int>(chr_bank0 | 0x01));
+            chr_offsets[0] = chrBankOffset(static_cast<int>(chr_bank0 & 0xFE));
+            chr_offsets[1] = chrBankOffset(static_cast<int>(chr_bank0 | 0x01));
             break;
         case 1:
-            chr_offsets[0] = chrBankOffset(cartridge, static_cast<int>(chr_bank0));
-            chr_offsets[1] = chrBankOffset(cartridge, static_cast<int>(chr_bank1));
+            chr_offsets[0] = chrBankOffset(static_cast<int>(chr_bank0));
+            chr_offsets[1] = chrBankOffset(static_cast<int>(chr_bank1));
             break;
     }
 }
 
 // Control ($8000-$9FFF)
-void Mapper1::writeCtrl(Cartridge *cartridge, byte value) {
+void Mapper1::writeCtrl(byte value) {
     control = value;
     chr_mode = (value >> 4) & 1;
     prg_mode = (value >> 2) & 3;
@@ -81,7 +81,7 @@ void Mapper1::writeCtrl(Cartridge *cartridge, byte value) {
     }
 }
 
-uint8_t Mapper1::read(Cartridge *cartridge, uint16_t address) {
+uint8_t Mapper1::read(uint16_t address) {
     if (address < 0x2000) {
         const uint16_t bank = address >> 12;
         const uint16_t offset = address & 4095;
@@ -100,19 +100,19 @@ uint8_t Mapper1::read(Cartridge *cartridge, uint16_t address) {
     }
 }
 
-int Mapper4::prgBankOffset(Cartridge *c, int index) {
+int Mapper4::prgBankOffset(int index) {
     if (index >= 0x80) {
         index -= 0x100;
     }
-    index %= c->prg_size >> 13;
+    index %= cartridge->prg_size >> 13;
     int offset = index << 13;
     if (offset < 0) {
-        offset += c->prg_size;
+        offset += cartridge->prg_size;
     }
     return offset;
 }
 
-int Mapper4::chrBankOffset(Cartridge *cartridge, int index) {
+int Mapper4::chrBankOffset(int index) {
     if (index >= 0x80) {
         index -= 0x100;
     }
@@ -124,43 +124,45 @@ int Mapper4::chrBankOffset(Cartridge *cartridge, int index) {
     return offset;
 }
 
-void Mapper4::updateOffsets(Cartridge *cartridge) {
+void Mapper4::updateOffsets() {
     switch (prg_mode) {
         case 0:
-            prg_offsets[0] = prgBankOffset(cartridge, static_cast<int>(regs[6]));
-            prg_offsets[1] = prgBankOffset(cartridge, static_cast<int>(regs[7]));
-            prg_offsets[2] = prgBankOffset(cartridge, -2);
-            prg_offsets[3] = prgBankOffset(cartridge, -1);
+            prg_offsets[0] = prgBankOffset(static_cast<int>(regs[6]));
+            prg_offsets[1] = prgBankOffset(static_cast<int>(regs[7]));
+            prg_offsets[2] = prgBankOffset(-2);
+            prg_offsets[3] = prgBankOffset(-1);
             break;
         case 1:
-            prg_offsets[0] = prgBankOffset(cartridge, -2);
-            prg_offsets[1] = prgBankOffset(cartridge, static_cast<int>(regs[7]));
-            prg_offsets[2] = prgBankOffset(cartridge, static_cast<int>(regs[6]));
-            prg_offsets[3] = prgBankOffset(cartridge, -1);
+            prg_offsets[0] = prgBankOffset(-2);
+            prg_offsets[1] = prgBankOffset(static_cast<int>(regs[7]));
+            prg_offsets[2] = prgBankOffset(static_cast<int>(regs[6]));
+            prg_offsets[3] = prgBankOffset(-1);
             break;
+        default:break;
     }
 
     switch (chr_mode) {
         case 0:
-            chr_offsets[0] = chrBankOffset(cartridge, static_cast<int>(regs[0] & 0xFE));
-            chr_offsets[1] = chrBankOffset(cartridge, static_cast<int>(regs[0] | 0x01));
-            chr_offsets[2] = chrBankOffset(cartridge, static_cast<int>(regs[1] & 0xFE));
-            chr_offsets[3] = chrBankOffset(cartridge, static_cast<int>(regs[1] | 0x01));
-            chr_offsets[4] = chrBankOffset(cartridge, static_cast<int>(regs[2]));
-            chr_offsets[5] = chrBankOffset(cartridge, static_cast<int>(regs[3]));
-            chr_offsets[6] = chrBankOffset(cartridge, static_cast<int>(regs[4]));
-            chr_offsets[7] = chrBankOffset(cartridge, static_cast<int>(regs[5]));
+            chr_offsets[0] = chrBankOffset(static_cast<int>(regs[0] & 0xFE));
+            chr_offsets[1] = chrBankOffset(static_cast<int>(regs[0] | 0x01));
+            chr_offsets[2] = chrBankOffset(static_cast<int>(regs[1] & 0xFE));
+            chr_offsets[3] = chrBankOffset(static_cast<int>(regs[1] | 0x01));
+            chr_offsets[4] = chrBankOffset(static_cast<int>(regs[2]));
+            chr_offsets[5] = chrBankOffset(static_cast<int>(regs[3]));
+            chr_offsets[6] = chrBankOffset(static_cast<int>(regs[4]));
+            chr_offsets[7] = chrBankOffset(static_cast<int>(regs[5]));
             break;
         case 1:
-            chr_offsets[0] = chrBankOffset(cartridge, static_cast<int>(regs[2]));
-            chr_offsets[1] = chrBankOffset(cartridge, static_cast<int>(regs[3]));
-            chr_offsets[2] = chrBankOffset(cartridge, static_cast<int>(regs[4]));
-            chr_offsets[3] = chrBankOffset(cartridge, static_cast<int>(regs[5]));
-            chr_offsets[4] = chrBankOffset(cartridge, static_cast<int>(regs[0] & 0xFE));
-            chr_offsets[5] = chrBankOffset(cartridge, static_cast<int>(regs[0] | 0x01));
-            chr_offsets[6] = chrBankOffset(cartridge, static_cast<int>(regs[1] & 0xFE));
-            chr_offsets[7] = chrBankOffset(cartridge, static_cast<int>(regs[1] | 0x01));
+            chr_offsets[0] = chrBankOffset(static_cast<int>(regs[2]));
+            chr_offsets[1] = chrBankOffset(static_cast<int>(regs[3]));
+            chr_offsets[2] = chrBankOffset(static_cast<int>(regs[4]));
+            chr_offsets[3] = chrBankOffset(static_cast<int>(regs[5]));
+            chr_offsets[4] = chrBankOffset(static_cast<int>(regs[0] & 0xFE));
+            chr_offsets[5] = chrBankOffset(static_cast<int>(regs[0] | 0x01));
+            chr_offsets[6] = chrBankOffset(static_cast<int>(regs[1] & 0xFE));
+            chr_offsets[7] = chrBankOffset(static_cast<int>(regs[1] | 0x01));
             break;
+        default:break;
     }
 }
 

@@ -1,7 +1,10 @@
+#include <utility>
+
 #ifndef VMOS6502_MAPPER_H
 #define VMOS6502_MAPPER_H
 
 #include <iostream>
+#include <memory>
 
 #include "cartridge.h"
 
@@ -15,13 +18,21 @@ enum MirrorModes {
     MirrorFour = 4
 };
 
-struct Mapper {
-    virtual uint8_t read(Cartridge *cartridge, uint16_t address) = 0;
+class Mapper {
+public:
+    virtual uint8_t read(uint16_t address) = 0;
 
-    virtual void write(Cartridge *cartridge, uint16_t address, uint8_t value) = 0;
+    virtual void write(uint16_t address, uint8_t value) = 0;
+
+    std::shared_ptr<Cartridge> cartridge{};
 };
 
-struct Mapper1 : public Mapper {
+class Mapper1 : public Mapper {
+public:
+    explicit Mapper1(std::shared_ptr<Cartridge> cartridge1) : cartridge(std::move(cartridge1)), shift_reg(0), control(0), prg_mode(0), chr_mode(0), prg_bank(0), chr_bank0(0), chr_bank1(0),
+                prg_offsets{0, 0}, chr_offsets{0, 0} {};
+
+    std::shared_ptr<Cartridge> cartridge;
     uint8_t shift_reg;
     uint8_t control;
     uint8_t prg_mode;
@@ -32,17 +43,17 @@ struct Mapper1 : public Mapper {
     int prg_offsets[2];
     int chr_offsets[2];
 
-    int prgBankOffset(Cartridge *c, int index);
+    int prgBankOffset(int index);
 
-    int chrBankOffset(Cartridge *cartridge, int index);
+    int chrBankOffset(int index);
 
-    void updateOffsets(Cartridge *cartridge);
+    void updateOffsets();
 
-    void writeCtrl(Cartridge *cartridge, uint8_t value);
+    void writeCtrl(uint8_t value);
 
-    uint8_t read(Cartridge *cartridge, uint16_t address);
+    uint8_t read(uint16_t address);
 
-    void write(Cartridge *cartridge, uint16_t address, uint8_t value) {
+    void write(uint16_t address, uint8_t value) {
         if (address < 0x2000) {
             const uint16_t bank = address >> 12;
             const uint16_t offset = address & 4095;
@@ -50,15 +61,15 @@ struct Mapper1 : public Mapper {
         } else if (address >= 0x8000) {
             if ((value & 0x80) == 0x80) {
                 shift_reg = 0x10;
-                writeCtrl(cartridge, control | 0x0C);
-                updateOffsets(cartridge);
+                writeCtrl(control | 0x0C);
+                updateOffsets();
             } else {
                 const bool complete = (shift_reg & 1) == 1;
                 shift_reg >>= 1;
                 shift_reg |= (value & 1) << 4;
                 if (complete) {
                     if (address <= 0x9FFF) {
-                        writeCtrl(cartridge, shift_reg);
+                        writeCtrl(shift_reg);
                     } else if (address <= 0xBFFF) {
                         // CHRbank 0 ($A000-$BFFF)
                         chr_bank0 = shift_reg;
@@ -69,7 +80,7 @@ struct Mapper1 : public Mapper {
                         // PRGbank ($E000-$FFFF)
                         prg_bank = shift_reg & 0x0F;
                     }
-                    updateOffsets(cartridge);
+                    updateOffsets();
                     shift_reg = 0x10;
                 }
             }
@@ -81,16 +92,18 @@ struct Mapper1 : public Mapper {
         }
     }
 
-    Mapper1() : shift_reg(0), control(0), prg_mode(0), chr_mode(0), prg_bank(0), chr_bank0(0), chr_bank1(0),
-                prg_offsets{0, 0}, chr_offsets{0, 0} {}
 };
 
-struct Mapper2 : public Mapper {
+class Mapper2 : public Mapper {
+public:
+    Mapper2(std::shared_ptr<Cartridge> cartridge1, int _prgBanks, int _prgBank1, int _prgBank2) : cartridge(std::move(cartridge1)), prg_banks(_prgBanks), prg_bank1(_prgBank1),
+                                                           prg_bank2(_prgBank2) {}
+    std::shared_ptr<Cartridge> cartridge;
     int prg_banks;
     int prg_bank1;
     int prg_bank2;
 
-    uint8_t read(Cartridge *cartridge, uint16_t address) {
+    uint8_t read(uint16_t address) {
         if (address < 0x2000) {
             return cartridge->CHR[address];
         } else if (address >= 0xC000) {
@@ -109,7 +122,7 @@ struct Mapper2 : public Mapper {
         }
     }
 
-    void write(Cartridge *cartridge, uint16_t address, uint8_t value) {
+    void write(uint16_t address, uint8_t value) {
         if (address < 0x2000) {
             cartridge->CHR[address] = value;
         } else if (address >= 0x8000) {
@@ -122,17 +135,18 @@ struct Mapper2 : public Mapper {
                       << ')' << std::endl;
         }
     }
-
-    Mapper2(int _prgBanks, int _prgBank1, int _prgBank2) : prg_banks(_prgBanks), prg_bank1(_prgBank1),
-                                                           prg_bank2(_prgBank2) {}
 };
 
-struct Mapper3 : public Mapper {
+class Mapper3 : public Mapper {
+public:
+    Mapper3(std::shared_ptr<Cartridge> cartridge1, int _chrBank, int _prgBank1, int _prgBank2) : cartridge(cartridge1), chr_bank(_chrBank), prg_bank1(_prgBank1),
+                                                          prg_bank2(_prgBank2) {}
+    std::shared_ptr<Cartridge> cartridge;
     int chr_bank;
     int prg_bank1;
     int prg_bank2;
 
-    uint8_t read(Cartridge *cartridge, uint16_t address) {
+    uint8_t read(uint16_t address) {
         if (address < 0x2000) {
             const int index = chr_bank * 0x2000 + static_cast<int>(address);
             return cartridge->CHR[index];
@@ -152,7 +166,7 @@ struct Mapper3 : public Mapper {
         }
     }
 
-    void write(Cartridge *cartridge, uint16_t address, uint8_t value) {
+    void write(uint16_t address, uint8_t value) {
         if (address < 0x2000) {
             const int index = chr_bank * 0x2000 + static_cast<int>(address);
             cartridge->CHR[index] = value;
@@ -166,12 +180,14 @@ struct Mapper3 : public Mapper {
                       << ')' << std::endl;
         }
     }
-
-    Mapper3(int _chrBank, int _prgBank1, int _prgBank2) : chr_bank(_chrBank), prg_bank1(_prgBank1),
-                                                          prg_bank2(_prgBank2) {}
 };
 
-struct Mapper4 : public Mapper {
+class Mapper4 : public Mapper {
+public:
+    explicit Mapper4(std::shared_ptr<Cartridge> cartridge1) : cartridge(cartridge1), reg(0), regs{0, 0, 0, 0, 0, 0, 0, 0}, prg_mode(0), chr_mode(0), prg_offsets{0, 0, 0, 0},
+                chr_offsets{0, 0, 0, 0, 0, 0, 0, 0}, reload(0), counter(0), IRQ_enable(false) {};
+
+    std::shared_ptr<Cartridge> cartridge;
     uint8_t reg;
     uint8_t regs[8];
     uint8_t prg_mode;
@@ -182,13 +198,13 @@ struct Mapper4 : public Mapper {
     uint8_t counter;
     bool IRQ_enable;
 
-    int prgBankOffset(Cartridge *c, int index);
+    int prgBankOffset(int index);
 
-    int chrBankOffset(Cartridge *cartridge, int index);
+    int chrBankOffset(int index);
 
-    void updateOffsets(Cartridge *cartridge);
+    void updateOffsets();
 
-    uint8_t read(Cartridge *cartridge, uint16_t address) {
+    uint8_t read(uint16_t address) {
         if (address < 0x2000) {
             const uint16_t bank = address >> 10;
             const uint16_t offset = address & 1023;
@@ -207,7 +223,7 @@ struct Mapper4 : public Mapper {
         }
     }
 
-    void write(Cartridge *cartridge, uint16_t address, uint8_t value) {
+    void write(uint16_t address, uint8_t value) {
         if (address < 0x2000) {
             const uint16_t bank = address >> 10;
             const uint16_t offset = address & 1023;
@@ -218,11 +234,11 @@ struct Mapper4 : public Mapper {
                 prg_mode = (value >> 6) & 1;
                 chr_mode = (value >> 7) & 1;
                 reg = value & 7;
-                updateOffsets(cartridge);
+                updateOffsets();
             } else if (address <= 0x9FFF && (address & 1)) {
                 // bank data
                 regs[reg] = value;
-                updateOffsets(cartridge);
+                updateOffsets();
             } else if (address <= 0xBFFF && (address & 1) == 0) {
                 switch (value & 1) {
                     case 0:
@@ -254,15 +270,16 @@ struct Mapper4 : public Mapper {
                       << ')' << std::endl;
         }
     }
-
-    Mapper4() : reg(0), regs{0, 0, 0, 0, 0, 0, 0, 0}, prg_mode(0), chr_mode(0), prg_offsets{0, 0, 0, 0},
-                chr_offsets{0, 0, 0, 0, 0, 0, 0, 0}, reload(0), counter(0), IRQ_enable(false) {}
 };
 
-struct Mapper7 : public Mapper {
+class Mapper7 : public Mapper {
+public:
+    explicit Mapper7(std::shared_ptr<Cartridge> cartridge1) : cartridge(cartridge1), prg_bank(0) {}
+
+    std::shared_ptr<Cartridge> cartridge;
     int prg_bank;
 
-    uint8_t read(Cartridge *cartridge, uint16_t address) {
+    uint8_t read(uint16_t address) override {
         if (address < 0x2000) {
             return cartridge->CHR[address];
         } else if (address >= 0x8000) {
@@ -278,7 +295,7 @@ struct Mapper7 : public Mapper {
         }
     }
 
-    void write(Cartridge *cartridge, uint16_t address, uint8_t value) {
+    void write(uint16_t address, uint8_t value) override {
         if (address < 0x2000) {
             cartridge->CHR[address] = value;
         } else if (address >= 0x8000) {
@@ -290,6 +307,7 @@ struct Mapper7 : public Mapper {
                 case 0x10:
                     cartridge->mirror = MirrorSingle1;
                     break;
+                default:break;
             }
         } else if (address >= 0x6000) {
             int index = static_cast<int>(address) - 0x6000;
@@ -299,8 +317,6 @@ struct Mapper7 : public Mapper {
                       << ')' << std::endl;
         }
     }
-
-    Mapper7() : prg_bank(0) {}
 };
 
 #endif //VMOS6502_MAPPER_H

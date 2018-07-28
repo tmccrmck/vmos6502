@@ -194,6 +194,7 @@ int main(int argc, char *argv[]) {
         if (getKey(window, GLFW_KEY_ESCAPE)) glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
 
+    /*
     // save SRAM back to file
     if (nes->cartridge->battery_present) {
         std::cout << std::endl << "Writing SRAM..." << std::endl;
@@ -203,7 +204,7 @@ int main(int argc, char *argv[]) {
         } else {
             fclose(fp);
         }
-    }
+    }*/
 
     std::cout << std::endl << "Stopping audio stream..." << std::endl;
     Pa_StopStream(nes->apu->stream);

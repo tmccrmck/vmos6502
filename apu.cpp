@@ -334,6 +334,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
                 this->tickLength();
             }
             break;
+        default:break;
     }
 }
 

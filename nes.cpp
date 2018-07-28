@@ -27,8 +27,7 @@ uint16_t NES::pop16() {
 
 NES::NES(const std::string path, const std::string SRAM_path) : initialized(false) {
     std::cout << "Initializing cartridge..." << std::endl;
-    cartridge = new Cartridge(path, SRAM_path);
-    if (!cartridge->initialized) return;
+    auto cartridge = std::make_shared<Cartridge>(path, SRAM_path);
 
     std::cout << "Initializing controllers..." << std::endl;
     controller1 = new Controller;
@@ -40,27 +39,27 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     std::cout << "Initializing mapper..." << std::endl;
     if (cartridge->mapper == 0) {
         const int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper2(prg_banks, 0, prg_banks - 1);
+        mapper = new Mapper2(cartridge, prg_banks, 0, prg_banks - 1);
     } else if (cartridge->mapper == 1) {
-        auto *m = new Mapper1();
+        auto *m = new Mapper1(cartridge);
         m->shift_reg = 0x10;
-        m->prg_offsets[1] = m->prgBankOffset(cartridge, -1);
+        m->prg_offsets[1] = m->prgBankOffset(-1);
         mapper = m;
     } else if (cartridge->mapper == 2) {
         const int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper2(prg_banks, 0, prg_banks - 1);
+        mapper = new Mapper2(cartridge, prg_banks, 0, prg_banks - 1);
     } else if (cartridge->mapper == 3) {
         const int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper3(0, 0, prg_banks - 1);
+        mapper = new Mapper3(cartridge, 0, 0, prg_banks - 1);
     } else if (cartridge->mapper == 4) {
-        Mapper4 *m = new Mapper4();
-        m->prg_offsets[0] = m->prgBankOffset(cartridge, 0);
-        m->prg_offsets[1] = m->prgBankOffset(cartridge, 1);
-        m->prg_offsets[2] = m->prgBankOffset(cartridge, -2);
-        m->prg_offsets[3] = m->prgBankOffset(cartridge, -1);
+        auto *m = new Mapper4(cartridge);
+        m->prg_offsets[0] = m->prgBankOffset(0);
+        m->prg_offsets[1] = m->prgBankOffset(1);
+        m->prg_offsets[2] = m->prgBankOffset(-2);
+        m->prg_offsets[3] = m->prgBankOffset(-1);
         mapper = m;
     } else if (cartridge->mapper == 7) {
-        mapper = new Mapper7();
+        mapper = new Mapper7(cartridge);
     } else {
         std::cerr << "ERROR: cartridge uses Mapper " << static_cast<int>(cartridge->mapper)
                   << ", which isn't currently supported by vmos!" << std::endl;
@@ -130,7 +129,7 @@ void NES::emulate(double seconds) {
         const int ppuCycles = cpuCycles * 3;
         for (int i = 0; i < ppuCycles; ++i) {
             PPU *ppu = this->ppu;
-            ppu->tickPPU(this->cpu, mapper, cartridge);
+            ppu->tickPPU(this->cpu, mapper);
         }
 
         for (int i = 0; i < cpuCycles; ++i) {
@@ -144,9 +143,9 @@ byte NES::readByte(uint16_t address) {
     if (address < 0x2000) {
         return this->RAM[address & 2047];
     } else if (address < 0x4000) {
-        return ppu->readPPURegister(0x2000 + (address & 7), mapper, cartridge);
+        return ppu->readPPURegister(0x2000 + (address & 7), mapper);
     } else if (address == 0x4014) {
-        return ppu->readPPURegister(address, mapper, cartridge);
+        return ppu->readPPURegister(address, mapper);
     } else if (address == 0x4015) {
         // apu reg read
         byte read_status = 0;
@@ -173,7 +172,7 @@ byte NES::readByte(uint16_t address) {
     } else if (address < 0x6000) {
         return 0;
     } else if (address >= 0x6000) {
-        return this->mapper->read(this->cartridge, address);
+        return this->mapper->read(address);
     } else {
         std::cerr << "ERROR: CPU encountered unrecognized read (address 0x" << std::hex << address << std::dec << ')'
                   << std::endl;
@@ -197,14 +196,15 @@ uint16_t NES::read16(uint16_t address) {
 }
 
 void NES::writeByte(uint16_t address, byte value) {
+    std::cout << "Writing byte " << unsigned(value) << " to address " << std::hex << address << std::endl;
     if (address < 0x2000) {
         this->RAM[address & 2047] = value;
     } else if (address < 0x4000) {
-        ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cartridge, cpu);
+        ppu->writeRegisterPPU(0x2000 + (address & 7), value, mapper, cpu);
     } else if (address < 0x4014) {
         this->apu->writeRegisterAPU(address, value);
     } else if (address == 0x4014) {
-        ppu->writeRegisterPPU(address, value, mapper, cartridge, cpu);
+        ppu->writeRegisterPPU(address, value, mapper, cpu);
     } else if (address == 0x4015) {
         this->apu->writeRegisterAPU(address, value);
 
@@ -217,7 +217,7 @@ void NES::writeByte(uint16_t address, byte value) {
     } else if (address < 0x6000) {
         // I/O registers
     } else if (address >= 0x6000) {
-        this->mapper->write(this->cartridge, address, value);
+        this->mapper->write(address, value);
     } else {
         std::cerr << "ERROR: CPU encountered unrecognized write (address 0x" << std::hex << address << std::dec << ')'
                   << std::endl;

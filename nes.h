@@ -35,7 +35,6 @@ public:
     CPU *cpu;
     APU *apu;
     PPU *ppu;
-    Cartridge *cartridge;
     Controller *controller1;
     Controller *controller2;
     Mapper *mapper;
