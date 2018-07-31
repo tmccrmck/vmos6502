@@ -33,8 +33,8 @@ class NES {
 public:
     bool initialized;
     CPU *cpu;
-    APU *apu;
-    PPU *ppu;
+    std::unique_ptr<APU> apu;
+    std::unique_ptr<PPU> ppu;
     Controller *controller1;
     Controller *controller2;
     Mapper *mapper;

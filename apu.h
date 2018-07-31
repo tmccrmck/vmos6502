@@ -41,7 +41,7 @@ public:
     uint8_t envelope_vol;
     uint8_t const_vol;
 
-    Pulse() : enabled(false), channel(0), length_enabled(false), length_val(0), timer_period(0), timer_val(0),
+    explicit Pulse(uint8_t _channel) : enabled(false), channel(_channel), length_enabled(false), length_val(0), timer_period(0), timer_val(0),
               duty_mode(0), duty_val(0), sweep_reload(false), sweep_enabled(false), sweep_negate(false), sweep_shift(0),
               sweep_period(0), sweep_val(0), envelope_enabled(false), envelope_loop(false), envelope_start(false),
               envelope_period(0), envelope_val(0), envelope_vol(0), const_vol(0) {}
@@ -95,7 +95,7 @@ struct Noise {
     uint8_t envelope_vol;
     uint8_t const_vol;
 
-    Noise() : enabled(false), mode(false), shift_reg(0), length_enabled(false), length_val(0), timer_period(0),
+    Noise() : enabled(false), mode(false), shift_reg(1), length_enabled(false), length_val(0), timer_period(0),
               timer_val(0), envelope_enabled(false), envelope_loop(false), envelope_start(false), envelope_period(0),
               envelope_val(0), envelope_vol(0), const_vol(0) {}
 };
@@ -129,7 +129,7 @@ class APU {
 public:
     PaStream *stream{};
     std::unique_ptr<Pulse> pulse1;
-    Pulse pulse2;
+    std::unique_ptr<Pulse> pulse2;
     Triangle triangle;
     Noise noise;
     DMC dmc;
@@ -138,7 +138,7 @@ public:
     uint8_t frame_val;
     bool frame_IRQ;
 
-    APU() : pulse1(new Pulse()), cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+    APU() : pulse1(new Pulse(1)), pulse2(new Pulse(2)), cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
 
     void tickLength();
 

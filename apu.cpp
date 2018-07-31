@@ -181,8 +181,8 @@ void APU::tickLength() {
     if (this->pulse1->length_enabled && this->pulse1->length_val > 0) {
         --this->pulse1->length_val;
     }
-    if (this->pulse2.length_enabled && this->pulse2.length_val > 0) {
-        --this->pulse2.length_val;
+    if (this->pulse2->length_enabled && this->pulse2->length_val > 0) {
+        --this->pulse2->length_val;
     }
     if (this->triangle.length_enabled && this->triangle.length_val > 0) {
         --this->triangle.length_val;
@@ -194,12 +194,12 @@ void APU::tickLength() {
 
 void APU::tickSweep() {
     pulse1->pulseTickSweep();
-    pulse2.pulseTickSweep();
+    pulse2->pulseTickSweep();
 }
 
 void APU::tickEnvelope() {
     this->pulse1->tickEnvelope();
-    this->pulse2.tickEnvelope();
+    this->pulse2->tickEnvelope();
 
     if (triangle.counter_reload) {
         triangle.counter_val = triangle.counter_period;
@@ -242,16 +242,16 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
             this->pulse1->pulseWriteTimerHigh(value);
             break;
         case 0x4004:
-            this->pulse2.pulseWriteControl(value);
+            this->pulse2->pulseWriteControl(value);
             break;
         case 0x4005:
-            this->pulse2.pulseWriteSweep(value);
+            this->pulse2->pulseWriteSweep(value);
             break;
         case 0x4006:
-            this->pulse2.timer_period = (this->pulse2.timer_period & 0xFF00) | static_cast<uint16_t>(value);
+            this->pulse2->timer_period = (this->pulse2->timer_period & 0xFF00) | static_cast<uint16_t>(value);
             break;
         case 0x4007:
-            this->pulse2.pulseWriteTimerHigh(value);
+            this->pulse2->pulseWriteTimerHigh(value);
             break;
         case 0x4008:
             this->triangle.length_enabled = ((value >> 7) & 1) == 0;
@@ -301,15 +301,15 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
             break;
         case 0x4015:
             this->pulse1->enabled = (value & 1) == 1;
-            this->pulse2.enabled = (value & 2) == 2;
+            this->pulse2->enabled = (value & 2) == 2;
             this->triangle.enabled = (value & 4) == 4;
             this->noise.enabled = (value & 8) == 8;
             this->dmc.enabled = (value & 16) == 16;
             if (!this->pulse1->enabled) {
                 this->pulse1->length_val = 0;
             }
-            if (!this->pulse2.enabled) {
-                this->pulse2.length_val = 0;
+            if (!this->pulse2->enabled) {
+                this->pulse2->length_val = 0;
             }
             if (!this->triangle.enabled) {
                 this->triangle.length_val = 0;
@@ -346,7 +346,7 @@ void APU::tickAPU(CPU &cpu) {
     // tick timers
     if ((this->cycle & 1) == 0) {
         this->pulse1->tickPulseTimer();
-        this->pulse2.tickPulseTimer();
+        this->pulse2->tickPulseTimer();
 
         if (noise.timer_val == 0) {
             noise.timer_val = noise.timer_period;
@@ -454,7 +454,7 @@ void APU::tickAPU(CPU &cpu) {
 
     if (s1 != s2) {
         const byte p1_output = this->pulse1->pulseOutput();
-        const byte p2_output = this->pulse2.pulseOutput();
+        const byte p2_output = this->pulse2->pulseOutput();
 
         const byte tri_output = (!triangle.enabled || triangle.length_val == 0 || triangle.counter_val == 0) ? 0 : tri_table[triangle.duty_val];
 

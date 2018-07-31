@@ -51,9 +51,9 @@ public:
     int scanline; // 0-261. 0-239 is visible, 240 is postline, 241-260 is the v_blank interval, 261 is preline
     uint64_t frame;
 
-    byte palette_tbl[32];
-    byte name_tbl[2048];
-    byte oam_tbl[256];
+    std::array<byte, 32> palette_tbl{0};
+    std::array<byte, 2048> name_tbl{0};
+    std::array<byte, 256> oam_tbl{0};
 
     uint32_t *front;
     uint32_t *back;
@@ -79,10 +79,10 @@ public:
     uint64_t tile_data;
 
     int sprite_cnt;
-    uint32_t sprite_patterns[8];
-    byte sprite_pos[8];
-    byte sprite_priorities[8];
-    byte sprite_idx[8];
+    std::array<uint32_t, 8> sprite_patterns{0};
+    std::array<byte, 8> sprite_pos{0};
+    std::array<byte, 8> sprite_priorities{0};
+    std::array<byte, 8> sprite_idx{0};
 
     // $2000 PPUCTRL
     byte flag_name_tbl;       // 0: $2000.  1: $2400. 2: $2800. 3: $2C00
@@ -112,23 +112,16 @@ public:
     // $2007 PPUDATA
     byte buffered_data;
 
-    PPU() : cycle(0), scanline(0), frame(0), v(0), t(0), x(0), w(0), f(0), reg(0), nmi_occurred(false), nmi_out(false),
-            nmi_last(false),
+    PPU() : cycle(340), scanline(250), frame(0), front(new uint32_t[256 * 240]), back(new uint32_t[256 * 240]), v(0),
+            t(0), x(0), w(0), f(0), reg(0),
+            nmi_occurred(false), nmi_out(false), nmi_last(false),
             nmi_delay(0), name_tbl_u8(0), attrib_tbl_u8(0), low_tile_u8(0), high_tile_u8(0), tile_data(0),
             sprite_cnt(0), flag_name_tbl(0), flag_increment(0),
             flag_sprite_tbl(0), flag_background_tbl(0), flag_sprite_size(0), flag_rw(0), flag_gray(0),
             flag_show_left_background(0), flag_show_left_sprites(0),
             flag_show_background(0), flag_show_sprites(0), flag_red_tint(0), flag_green_tint(0), flag_blue_tint(0),
             flag_sprite_zero_hit(0), flag_sprite_overflow(0),
-            oam_addr(0), buffered_data(0) {
-        memset(palette_tbl, 0, 32);
-        memset(name_tbl, 0, 2048);
-        memset(oam_tbl, 0, 256);
-        memset(sprite_patterns, 0, 32);
-        memset(sprite_pos, 0, 8);
-        memset(sprite_priorities, 0, 8);
-        memset(sprite_idx, 0, 8);
-    }
+            oam_addr(0), buffered_data(0) {}
 
     void writePPUCtrl(byte x);
 

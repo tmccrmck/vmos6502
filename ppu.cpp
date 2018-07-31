@@ -10,6 +10,7 @@ uint16_t mirrorAddress(byte mode, uint16_t address) {
 void PPU::spritePixel(byte &i, byte &sprite) {
     i = sprite = 0;
     if (this->flag_show_sprites == 0) return;
+
     for (i = 0; i < this->sprite_cnt; ++i) {
         int offset = (this->cycle - 1) - static_cast<int>(this->sprite_pos[i]);
         if (offset < 0 || offset > 7) continue;
@@ -18,7 +19,6 @@ void PPU::spritePixel(byte &i, byte &sprite) {
         if ((sprite & 3)) return;
     }
     i = sprite = 0;
-    return;
 }
 
 void PPU::writePPUCtrl(byte value) {

@@ -70,24 +70,15 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
 
     std::cout << "Initializing NES CPU..." << std::endl;
     cpu = new CPU(this);
-
     cpu->pc = read16(0xFFFC);
     cpu->sp = 0xFD;
     cpu->flags = 0x24;
 
     std::cout << "Initializing NES APU..." << std::endl;
-    apu = new APU();
-    apu->noise.shift_reg = 1;
-    apu->pulse1->channel = 1;
-    apu->pulse2.channel = 2;
+    apu = std::make_unique<APU>();
 
     std::cout << "Initializing NES PPU..." << std::endl;
-    ppu = new PPU();
-    ppu->front = new uint32_t[256 * 240];
-    ppu->back = new uint32_t[256 * 240];
-    ppu->cycle = 340;
-    ppu->scanline = 250;
-    ppu->frame = 0;
+    ppu = std::make_unique<PPU>();
 
     ppu->writePPUCtrl(0);
     ppu->writePPUMask(0);
@@ -128,7 +119,6 @@ void NES::emulate(double seconds) {
 
         const int ppuCycles = cpuCycles * 3;
         for (int i = 0; i < ppuCycles; ++i) {
-            PPU *ppu = this->ppu;
             ppu->tickPPU(this->cpu, mapper);
         }
 
@@ -152,7 +142,7 @@ byte NES::readByte(uint16_t address) {
         if (apu->pulse1->length_val > 0) {
             read_status |= 1;
         }
-        if (apu->pulse2.length_val > 0) {
+        if (apu->pulse2->length_val > 0) {
             read_status |= 2;
         }
         if (apu->triangle.length_val > 0) {
