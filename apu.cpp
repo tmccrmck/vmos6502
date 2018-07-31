@@ -86,20 +86,20 @@ constexpr std::array<std::array<byte, 8>, 4> duty_tbl = {{
                                                                  {1, 0, 0, 1, 1, 1, 1, 1},
                                                          }};
 
-void pulseTickEnvelope(Pulse &p) {
-    if (p.envelope_start) {
-        p.envelope_vol = 15;
-        p.envelope_val = p.envelope_period;
-        p.envelope_start = false;
-    } else if (p.envelope_val > 0) {
-        --p.envelope_val;
+void Pulse::tickEnvelope() {
+    if (this->envelope_start) {
+        this->envelope_vol = 15;
+        this->envelope_val = this->envelope_period;
+        this->envelope_start = false;
+    } else if (this->envelope_val > 0) {
+        --this->envelope_val;
     } else {
-        if (p.envelope_vol > 0) {
-            --p.envelope_vol;
-        } else if (p.envelope_loop) {
-            p.envelope_vol = 15;
+        if (this->envelope_vol > 0) {
+            --this->envelope_vol;
+        } else if (this->envelope_loop) {
+            this->envelope_vol = 15;
         }
-        p.envelope_val = p.envelope_period;
+        this->envelope_val = this->envelope_period;
     }
 }
 
@@ -178,8 +178,8 @@ void Pulse::pulseWriteTimerHigh(byte value) {
 }
 
 void APU::tickLength() {
-    if (this->pulse1.length_enabled && this->pulse1.length_val > 0) {
-        --this->pulse1.length_val;
+    if (this->pulse1->length_enabled && this->pulse1->length_val > 0) {
+        --this->pulse1->length_val;
     }
     if (this->pulse2.length_enabled && this->pulse2.length_val > 0) {
         --this->pulse2.length_val;
@@ -193,13 +193,13 @@ void APU::tickLength() {
 }
 
 void APU::tickSweep() {
-    pulse1.pulseTickSweep();
+    pulse1->pulseTickSweep();
     pulse2.pulseTickSweep();
 }
 
 void APU::tickEnvelope() {
-    pulseTickEnvelope(this->pulse1);
-    pulseTickEnvelope(this->pulse2);
+    this->pulse1->tickEnvelope();
+    this->pulse2.tickEnvelope();
 
     if (triangle.counter_reload) {
         triangle.counter_val = triangle.counter_period;
@@ -230,16 +230,16 @@ void APU::tickEnvelope() {
 void APU::writeRegisterAPU(uint16_t address, byte value) {
     switch (address) {
         case 0x4000:
-            this->pulse1.pulseWriteControl(value);
+            this->pulse1->pulseWriteControl(value);
             break;
         case 0x4001:
-            this->pulse1.pulseWriteSweep(value);
+            this->pulse1->pulseWriteSweep(value);
             break;
         case 0x4002:
-            this->pulse1.timer_period = (this->pulse1.timer_period & 0xFF00) | static_cast<uint16_t>(value);
+            this->pulse1->timer_period = (this->pulse1->timer_period & 0xFF00) | static_cast<uint16_t>(value);
             break;
         case 0x4003:
-            this->pulse1.pulseWriteTimerHigh(value);
+            this->pulse1->pulseWriteTimerHigh(value);
             break;
         case 0x4004:
             this->pulse2.pulseWriteControl(value);
@@ -300,13 +300,13 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
             this->noise.envelope_start = true;
             break;
         case 0x4015:
-            this->pulse1.enabled = (value & 1) == 1;
+            this->pulse1->enabled = (value & 1) == 1;
             this->pulse2.enabled = (value & 2) == 2;
             this->triangle.enabled = (value & 4) == 4;
             this->noise.enabled = (value & 8) == 8;
             this->dmc.enabled = (value & 16) == 16;
-            if (!this->pulse1.enabled) {
-                this->pulse1.length_val = 0;
+            if (!this->pulse1->enabled) {
+                this->pulse1->length_val = 0;
             }
             if (!this->pulse2.enabled) {
                 this->pulse2.length_val = 0;
@@ -345,7 +345,7 @@ void APU::tickAPU(CPU &cpu) {
 
     // tick timers
     if ((this->cycle & 1) == 0) {
-        this->pulse1.tickPulseTimer();
+        this->pulse1->tickPulseTimer();
         this->pulse2.tickPulseTimer();
 
         if (noise.timer_val == 0) {
@@ -453,7 +453,7 @@ void APU::tickAPU(CPU &cpu) {
     const int s2 = static_cast<int>(static_cast<double>(cycle2) / SAMPLE_RATE);
 
     if (s1 != s2) {
-        const byte p1_output = this->pulse1.pulseOutput();
+        const byte p1_output = this->pulse1->pulseOutput();
         const byte p2_output = this->pulse2.pulseOutput();
 
         const byte tri_output = (!triangle.enabled || triangle.length_val == 0 || triangle.counter_val == 0) ? 0 : tri_table[triangle.duty_val];

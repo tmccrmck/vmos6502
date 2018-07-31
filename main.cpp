@@ -93,6 +93,8 @@ int main(int argc, char *argv[]) {
     outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = nullptr;
 
+
+
     err = Pa_OpenStream(
             &nes->apu->stream,
             nullptr,

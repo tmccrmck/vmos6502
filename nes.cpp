@@ -78,7 +78,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     std::cout << "Initializing NES APU..." << std::endl;
     apu = new APU();
     apu->noise.shift_reg = 1;
-    apu->pulse1.channel = 1;
+    apu->pulse1->channel = 1;
     apu->pulse2.channel = 2;
 
     std::cout << "Initializing NES PPU..." << std::endl;
@@ -149,7 +149,7 @@ byte NES::readByte(uint16_t address) {
     } else if (address == 0x4015) {
         // apu reg read
         byte read_status = 0;
-        if (apu->pulse1.length_val > 0) {
+        if (apu->pulse1->length_val > 0) {
             read_status |= 1;
         }
         if (apu->pulse2.length_val > 0) {

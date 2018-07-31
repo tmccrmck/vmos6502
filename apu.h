@@ -48,6 +48,8 @@ public:
 
     void tickPulseTimer();
 
+    void tickEnvelope();
+
     void sweep();
 
     void pulseTickSweep();
@@ -126,7 +128,7 @@ public:
 class APU {
 public:
     PaStream *stream{};
-    Pulse pulse1;
+    std::unique_ptr<Pulse> pulse1;
     Pulse pulse2;
     Triangle triangle;
     Noise noise;
@@ -136,7 +138,7 @@ public:
     uint8_t frame_val;
     bool frame_IRQ;
 
-    APU() : cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+    APU() : pulse1(new Pulse()), cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
 
     void tickLength();
 
