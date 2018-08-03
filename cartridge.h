@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdint>
 #include <string>
+#include <array>
 
 typedef uint8_t byte;
 
@@ -26,7 +27,7 @@ struct Cartridge {
     int prg_size;
     byte *CHR; // CHR-ROM banks
     int chr_size;
-    byte *SRAM; // Save RAM
+    std::array<byte, 8192> SRAM; // Save RAM
     bool trainer_present;
     byte *trainer;
     byte mapper; // mapper type

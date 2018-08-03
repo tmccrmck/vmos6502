@@ -210,7 +210,6 @@ void APU::tickEnvelope() {
         triangle.counter_reload = false;
     }
 
-    //Noise *n = &this->noise;
     if (noise.envelope_start) {
         noise.envelope_vol = 15;
         noise.envelope_val = noise.envelope_period;
@@ -258,6 +257,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
             this->triangle.counter_period = value & 0x7F;
             break;
         case 0x4009:
+            break;
         case 0x4010:
             this->dmc.irq = (value & 0x80) == 0x80;
             this->dmc.loop = (value & 0x40) == 0x40;
@@ -338,7 +338,7 @@ void APU::writeRegisterAPU(uint16_t address, byte value) {
     }
 }
 
-void APU::tickAPU(CPU &cpu) {
+void APU::tickAPU(std::unique_ptr<CPU>& cpu) {
     uint64_t cycle1 = this->cycle;
     ++this->cycle;
     uint64_t cycle2 = this->cycle;
@@ -362,8 +362,8 @@ void APU::tickAPU(CPU &cpu) {
         if (dmc.enabled) {
             // tick reader
             if (dmc.cur_len > 0 && dmc.bit_count == 0) {
-                cpu.stall += 4;
-                dmc.shift_reg = cpu.readb(dmc.cur_addr);
+                cpu->stall += 4;
+                dmc.shift_reg = cpu->readb(dmc.cur_addr);
                 dmc.bit_count = 8;
                 ++dmc.cur_addr;
                 if (dmc.cur_addr == 0) {
@@ -428,9 +428,10 @@ void APU::tickAPU(CPU &cpu) {
                     this->tickSweep();
                     this->tickLength();
                     if (this->frame_IRQ) {
-                        cpu.triggerIRQ();
+                        cpu->triggerIRQ();
                     }
                     break;
+                default:break;
             }
         } else if (fp == 5) {
             this->frame_val = (this->frame_val + 1) % 5;
@@ -445,6 +446,7 @@ void APU::tickAPU(CPU &cpu) {
                     this->tickSweep();
                     this->tickLength();
                     break;
+                default:break;
             }
         }
     }

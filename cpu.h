@@ -45,9 +45,9 @@ public:
     int stall;
     NES *nes;
 
-    explicit CPU(NES *nes_) : cycles(0), pc(0), sp(0), a(0), x(0), y(0), flags(0), interrupt(0), stall(0), nes(nes_) {}
+    explicit CPU(NES *nes_, uint16_t _pc) : cycles(0), pc(_pc), sp(0xFD), a(0), x(0), y(0), flags(0x24), interrupt(0), stall(0), nes(nes_) {}
 
-    void executeOpcode(byte opcode, uint16_t address, Instruction instruction);
+    void executeOpcode(const byte opcode, const uint16_t address, const Instruction& instruction);
 
     bool pagesDiffer(uint16_t a, uint16_t b);
 

@@ -16,7 +16,7 @@ bool CPU::pagesDiffer(uint16_t a, uint16_t b) {
 }
 
 
-void CPU::executeOpcode(byte opcode, uint16_t address, Instruction instruction) {
+void CPU::executeOpcode(const byte opcode, const uint16_t address, const Instruction& instruction) {
     switch (opcode) {
         case 0x0:
             this->brk();

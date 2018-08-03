@@ -121,7 +121,11 @@ public:
             flag_show_left_background(0), flag_show_left_sprites(0),
             flag_show_background(0), flag_show_sprites(0), flag_red_tint(0), flag_green_tint(0), flag_blue_tint(0),
             flag_sprite_zero_hit(0), flag_sprite_overflow(0),
-            oam_addr(0), buffered_data(0) {}
+            oam_addr(0), buffered_data(0) {
+        writePPUCtrl(0);
+        writePPUMask(0);
+        oam_addr = 0;
+    }
 
     void writePPUCtrl(byte x);
 
@@ -133,7 +137,7 @@ public:
 
     void spritePixel(byte &i, byte &sprite);
 
-    void tickPPU(CPU *cpu, Mapper *mapper);
+    void tickPPU(std::unique_ptr<CPU>& cpu, Mapper *mapper);
 
     byte readPPU(uint16_t address, Mapper *mapper);
 
@@ -141,7 +145,7 @@ public:
 
     byte readPPURegister(uint16_t address, Mapper *mapper);
 
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, CPU *cpu);
+    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, std::unique_ptr<CPU>& cpu);
 };
 
 #endif //VMOS6502_PPU_H

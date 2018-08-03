@@ -64,14 +64,11 @@ Cartridge::Cartridge(const std::string path, const std::string SRAM_path) : init
 
     fclose(fp);
 
-    SRAM = new byte[8192];
-
-    memset(SRAM, 0, 8192);
     if (battery_present) {
         // try to read saved SRAM
         std::cout << "Attempting to read previously saved SRAM..." << std::endl;
         fp = fopen(SRAM_path.c_str(), "rb");
-        if (fp == nullptr || (fread(SRAM, 8192, 1, fp) != 1)) {
+        if (fp == nullptr || (fread(SRAM.data(), sizeof(int), SRAM.size(), fp) != 1)) {
             std::cout << "WARN: failed to open SRAM file!" << std::endl;
         } else {
             fclose(fp);

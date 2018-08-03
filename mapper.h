@@ -29,27 +29,11 @@ public:
 
 class Mapper1 : public Mapper {
 public:
-    explicit Mapper1(std::shared_ptr<Cartridge> cartridge1) : cartridge(std::move(cartridge1)), shift_reg(0), control(0), prg_mode(0), chr_mode(0), prg_bank(0), chr_bank0(0), chr_bank1(0),
-                prg_offsets{0, 0}, chr_offsets{0, 0} {};
-
-    std::shared_ptr<Cartridge> cartridge;
-    uint8_t shift_reg;
-    uint8_t control;
-    uint8_t prg_mode;
-    uint8_t chr_mode;
-    uint8_t prg_bank;
-    uint8_t chr_bank0;
-    uint8_t chr_bank1;
-    int prg_offsets[2];
-    int chr_offsets[2];
-
-    int prgBankOffset(int index);
-
-    int chrBankOffset(int index);
-
-    void updateOffsets();
-
-    void writeCtrl(uint8_t value);
+    explicit Mapper1(std::shared_ptr<Cartridge> cartridge1, uint8_t _shift) : cartridge(std::move(cartridge1)),
+                                                                              shift_reg(_shift), control(0),
+                                                                              prg_mode(0), chr_mode(0),
+                                                                              prg_bank(0), chr_bank0(0), chr_bank1(0),
+                                                                              prg_offsets{0, 0}, chr_offsets{0, 0} {};
 
     uint8_t read(uint16_t address);
 
@@ -92,12 +76,32 @@ public:
         }
     }
 
+    std::shared_ptr<Cartridge> cartridge;
+    uint8_t shift_reg;
+    uint8_t control;
+    uint8_t prg_mode;
+    uint8_t chr_mode;
+    uint8_t prg_bank;
+    uint8_t chr_bank0;
+    uint8_t chr_bank1;
+    int prg_offsets[2];
+    int chr_offsets[2];
+
+    int prgBankOffset(int index);
+
+    int chrBankOffset(int index);
+
+    void updateOffsets();
+
+    void writeCtrl(uint8_t value);
+
 };
 
 class Mapper2 : public Mapper {
 public:
-    Mapper2(std::shared_ptr<Cartridge> cartridge1, int _prgBanks, int _prgBank1, int _prgBank2) : cartridge(std::move(cartridge1)), prg_banks(_prgBanks), prg_bank1(_prgBank1),
-                                                           prg_bank2(_prgBank2) {}
+    Mapper2(std::shared_ptr<Cartridge> cartridge1, int _prgBanks, int _prgBank1, int _prgBank2) : cartridge(
+            std::move(cartridge1)), prg_banks(_prgBanks), prg_bank1(_prgBank1), prg_bank2(_prgBank2) {}
+
     std::shared_ptr<Cartridge> cartridge;
     int prg_banks;
     int prg_bank1;
@@ -139,8 +143,11 @@ public:
 
 class Mapper3 : public Mapper {
 public:
-    Mapper3(std::shared_ptr<Cartridge> cartridge1, int _chrBank, int _prgBank1, int _prgBank2) : cartridge(cartridge1), chr_bank(_chrBank), prg_bank1(_prgBank1),
-                                                          prg_bank2(_prgBank2) {}
+    Mapper3(std::shared_ptr<Cartridge> cartridge1, int _chrBank, int _prgBank1, int _prgBank2) : cartridge(cartridge1),
+                                                                                                 chr_bank(_chrBank),
+                                                                                                 prg_bank1(_prgBank1),
+                                                                                                 prg_bank2(_prgBank2) {}
+
     std::shared_ptr<Cartridge> cartridge;
     int chr_bank;
     int prg_bank1;
@@ -184,8 +191,11 @@ public:
 
 class Mapper4 : public Mapper {
 public:
-    explicit Mapper4(std::shared_ptr<Cartridge> cartridge1) : cartridge(cartridge1), reg(0), regs{0, 0, 0, 0, 0, 0, 0, 0}, prg_mode(0), chr_mode(0), prg_offsets{0, 0, 0, 0},
-                chr_offsets{0, 0, 0, 0, 0, 0, 0, 0}, reload(0), counter(0), IRQ_enable(false) {};
+    explicit Mapper4(std::shared_ptr<Cartridge> cartridge1) : cartridge(cartridge1), reg(0),
+                                                              regs{0, 0, 0, 0, 0, 0, 0, 0}, prg_mode(0), chr_mode(0),
+                                                              prg_offsets{0, 0, 0, 0},
+                                                              chr_offsets{0, 0, 0, 0, 0, 0, 0, 0}, reload(0),
+                                                              counter(0), IRQ_enable(false) {};
 
     std::shared_ptr<Cartridge> cartridge;
     uint8_t reg;
@@ -307,7 +317,8 @@ public:
                 case 0x10:
                     cartridge->mirror = MirrorSingle1;
                     break;
-                default:break;
+                default:
+                    break;
             }
         } else if (address >= 0x6000) {
             int index = static_cast<int>(address) - 0x6000;

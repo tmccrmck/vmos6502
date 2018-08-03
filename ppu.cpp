@@ -78,7 +78,7 @@ byte PPU::readPPU(uint16_t address, Mapper *mapper) {
     return 0;
 }
 
-void PPU::tickPPU(CPU *cpu, Mapper *mapper) {
+void PPU::tickPPU(std::unique_ptr<CPU>& cpu, Mapper *mapper) {
     if (this->nmi_delay > 0) {
         this->nmi_delay--;
         if (this->nmi_delay == 0 && this->nmi_out && this->nmi_occurred) {
@@ -376,7 +376,7 @@ byte PPU::readPPURegister(uint16_t address, Mapper *mapper) {
     return 0;
 }
 
-void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, CPU *cpu) {
+void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, std::unique_ptr<CPU>& cpu) {
     this->reg = value;
     switch (address) {
         case 0x2000:

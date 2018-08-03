@@ -32,13 +32,13 @@ enum Buttons {
 class NES {
 public:
     bool initialized;
-    CPU *cpu;
+    std::unique_ptr<CPU> cpu;
     std::unique_ptr<APU> apu;
     std::unique_ptr<PPU> ppu;
-    Controller *controller1;
-    Controller *controller2;
+    std::unique_ptr<Controller> controller1;
+    std::unique_ptr<Controller> controller2;
     Mapper *mapper;
-    byte *RAM;
+    std::array<byte, 2048> RAM = {0};
 
     NES(std::string path, std::string SRAM_path);
 

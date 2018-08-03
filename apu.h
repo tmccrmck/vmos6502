@@ -148,7 +148,7 @@ public:
 
     void writeRegisterAPU(uint16_t address, byte value);
 
-    void tickAPU(CPU& cpu);
+    void tickAPU(std::unique_ptr<CPU>& cpu);
 };
 
 #endif //VMOS6502_APU_H

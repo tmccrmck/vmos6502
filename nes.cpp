@@ -30,19 +30,15 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     auto cartridge = std::make_shared<Cartridge>(path, SRAM_path);
 
     std::cout << "Initializing controllers..." << std::endl;
-    controller1 = new Controller;
-    controller2 = new Controller;
-
-    RAM = new byte[2048];
-    memset(RAM, 0, 2048);
+    controller1 = std::make_unique<Controller>();
+    controller2 = std::make_unique<Controller>();
 
     std::cout << "Initializing mapper..." << std::endl;
     if (cartridge->mapper == 0) {
-        const int prg_banks = cartridge->prg_size >> 14;
+        int prg_banks = cartridge->prg_size >> 14;
         mapper = new Mapper2(cartridge, prg_banks, 0, prg_banks - 1);
     } else if (cartridge->mapper == 1) {
-        auto *m = new Mapper1(cartridge);
-        m->shift_reg = 0x10;
+        auto *m = new Mapper1(cartridge, 0x10);
         m->prg_offsets[1] = m->prgBankOffset(-1);
         mapper = m;
     } else if (cartridge->mapper == 2) {
@@ -69,10 +65,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     std::cout << "Mapper " << static_cast<int>(cartridge->mapper) << " activated." << std::endl;
 
     std::cout << "Initializing NES CPU..." << std::endl;
-    cpu = new CPU(this);
-    cpu->pc = read16(0xFFFC);
-    cpu->sp = 0xFD;
-    cpu->flags = 0x24;
+    cpu = std::make_unique<CPU>(this, read16(0xFFFC));
 
     std::cout << "Initializing NES APU..." << std::endl;
     apu = std::make_unique<APU>();
@@ -80,9 +73,6 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     std::cout << "Initializing NES PPU..." << std::endl;
     ppu = std::make_unique<PPU>();
 
-    ppu->writePPUCtrl(0);
-    ppu->writePPUMask(0);
-    ppu->oam_addr = 0;
     initialized = true;
 }
 
@@ -91,7 +81,6 @@ void NES::emulate(double seconds) {
 
     while (cycles > 0) {
         int cpuCycles = 0;
-        CPU *cpu = this->cpu;
 
         if (cpu->stall > 0) {
             --cpu->stall;
@@ -119,11 +108,11 @@ void NES::emulate(double seconds) {
 
         const int ppuCycles = cpuCycles * 3;
         for (int i = 0; i < ppuCycles; ++i) {
-            ppu->tickPPU(this->cpu, mapper);
+            ppu->tickPPU(cpu, mapper);
         }
 
         for (int i = 0; i < cpuCycles; ++i) {
-            this->apu->tickAPU(*cpu);
+            this->apu->tickAPU(cpu);
         }
         cycles -= cpuCycles;
     }
@@ -215,7 +204,7 @@ void NES::writeByte(uint16_t address, byte value) {
 }
 
 void NES::execute(byte opcode) {
-    const Instruction &instruction = instructions[opcode];
+    const Instruction& instruction = instructions[opcode];
 
     uint16_t address = 0;
     bool page_crossed = false;
