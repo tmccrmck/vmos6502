@@ -55,6 +55,15 @@ public:
 
     void writeb(uint16_t addr, byte value);
 
+    // PHP - PusH Processor status
+    void php();
+
+    // set interrupt disable flag if 'value' is true
+    void setI(bool value);
+
+    // note use getI
+    void triggerIRQ();
+private:
     // set zero flag if 'value' is zero
     void setZ(byte value);
 
@@ -75,9 +84,6 @@ public:
 
     // get carry flag
     byte getC();
-
-    // set interrupt disable flag if 'value' is true
-    void setI(bool value);
 
     // get interrupt disable flag
     byte getI();
@@ -156,9 +162,6 @@ public:
 
     // ORA - logical OR with Accumulator
     void ora(uint16_t address);
-
-    // PHP - PusH Processor status
-    void php();
 
     // ROL - ROtate Left
     void rol(uint16_t address, byte mode);
@@ -282,10 +285,6 @@ public:
 
     // NOP - No OPeration
     void nop();
-
-    // note use getI
-    void triggerIRQ();
-
 };
 
 #endif //VMOS6502_CPU_H
