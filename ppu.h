@@ -137,15 +137,15 @@ public:
 
     void spritePixel(byte &i, byte &sprite);
 
-    void tickPPU(std::unique_ptr<CPU>& cpu, Mapper *mapper);
+    void tickPPU(std::unique_ptr<CPU>& cpu, std::unique_ptr<Mapper>& mapper);
 
-    byte readPPU(uint16_t address, Mapper *mapper);
+    byte readPPU(uint16_t address, std::unique_ptr<Mapper>& mapper);
 
-    void writePPU(uint16_t address, byte value, Mapper *mapper);
+    void writePPU(uint16_t address, byte value, std::unique_ptr<Mapper>& mapper);
 
-    byte readPPURegister(uint16_t address, Mapper *mapper);
+    byte readPPURegister(uint16_t address, std::unique_ptr<Mapper>& mapper);
 
-    void writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, std::unique_ptr<CPU>& cpu);
+    void writeRegisterPPU(uint16_t address, byte value, std::unique_ptr<Mapper>& mapper, std::unique_ptr<CPU>& cpu);
 };
 
 #endif //VMOS6502_PPU_H

@@ -34,33 +34,7 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     controller2 = std::make_unique<Controller>();
 
     std::cout << "Initializing mapper..." << std::endl;
-    if (cartridge->mapper == 0) {
-        int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper2(cartridge, prg_banks, 0, prg_banks - 1);
-    } else if (cartridge->mapper == 1) {
-        auto *m = new Mapper1(cartridge, 0x10);
-        m->prg_offsets[1] = m->prgBankOffset(-1);
-        mapper = m;
-    } else if (cartridge->mapper == 2) {
-        const int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper2(cartridge, prg_banks, 0, prg_banks - 1);
-    } else if (cartridge->mapper == 3) {
-        const int prg_banks = cartridge->prg_size >> 14;
-        mapper = new Mapper3(cartridge, 0, 0, prg_banks - 1);
-    } else if (cartridge->mapper == 4) {
-        auto *m = new Mapper4(cartridge);
-        m->prg_offsets[0] = m->prgBankOffset(0);
-        m->prg_offsets[1] = m->prgBankOffset(1);
-        m->prg_offsets[2] = m->prgBankOffset(-2);
-        m->prg_offsets[3] = m->prgBankOffset(-1);
-        mapper = m;
-    } else if (cartridge->mapper == 7) {
-        mapper = new Mapper7(cartridge);
-    } else {
-        std::cerr << "ERROR: cartridge uses Mapper " << static_cast<int>(cartridge->mapper)
-                  << ", which isn't currently supported by vmos!" << std::endl;
-        return;
-    }
+    mapper = setMapper(cartridge);
 
     std::cout << "Mapper " << static_cast<int>(cartridge->mapper) << " activated." << std::endl;
 
@@ -74,6 +48,27 @@ NES::NES(const std::string path, const std::string SRAM_path) : initialized(fals
     ppu = std::make_unique<PPU>();
 
     initialized = true;
+}
+
+std::unique_ptr<Mapper> NES::setMapper(const std::shared_ptr<Cartridge> &cartridge) {
+    if (cartridge->mapper == 0) {
+        int prg_banks = cartridge->prg_size >> 14;
+        return std::make_unique<Mapper2>(cartridge, prg_banks, 0, prg_banks - 1);
+    } else if (cartridge->mapper == 1) {
+        return std::make_unique<Mapper1>(cartridge, 0x10);
+    } else if (cartridge->mapper == 2) {
+        int prg_banks = cartridge->prg_size >> 14;
+        return std::make_unique<Mapper2>(cartridge, prg_banks, 0, prg_banks - 1);
+    } else if (cartridge->mapper == 3) {
+        const int prg_banks = cartridge->prg_size >> 14;
+        return std::make_unique<Mapper3>(cartridge, 0, 0, prg_banks - 1);
+    } else if (cartridge->mapper == 4) {
+        return std::make_unique<Mapper4>(cartridge);
+    } else if (cartridge->mapper == 7) {
+        return std::make_unique<Mapper7>(cartridge);
+    } else {
+        throw "Mapper value doesn't exist";
+    }
 }
 
 void NES::emulate(double seconds) {

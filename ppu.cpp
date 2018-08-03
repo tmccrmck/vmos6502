@@ -61,7 +61,7 @@ byte PPU::readPalette(uint16_t address) {
     return this->palette_tbl[address];
 }
 
-byte PPU::readPPU(uint16_t address, Mapper *mapper) {
+byte PPU::readPPU(uint16_t address, std::unique_ptr<Mapper>& mapper) {
     address &= 16383;
     if (address < 0x2000) {
         return mapper->read(address);
@@ -78,7 +78,7 @@ byte PPU::readPPU(uint16_t address, Mapper *mapper) {
     return 0;
 }
 
-void PPU::tickPPU(std::unique_ptr<CPU>& cpu, Mapper *mapper) {
+void PPU::tickPPU(std::unique_ptr<CPU>& cpu, std::unique_ptr<Mapper>& mapper) {
     if (this->nmi_delay > 0) {
         this->nmi_delay--;
         if (this->nmi_delay == 0 && this->nmi_out && this->nmi_occurred) {
@@ -324,7 +324,7 @@ void PPU::tickPPU(std::unique_ptr<CPU>& cpu, Mapper *mapper) {
     }
 }
 
-void PPU::writePPU(uint16_t address, byte value, Mapper *mapper) {
+void PPU::writePPU(uint16_t address, byte value, std::unique_ptr<Mapper>& mapper) {
     address &= 16383;
     if (address < 0x2000) {
         mapper->write(address, value);
@@ -345,7 +345,7 @@ void PPU::writePPU(uint16_t address, byte value, Mapper *mapper) {
     }
 }
 
-byte PPU::readPPURegister(uint16_t address, Mapper *mapper) {
+byte PPU::readPPURegister(uint16_t address, std::unique_ptr<Mapper>& mapper) {
     if (address == 0x2002) {
         byte status = reg & 0x1F;
         status |= this->flag_sprite_overflow << 5;
@@ -376,7 +376,7 @@ byte PPU::readPPURegister(uint16_t address, Mapper *mapper) {
     return 0;
 }
 
-void PPU::writeRegisterPPU(uint16_t address, byte value, Mapper *mapper, std::unique_ptr<CPU>& cpu) {
+void PPU::writeRegisterPPU(uint16_t address, byte value, std::unique_ptr<Mapper>& mapper, std::unique_ptr<CPU>& cpu) {
     this->reg = value;
     switch (address) {
         case 0x2000:

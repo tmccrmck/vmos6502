@@ -37,7 +37,7 @@ public:
     std::unique_ptr<PPU> ppu;
     std::unique_ptr<Controller> controller1;
     std::unique_ptr<Controller> controller2;
-    Mapper *mapper;
+    std::unique_ptr<Mapper> mapper;
     std::array<byte, 2048> RAM = {0};
 
     NES(std::string path, std::string SRAM_path);
@@ -61,6 +61,8 @@ public:
     uint16_t read16_ff_bug(uint16_t address);
 
     void writeByte(uint16_t address, byte value);
+
+    std::unique_ptr<Mapper> setMapper(const std::shared_ptr<Cartridge> &cartridge);
 };
 
 #endif
