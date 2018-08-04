@@ -1075,7 +1075,7 @@ void CPU::sbc(uint16_t address) {
     const byte c = getC();
     this->a = a - b - (1 - c);
     setZN(this->a);
-    setC(static_cast<int>(a) - static_cast<int>(b) - static_cast<int>(1 - c) >= 0);
+    setC(static_cast<int>(a) - static_cast<int>(b) - (1 - c) >= 0);
     setV(((a ^ b) & 0x80) != 0 && ((a ^ this->a) & 0x80) != 0);
 }
 

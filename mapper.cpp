@@ -34,7 +34,7 @@ void Mapper1::updateOffsets() {
     switch (prg_mode) {
         case 0:
         case 1:
-            prg_offsets[0] = prgBankOffset(static_cast<int>(prg_bank & 0xFE));
+            prg_offsets[0] = prgBankOffset(prg_bank & 0xFE);
             prg_offsets[1] = prgBankOffset(static_cast<int>(prg_bank | 0x01));
             break;
         case 2:
@@ -257,13 +257,7 @@ void Mapper4::write(uint16_t address, uint8_t value) {
         } else if (address <= 0xDFFF && (address & 1)) {
             // IRQ reload
             counter = 0;
-        } else if ((address & 1) == 0) {
-            // IRQ disable
-            IRQ_enable = false;
-        } else {
-            // IRQ enable
-            IRQ_enable = true;
-        }
+        } else IRQ_enable = (address & 1) != 0;
     } else if (address >= 0x6000) {
         cartridge->SRAM[static_cast<int>(address) - 0x6000] = value;
     } else {

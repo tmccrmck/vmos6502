@@ -138,7 +138,7 @@ public:
     uint8_t frame_val;
     bool frame_IRQ;
 
-    APU() : pulse1(new Pulse(1)), pulse2(new Pulse(2)), cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
+    APU() : pulse1(std::make_unique<Pulse>(1)), pulse2(std::make_unique<Pulse>(2)), cycle(0), frame_period(0), frame_val(0), frame_IRQ(false) {}
 
     void tickLength();
 

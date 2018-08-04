@@ -68,8 +68,7 @@ int main(int argc, char *argv[]) {
     std::string sram(argv[1]);
     std::string sram_path = sram + ".srm";
 
-    //std::unique_ptr<NES> nes = std::make_unique<NES>(sram, sram_path);
-    NES *nes = new NES(sram, sram_path);
+    std::unique_ptr<NES> nes = std::make_unique<NES>(sram, sram_path);
 
     if (!nes->initialized) return EXIT_FAILURE;
 
@@ -160,8 +159,6 @@ int main(int argc, char *argv[]) {
         nes->controller1->buttons = getKeys(window, turbo) | getJoy(GLFW_JOYSTICK_1, turbo);
         nes->controller2->buttons = getJoy(GLFW_JOYSTICK_2, turbo);
 
-        //if ((nes->ppu->frame & 3) == 0) nes->printState();
-
         // step the NES state forward by 'dt' seconds, or more if in fast-forward
         nes->emulate(getKey(window, GLFW_KEY_GRAVE_ACCENT) ? 4.0 * dt : dt);
 
@@ -220,7 +217,6 @@ int main(int argc, char *argv[]) {
     std::cout << "Terminating PortAudio..." << std::endl;
     Pa_Sleep(500L);
     Pa_Terminate();
-    delete (nes);
 
     return EXIT_SUCCESS;
 }

@@ -1,7 +1,7 @@
 #ifndef VMOS6502_CONTROLLER_H
 #define VMOS6502_CONTROLLER_H
 
-#include <stdint.h>
+#include <cstdint>
 
 typedef uint8_t byte;
 
@@ -12,6 +12,7 @@ public:
     byte strobe;
 
     Controller() : buttons(0), index(0), strobe(0) {}
+    ~Controller() = default;
 
     byte readController();
 
