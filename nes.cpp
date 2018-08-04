@@ -25,29 +25,27 @@ uint16_t NES::pop16() {
     return hi << 8 | lo;
 }
 
-NES::NES(const std::string path, const std::string SRAM_path) : initialized(false) {
-    std::cout << "Initializing cartridge..." << std::endl;
+NES::NES(const std::string path, const std::string SRAM_path) {
+    std::cout << "Creating cartridge..." << std::endl;
     auto cartridge = std::make_shared<Cartridge>(path, SRAM_path);
 
-    std::cout << "Initializing controllers..." << std::endl;
+    std::cout << "Creating controllers..." << std::endl;
     controller1 = std::make_unique<Controller>();
     controller2 = std::make_unique<Controller>();
 
-    std::cout << "Initializing mapper..." << std::endl;
+    std::cout << "Creating mapper..." << std::endl;
     mapper = setMapper(cartridge);
 
     std::cout << "Mapper " << static_cast<int>(cartridge->mapper) << " activated." << std::endl;
 
-    std::cout << "Initializing NES CPU..." << std::endl;
+    std::cout << "Creating NES CPU..." << std::endl;
     cpu = std::make_unique<CPU>(this, read16(0xFFFC));
 
-    std::cout << "Initializing NES APU..." << std::endl;
+    std::cout << "Creating NES APU..." << std::endl;
     apu = std::make_unique<APU>();
 
-    std::cout << "Initializing NES PPU..." << std::endl;
+    std::cout << "Creating NES PPU..." << std::endl;
     ppu = std::make_unique<PPU>();
-
-    initialized = true;
 }
 
 std::unique_ptr<Mapper> NES::setMapper(const std::shared_ptr<Cartridge> &cartridge) {
