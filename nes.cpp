@@ -259,15 +259,3 @@ void NES::execute(byte opcode) {
 
     cpu->executeOpcode(opcode, address, instruction);
 }
-
-/*
-void NES::printState() {
-    std::cout << "CPU status: "
-              << "PC=" << cpu->pc <<  std::endl;
-    std::cout << "APU status: "
-              << "DM=" << apu->dmc.enabled << " P1=" << apu->pulse1.enabled << " P2=" << apu->pulse2.enabled << " TR=" << apu->triangle.enabled<< " NO=" << apu->noise.enabled << std::endl;
-    std::cout << "PPU status: "
-              << "BG=" << unsigned(ppu->flag_show_background) << " BL=" << unsigned(ppu->flag_show_left_background) << " sp=" << unsigned(ppu->flag_show_sprites) << " SL="<< unsigned(ppu->flag_show_left_sprites) << std::endl;
-}
-*/
-

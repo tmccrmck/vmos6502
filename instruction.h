@@ -2,12 +2,13 @@
 #define VMOS6502_INSTR_H
 
 #include <cstdint>
+#include <string>
 
 typedef uint8_t byte;
 
 struct Instruction {
     const byte opcode;
-    const char *name;
+    std::string_view name;
     const byte mode;
     const byte size;
     const byte cycles;
