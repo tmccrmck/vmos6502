@@ -1,4 +1,3 @@
-#include <memory>
 #include <iostream>
 #include <portaudio.h>
 #include "pa_linux_alsa.h"

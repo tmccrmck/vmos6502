@@ -24,6 +24,8 @@ public:
 
     virtual void write(uint16_t address, uint8_t value) = 0;
 
+    virtual ~Mapper() = default;
+
     std::shared_ptr<Cartridge> cartridge;
 };
 

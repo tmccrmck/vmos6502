@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cstring>
-#include <memory>
 
 #include "cartridge.h"
 #include "controller.h"

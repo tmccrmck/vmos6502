@@ -168,7 +168,7 @@ uint16_t NES::read16(uint16_t address) {
 }
 
 void NES::writeByte(uint16_t address, byte value) {
-    std::cout << "Writing byte " << unsigned(value) << " to address " << std::hex << address << std::endl;
+    //std::cout << "Writing byte " << unsigned(value) << " to address " << std::hex << address << std::endl;
     if (address < 0x2000) {
         this->RAM[address & 2047] = value;
     } else if (address < 0x4000) {
